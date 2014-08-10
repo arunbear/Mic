@@ -8,12 +8,13 @@ use Package::Stash;
 
 our $VERSION = 0.000_001;
 
+my $Class_count = 0;
+
 sub minionize {
-    shift;
-    my ($spec) = @_;
+    my (undef, $spec) = @_;
 
     my $class = $spec->{name}
-      or confess 'Need a {name}';
+      || "Minion::Class_${\ ++$Class_count }";
     
     my $stash = Package::Stash->new($class);
 
@@ -33,6 +34,7 @@ sub minionize {
     foreach my $sub ( keys %{ $spec->{methods} } ) {
         $stash->add_symbol("&$sub", $spec->{methods}{$sub});
     }
+    return $class;
 }
 
 1;
