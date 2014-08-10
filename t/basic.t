@@ -7,6 +7,7 @@ use Minion;
 *diag = \&Test::More::diag;
 
 my %Class = (
+    interface => [qw(new next)],
     has  => {
         count => { default => 0 },
     }, 
@@ -29,6 +30,7 @@ ok $counter->next == 2;
 
 my %Named_class = (
     name => 'Counter',
+    interface => [qw(new next)],
     has  => {
         count => { default => 0 },
     }, 

@@ -13,21 +13,10 @@ my $Class_count = 0;
 sub minionize {
     my (undef, $spec) = @_;
 
-    my $class = $spec->{name}
-      || "Minion::Class_${\ ++$Class_count }";
+    $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
     
-    my $stash = Package::Stash->new($class);
-    $stash->add_symbol("&__new__", sub {
-        shift;
-        my %obj;
-
-        foreach my $attr ( keys %{ $spec->{has} } ) {
-            $obj{"__$attr"} = $spec->{has}{default};
-        }
-        bless \ %obj => $class;            
-        lock_keys(%obj);
-        return \ %obj;
-    });
+    my $stash = Package::Stash->new($spec->{name});
+    _add_object_maker($stash, $spec);
 
     if ( ! exists $spec->{methods}{new} ) {
         $spec->{methods}{new} = sub {
@@ -37,10 +26,53 @@ sub minionize {
         };
     }
 
+    _add_methods($stash, $spec);
+    return $spec->{name};
+}
+
+sub _add_object_maker {
+    my ($stash, $spec) = @_;
+
+    $stash->add_symbol("&__new__", sub {
+        shift;
+        my %obj;
+
+        foreach my $attr ( keys %{ $spec->{has} } ) {
+            $obj{"__$attr"} = $spec->{has}{default};
+        }
+        bless \ %obj => $spec->{name};            
+        lock_keys(%obj);
+        return \ %obj;
+    });
+}
+
+sub _add_methods {
+    my ($stash, $spec) = @_;
+
+    my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
+    my $private_stash = Package::Stash->new($stash->name.'::Private');
+
     foreach my $sub ( keys %{ $spec->{methods} } ) {
-        $stash->add_symbol("&$sub", $spec->{methods}{$sub});
+        my $use_stash = $in_interface{$sub} ? $stash : $private_stash;
+        $use_stash->add_symbol("&$sub", $spec->{methods}{$sub});
     }
-    return $class;
+}
+
+sub _privitise {
+    my ($stash, $spec) = @_;
+
+    my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
+    my $private_stash = Package::Stash->new($stash->name.'::Private');
+
+    foreach my $meth ( keys %{ $spec->{methods} } ) {
+
+        next if $meth eq 'new';
+        if ( ! $in_interface{$meth} ) {
+            my $sym = "&$meth";
+            $private_stash->add_symbol($sym => $stash->get_symbol($sym));
+            $stash->remove_symbol($sym);
+        }
+    }
 }
 
 1;

@@ -3,6 +3,7 @@ use Test::Simpler tests => 3;
 use Minion;
 
 my %Class = (
+    interface => [qw(new next)],
     has  => {
         count => { default => 0 },
     }, 
