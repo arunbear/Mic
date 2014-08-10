@@ -16,7 +16,8 @@ sub minionize {
     $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
     
     my $stash = Package::Stash->new($spec->{name});
-    _add_object_maker($stash, $spec);
+    my $private_stash = Package::Stash->new("$spec->{name}::Private");
+    _add_object_maker($spec, $stash, $private_stash);
 
     if ( ! exists $spec->{methods}{new} ) {
         $spec->{methods}{new} = sub {
@@ -26,16 +27,16 @@ sub minionize {
         };
     }
 
-    _add_methods($stash, $spec);
+    _add_methods($spec, $stash, $private_stash);
     return $spec->{name};
 }
 
 sub _add_object_maker {
-    my ($stash, $spec) = @_;
+    my ($spec, $stash, $private_stash) = @_;
 
     $stash->add_symbol("&__new__", sub {
         shift;
-        my %obj;
+        my %obj = (PSUB => $private_stash->name);
 
         foreach my $attr ( keys %{ $spec->{has} } ) {
             $obj{"__$attr"} = $spec->{has}{default};
@@ -47,10 +48,9 @@ sub _add_object_maker {
 }
 
 sub _add_methods {
-    my ($stash, $spec) = @_;
+    my ($spec, $stash, $private_stash) = @_;
 
     my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
-    my $private_stash = Package::Stash->new($stash->name.'::Private');
 
     foreach my $sub ( keys %{ $spec->{methods} } ) {
         my $use_stash = $in_interface{$sub} ? $stash : $private_stash;
