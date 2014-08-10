@@ -23,7 +23,7 @@ sub minionize {
             my %obj;
 
             foreach my $attr ( keys %{ $spec->{has} } ) {
-                $obj{$attr} = $spec->{has}{default};
+                $obj{"__$attr"} = $spec->{has}{default};
             }
             bless \ %obj => $class;            
             lock_keys(%obj);
