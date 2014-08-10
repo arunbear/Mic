@@ -17,17 +17,23 @@ sub minionize {
       || "Minion::Class_${\ ++$Class_count }";
     
     my $stash = Package::Stash->new($class);
+    $stash->add_symbol("&__new__", sub {
+        shift;
+        my %obj;
+
+        foreach my $attr ( keys %{ $spec->{has} } ) {
+            $obj{"__$attr"} = $spec->{has}{default};
+        }
+        bless \ %obj => $class;            
+        lock_keys(%obj);
+        return \ %obj;
+    });
 
     if ( ! exists $spec->{methods}{new} ) {
         $spec->{methods}{new} = sub {
-            my %obj;
-
-            foreach my $attr ( keys %{ $spec->{has} } ) {
-                $obj{"__$attr"} = $spec->{has}{default};
-            }
-            bless \ %obj => $class;            
-            lock_keys(%obj);
-            return \ %obj;
+            my ($class) = @_;
+            my $obj = $class->__new__;
+            return $obj;
         };
     }
 
