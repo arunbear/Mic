@@ -1,13 +1,13 @@
 use strict;
-use Test::Simpler tests => 3;
+use Test::More;
 use Minion;
 
 my %Class = (
-    interface => [qw(new next)],
+    interface => [qw(next)],
     has  => {
         count => { default => 0 },
     }, 
-    methods => {
+    class_methods => {
         new => sub {
             my ($class, $start) = @_;
 
@@ -15,6 +15,8 @@ my %Class = (
             $obj->{__count} = $start;
             return $obj;
         },
+    },
+    methods => {
         next => sub {
             my ($self) = @_;
 
@@ -25,6 +27,7 @@ my %Class = (
 
 my $counter = Minion->minionize(\%Class)->new(1);
 
-ok $counter->next == 1;
-ok $counter->next == 2;
-ok $counter->next == 3;
+is($counter->next, 1);
+is($counter->next, 2);
+is($counter->next, 3);
+done_testing();

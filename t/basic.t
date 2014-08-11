@@ -45,7 +45,7 @@ my %Named_class = (
 Minion->minionize(\%Named_class);
 my $counter2 = Counter->new;
 
-ok $counter2->isa('Counter');
+ok $counter2->isa('Counter::__Minion');
 ok $counter2->next == 0;
 ok $counter2->next == 1;
 ok $counter2->next == 2;

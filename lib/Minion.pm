@@ -15,36 +15,45 @@ sub minionize {
 
     $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
     
-    my $stash = Package::Stash->new($spec->{name});
-    my $private_stash = Package::Stash->new("$spec->{name}::Private");
-    _add_object_maker($spec, $stash, $private_stash);
+    my $stash         = Package::Stash->new($spec->{name});
+    my $obj_stash     = Package::Stash->new("$spec->{name}::__Minion");
+    my $private_stash = Package::Stash->new("$spec->{name}::__Private");
 
-    if ( ! exists $spec->{methods}{new} ) {
-        $spec->{methods}{new} = sub {
+    _add_object_maker($spec, $stash, $private_stash, $obj_stash);
+    _add_class_methods($spec, $stash);
+    _add_methods($spec, $obj_stash, $private_stash);
+    return $spec->{name};
+}
+
+sub _add_object_maker {
+    my ($spec, $stash, $private_stash, $obj_stash) = @_;
+
+    $stash->add_symbol("&__new__", sub {
+        shift;
+        my %obj = ('!' => $private_stash->name);
+
+        foreach my $attr ( keys %{ $spec->{has} } ) {
+            $obj{"__$attr"} = $spec->{has}{default};
+        }
+        bless \ %obj => $obj_stash->name;            
+        lock_keys(%obj);
+        return \ %obj;
+    });
+}
+
+sub _add_class_methods {
+    my ($spec, $stash) = @_;
+
+    if ( ! exists $spec->{class_methods}{new} ) {
+        $spec->{class_methods}{new} = sub {
             my ($class) = @_;
             my $obj = $class->__new__;
             return $obj;
         };
     }
-
-    _add_methods($spec, $stash, $private_stash);
-    return $spec->{name};
-}
-
-sub _add_object_maker {
-    my ($spec, $stash, $private_stash) = @_;
-
-    $stash->add_symbol("&__new__", sub {
-        shift;
-        my %obj = (PSUB => $private_stash->name);
-
-        foreach my $attr ( keys %{ $spec->{has} } ) {
-            $obj{"__$attr"} = $spec->{has}{default};
-        }
-        bless \ %obj => $spec->{name};            
-        lock_keys(%obj);
-        return \ %obj;
-    });
+    foreach my $sub ( keys %{ $spec->{class_methods} } ) {
+        $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
+    }
 }
 
 sub _add_methods {
