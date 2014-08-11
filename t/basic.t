@@ -1,10 +1,6 @@
 use strict;
-use Test::Simpler tests => 7;
-use Test::More ();
+use Test::Most tests => 7;
 use Minion;
-
-*explain = \&Test::More::explain;
-*diag = \&Test::More::diag;
 
 my %Class = (
     interface => [qw(new next)],
@@ -22,9 +18,9 @@ my %Class = (
 
 my $counter = Minion->minionize(\%Class)->new;
 
-ok $counter->next == 0;
-ok $counter->next == 1;
-ok $counter->next == 2;
+is($counter->next, 0);
+is($counter->next, 1);
+is($counter->next, 2);
 
 # Now create a named class
 
@@ -45,7 +41,7 @@ my %Named_class = (
 Minion->minionize(\%Named_class);
 my $counter2 = Counter->new;
 
-ok $counter2->isa('Counter::__Minion');
-ok $counter2->next == 0;
-ok $counter2->next == 1;
-ok $counter2->next == 2;
+isa_ok($counter2, 'Counter::__Minion');
+is($counter2->next, 0);
+is($counter2->next, 1);
+is($counter2->next, 2);
