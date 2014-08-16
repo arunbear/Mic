@@ -10,8 +10,6 @@ our %__Meta = (
     }, 
 );
 
-our %foo = (a => 3);
-
 sub next {
     my ($self) = @_;
 
