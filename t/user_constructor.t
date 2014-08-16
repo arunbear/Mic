@@ -4,9 +4,6 @@ use Minion;
 
 my %Class = (
     interface => [qw(next)],
-    has  => {
-        count => { default => 0 },
-    }, 
     class_methods => {
         new => sub {
             my ($class, $start) = @_;
@@ -16,12 +13,17 @@ my %Class = (
             return $obj;
         },
     },
-    methods => {
-        next => sub {
-            my ($self) = @_;
+    implementation => {
+        has  => {
+            count => { default => 0 },
+        }, 
+        methods => {
+            next => sub {
+                my ($self) = @_;
 
-            $self->{__count}++;
-        }
+                $self->{__count}++;
+            }
+        },
     },
 );
 

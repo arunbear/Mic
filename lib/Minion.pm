@@ -32,8 +32,8 @@ sub _add_object_maker {
         shift;
         my %obj = ('!' => $private_stash->name);
 
-        foreach my $attr ( keys %{ $spec->{has} } ) {
-            $obj{"__$attr"} = $spec->{has}{default};
+        while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
+            $obj{"__$attr"} = $meta->{default};
         }
         bless \ %obj => $obj_stash->name;            
         lock_keys(%obj);
@@ -61,9 +61,9 @@ sub _add_methods {
 
     my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
 
-    foreach my $sub ( keys %{ $spec->{methods} } ) {
-        my $use_stash = $in_interface{$sub} ? $stash : $private_stash;
-        $use_stash->add_symbol("&$sub", $spec->{methods}{$sub});
+    while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
+        my $use_stash = $in_interface{$name} ? $stash : $private_stash;
+        $use_stash->add_symbol("&$name", $sub);
     }
 }
 

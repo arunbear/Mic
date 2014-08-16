@@ -3,16 +3,18 @@ use Test::Most tests => 9;
 use Minion;
 
 my %Class = (
-    interface => [qw(new next)],
-    has  => {
-        count => { default => 0 },
-    }, 
-    methods => {
-        next => sub {
-            my ($self) = @_;
+    interface => [qw(next)],
+    implementation => {
+        has  => {
+            count => { default => 0 },
+        }, 
+        methods => {
+            next => sub {
+                my ($self) = @_;
 
-            $self->{__count}++;
-        }
+                $self->{__count}++;
+            }
+        },
     },
 );
 
@@ -28,17 +30,19 @@ throws_ok { $counter->new } qr/Can't locate object method "new"/;
 
 my %Named_class = (
     name => 'Counter',
-    interface => [qw(new next)],
-    has  => {
-        count => { default => 0 },
-    }, 
-    methods => {
-        next => sub {
-            my ($self) = @_;
+    interface => [qw(next)],
+    implementation => {
+        has  => {
+            count => { default => 0 },
+        }, 
+        methods => {
+            next => sub {
+                my ($self) = @_;
 
-            $self->{__count}++;
-        }
-    },
+                $self->{__count}++;
+            }
+        },
+    }, 
 );
 Minion->minionize(\%Named_class);
 my $counter2 = Counter->new;
