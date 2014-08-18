@@ -3,6 +3,7 @@ package Minion;
 use strict;
 use 5.008_005;
 use Carp;
+use Carp::Assert;
 use Hash::Util qw( lock_keys );
 use Module::Runtime qw( require_module );
 use Package::Stash;
@@ -14,15 +15,15 @@ my $Class_count = 0;
 sub minionize {
     my (undef, $spec) = @_;
 
-    my $stash;
+    my $cls_stash;
     if ( ! $spec ) {
         my $caller_pkg = (caller)[0];
-        $stash = Package::Stash->new($caller_pkg);
-        $spec  = $stash->get_symbol('%__Meta');
+        $cls_stash = Package::Stash->new($caller_pkg);
+        $spec  = $cls_stash->get_symbol('%__Meta');
         $spec->{name} = $caller_pkg;
     }
     $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
-    $stash        ||= Package::Stash->new($spec->{name});
+    $cls_stash    ||= Package::Stash->new($spec->{name});
     
     my $obj_stash;
 
@@ -36,8 +37,11 @@ sub minionize {
         }
         $spec->{implementation} = { 
             package => $pkg, 
-            has     => $obj_stash->get_symbol('%__Meta')->{has},
             methods => $obj_stash->get_all_symbols('CODE'),
+            has     => {
+                %{ $obj_stash->get_symbol('%__Meta')->{has} || { } },
+                %{ $cls_stash->get_symbol('%__Meta')->{has} || { } },
+            },
         };
     }
     else {
@@ -45,8 +49,8 @@ sub minionize {
     }
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
 
-    _add_object_maker($spec, $stash, $private_stash, $obj_stash);
-    _add_class_methods($spec, $stash);
+    _add_object_maker($spec, $cls_stash, $private_stash, $obj_stash);
+    _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     return $spec->{name};
 }
@@ -72,8 +76,24 @@ sub _add_class_methods {
 
     if ( ! exists $spec->{class_methods}{new} ) {
         $spec->{class_methods}{new} = sub {
-            my ($class) = @_;
+            my $class = shift;
+            my ($arg);
+
+            if ( scalar @_ == 1 ) {
+                $arg = shift;
+            }
+            elsif ( scalar @_ > 1 ) {
+                $arg = { @_ };
+            }
             my $obj = $class->__new__;
+            while ( my ($name, $meta) = each %{ $spec->{has} } ) {
+                assert($arg->{$name}, "$name is provided.");
+
+                while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
+                    assert($code->($arg->{$name}),  "$name is $desc");
+                    $obj->{"__$name"} = $arg->{$name};
+                }
+            }
             return $obj;
         };
     }
@@ -90,6 +110,15 @@ sub _add_methods {
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         my $use_stash = $in_interface{$name} ? $stash : $private_stash;
         $use_stash->add_symbol("&$name", $sub);
+    }
+
+    while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
+        next unless $in_interface{$name};
+
+        if ( $meta->{reader} ) {
+            my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
+            $stash->add_symbol("&$name", sub { $_[0]->{"__$name"} });
+        }
     }
 }
 
