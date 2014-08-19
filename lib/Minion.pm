@@ -3,7 +3,6 @@ package Minion;
 use strict;
 use 5.008_005;
 use Carp;
-use Carp::Assert;
 use Hash::Util qw( lock_keys );
 use Module::Runtime qw( require_module );
 use Package::Stash;
@@ -137,6 +136,11 @@ sub _privitise {
             $stash->remove_symbol($sym);
         }
     }
+}
+
+sub assert {
+    my ($val, $desc) = @_;
+    $val or confess $desc;
 }
 
 1;
