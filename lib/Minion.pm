@@ -124,23 +124,6 @@ sub _add_methods {
     }
 }
 
-sub _privitise {
-    my ($stash, $spec) = @_;
-
-    my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
-    my $private_stash = Package::Stash->new($stash->name.'::Private');
-
-    foreach my $meth ( keys %{ $spec->{methods} } ) {
-
-        next if $meth eq 'new';
-        if ( ! $in_interface{$meth} ) {
-            my $sym = "&$meth";
-            $private_stash->add_symbol($sym => $stash->get_symbol($sym));
-            $stash->remove_symbol($sym);
-        }
-    }
-}
-
 sub assert {
     my ($val, $desc) = @_;
     $val or confess "Assertion failure: $desc";
