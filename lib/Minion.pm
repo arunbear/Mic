@@ -62,7 +62,9 @@ sub _add_object_maker {
         my %obj = ('!' => $private_stash->name);
 
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            $obj{"__$attr"} = $meta->{default};
+            $obj{"__$attr"} = ref $meta->{default} eq 'CODE'
+              ? $meta->{default}->()
+              : $meta->{default};
         }
         bless \ %obj => $obj_stash->name;            
         lock_keys(%obj);
@@ -85,8 +87,9 @@ sub _add_class_methods {
                 $arg = { @_ };
             }
             my $obj = $class->__new__;
-            while ( my ($name, $meta) = each %{ $spec->{has} } ) {
-                assert($arg->{$name}, "$name is provided.");
+            for my $name ( keys %{ $spec->{has} } ) {
+                assert(defined $arg->{$name}, "$name is provided.");
+                my $meta = $spec->{has}{$name};
 
                 while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
                     assert($code->($arg->{$name}),  "$name is $desc");
@@ -140,7 +143,7 @@ sub _privitise {
 
 sub assert {
     my ($val, $desc) = @_;
-    $val or confess $desc;
+    $val or confess "Assertion failure: $desc";
 }
 
 1;
