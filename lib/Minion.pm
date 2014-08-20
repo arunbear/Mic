@@ -76,18 +76,6 @@ sub _compose_roles {
         
         _add_role_items($spec, \ %from_role, $role, $meta->{has}, 'has');
         _add_role_items($spec, \ %from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
-        #my $role_has = $meta->{has};
-        #for my $name ( keys %$role_has ) {
-        #    if (my $other_role = $from_role{$name}) {
-        #        confess "Cannot have $name in $role and $other_role";
-        #    }
-        #    else{
-        #        $from_role{$name} = $role;
-        #        if ( ! $spec->{implementation}{has}{$name} ) {
-        #            $spec->{implementation}{has}{$name} = $role_has->{$name};
-        #        }
-        #    }            
-        #}
     }
 }
 
