@@ -39,19 +39,72 @@ sub minionize {
             methods => $obj_stash->get_all_symbols('CODE'),
             has     => {
                 %{ $obj_stash->get_symbol('%__Meta')->{has} || { } },
-                %{ $cls_stash->get_symbol('%__Meta')->{has} || { } },
             },
         };
     }
     else {
         $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
     }
-    my $private_stash = Package::Stash->new("$spec->{name}::__Private");
+    
+    my $class_meta = $cls_stash->get_symbol('%__Meta') || {};
+    $spec->{implementation}{has} = {
+        %{ $spec->{implementation}{has} || { } },
+        %{ $class_meta->{has} || { } },
+    };
+    _compose_roles($spec);
 
+    my $private_stash = Package::Stash->new("$spec->{name}::__Private");
     _add_object_maker($spec, $cls_stash, $private_stash, $obj_stash);
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     return $spec->{name};
+}
+
+sub _compose_roles {
+    my ($spec, $roles) = @_;
+    
+    $roles ||= $spec->{roles};
+    my %from_role;
+    
+    for my $role ( @{ $roles } ) {
+        
+        require_module($role);
+        my $stash = Package::Stash->new($role);
+        my $meta = $stash->get_symbol('%__Meta');
+        assert($meta->{role}, "$role is a role");
+        _compose_roles($spec, $meta->{roles} || []);
+        
+        _add_role_items($spec, \ %from_role, $role, $meta->{has}, 'has');
+        _add_role_items($spec, \ %from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
+        #my $role_has = $meta->{has};
+        #for my $name ( keys %$role_has ) {
+        #    if (my $other_role = $from_role{$name}) {
+        #        confess "Cannot have $name in $role and $other_role";
+        #    }
+        #    else{
+        #        $from_role{$name} = $role;
+        #        if ( ! $spec->{implementation}{has}{$name} ) {
+        #            $spec->{implementation}{has}{$name} = $role_has->{$name};
+        #        }
+        #    }            
+        #}
+    }
+}
+
+sub _add_role_items {
+    my ($spec, $from_role, $role, $item, $type) = @_;
+
+    for my $name ( keys %$item ) {
+        if (my $other_role = $from_role->{$name}) {
+            confess "Cannot have $name in $role and $other_role";
+        }
+        else{
+            $from_role->{$name} = $role;
+            if ( ! $spec->{implementation}{$type}{$name} ) {
+                $spec->{implementation}{$type}{$name} = $item->{$name};
+            }
+        }            
+    }
 }
 
 sub _add_object_maker {
