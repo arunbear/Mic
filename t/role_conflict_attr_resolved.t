@@ -4,7 +4,6 @@ use Test::Most;
 use Minion;
 
 {
-    package Camper;
     package Lawyer;
 
     our %__Meta = (
