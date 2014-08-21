@@ -53,6 +53,7 @@ sub minionize {
     _add_object_maker($spec, $cls_stash, $private_stash, $obj_stash);
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
+    _check_role_requirements($spec);
     return $spec->{name};
 }
 
@@ -67,10 +68,30 @@ sub _compose_roles {
         my $stash = _get_stash($role);
         my $meta = $stash->get_symbol('%__Meta');
         assert($meta->{role}, "$role is a role");
+        $spec->{required}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || []);
         
         _add_role_items($spec, \ %from_role, $role, $meta->{has}, 'has');
         _add_role_items($spec, \ %from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
+    }
+}
+
+sub _check_role_requirements {
+    my ($spec) = @_;
+
+    #use Data::Dump 'pp'; die pp($spec);
+    foreach my $role ( keys %{ $spec->{required} } ) {
+
+        my $required = $spec->{required}{$role};
+
+        foreach my $name ( @{ $required->{methods} } ) {
+            defined $spec->{implementation}{methods}{$name}
+              or confess "Method '$name', required by role $role, is not implemented.";
+        }
+        foreach my $name ( @{ $required->{attributes} } ) {
+            defined $spec->{implementation}{has}{$name}
+              or confess "Attribute '$name', required by role $role is not defined.";
+        }
     }
 }
 
