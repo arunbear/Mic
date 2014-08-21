@@ -28,12 +28,8 @@ sub minionize {
 
     if ( $spec->{implementation} && ! ref $spec->{implementation} ) {
         my $pkg = $spec->{implementation};
-        $obj_stash = Package::Stash->new($pkg); # allow for inlined pkg
+        $obj_stash = _get_stash($pkg);
 
-        if ( ! $obj_stash->has_symbol('%__Meta') ) {
-            require_module($pkg);
-            $obj_stash = Package::Stash->new($pkg);
-        }
         $spec->{implementation} = { 
             package => $pkg, 
             methods => $obj_stash->get_all_symbols('CODE'),
@@ -68,8 +64,7 @@ sub _compose_roles {
     
     for my $role ( @{ $roles } ) {
         
-        require_module($role);
-        my $stash = Package::Stash->new($role);
+        my $stash = _get_stash($role);
         my $meta = $stash->get_symbol('%__Meta');
         assert($meta->{role}, "$role is a role");
         _compose_roles($spec, $meta->{roles} || []);
@@ -77,6 +72,18 @@ sub _compose_roles {
         _add_role_items($spec, \ %from_role, $role, $meta->{has}, 'has');
         _add_role_items($spec, \ %from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
     }
+}
+
+sub _get_stash {
+    my $pkg = shift;
+
+    my $stash = Package::Stash->new($pkg); # allow for inlined pkg
+
+    if ( ! $stash->has_symbol('%__Meta') ) {
+        require_module($pkg);
+        $stash = Package::Stash->new($pkg);
+    }
+    return $stash;
 }
 
 sub _add_role_items {
