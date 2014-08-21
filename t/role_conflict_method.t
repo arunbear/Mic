@@ -39,6 +39,6 @@ package main;
 
 throws_ok {
     Minion->minionize(\ %BusyDude::__Meta);
-} qr/Cannot have 'pitch' in BaseballPro and Camper/;
+} qr/Cannot have 'pitch' in both BaseballPro and Camper/;
 
 done_testing();

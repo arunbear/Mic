@@ -91,7 +91,7 @@ sub _add_role_items {
 
     for my $name ( keys %$item ) {
         if (my $other_role = $from_role->{$name}) {
-            confess "Cannot have $name in $role and $other_role";
+            confess "Cannot have '$name' in both $role and $other_role";
         }
         else{
             if ( ! $spec->{implementation}{$type}{$name} ) {
