@@ -87,9 +87,9 @@ sub _add_role_items {
             confess "Cannot have $name in $role and $other_role";
         }
         else{
-            $from_role->{$name} = $role;
             if ( ! $spec->{implementation}{$type}{$name} ) {
                 $spec->{implementation}{$type}{$name} = $item->{$name};
+                $from_role->{$name} = $role;
             }
         }            
     }
