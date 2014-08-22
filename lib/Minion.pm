@@ -57,6 +57,7 @@ sub minionize {
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     _check_role_requirements($spec);
+    _check_interface($spec);
     return $spec->{name};
 }
 
@@ -82,7 +83,6 @@ sub _compose_roles {
 sub _check_role_requirements {
     my ($spec) = @_;
 
-    #use Data::Dump 'pp'; die pp($spec);
     foreach my $role ( keys %{ $spec->{required} } ) {
 
         my $required = $spec->{required}{$role};
@@ -96,6 +96,17 @@ sub _check_role_requirements {
               or confess "Attribute '$name', required by role $role, is not defined.";
         }
     }
+}
+
+sub _check_interface {
+    my ($spec) = @_;
+    my $count = 0;
+    foreach my $method ( @{ $spec->{interface} } ) {
+        defined $spec->{implementation}{methods}{$method}
+          or confess "Interface method '$method' is not implemented.";
+        ++$count;
+    }
+    $count > 0 or confess "Cannot have an empty interface.";
 }
 
 sub _get_stash {
@@ -181,18 +192,18 @@ sub _add_methods {
 
     my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
 
-    while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
-        my $use_stash = $in_interface{$name} ? $stash : $private_stash;
-        $use_stash->add_symbol("&$name", $sub);
-    }
-
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
         next unless $in_interface{$name};
 
         if ( $meta->{reader} ) {
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
-            $stash->add_symbol("&$name", sub { $_[0]->{"__$name"} });
+            $spec->{implementation}{methods}{$name} = sub { $_[0]->{"__$name"} };
         }
+    }
+
+    while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
+        my $use_stash = $in_interface{$name} ? $stash : $private_stash;
+        $use_stash->add_symbol("&$name", $sub);
     }
 }
 
