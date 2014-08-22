@@ -37,6 +37,9 @@ sub minionize {
                 %{ $obj_stash->get_symbol('%__Meta')->{has} || { } },
             },
         };
+        for (keys %{ $spec->{implementation}{methods} }) {
+            $obj_stash->remove_symbol("&$_"); # repopulated later per interface
+        }        
     }
     else {
         $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
