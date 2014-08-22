@@ -93,7 +93,7 @@ sub _check_role_requirements {
         }
         foreach my $name ( @{ $required->{attributes} } ) {
             defined $spec->{implementation}{has}{$name}
-              or confess "Attribute '$name', required by role $role is not defined.";
+              or confess "Attribute '$name', required by role $role, is not defined.";
         }
     }
 }
@@ -165,8 +165,8 @@ sub _add_class_methods {
 
                 while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
                     assert($code->($arg->{$name}),  "$name is $desc");
-                    $obj->{"__$name"} = $arg->{$name};
                 }
+                $obj->{"__$name"} = $arg->{$name};
             }
             return $obj;
         };
