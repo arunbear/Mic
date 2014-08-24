@@ -14,7 +14,7 @@ use Minion;
     sub sort {
         my ($self, $items) = @_;
         
-        my $cmp = sub { $self->{'!'}->cmp(@_) };
+        my $cmp = $self->{'!'}->can('cmp');
         return [ sort $cmp @$items ];
     }
 }
@@ -27,7 +27,7 @@ use Minion;
 
     # private sub
     sub cmp {
-        my (undef, $x, $y) = @_;
+        my ($x, $y) = @_;
         $y <=> $x;    
     }
 }
@@ -46,6 +46,7 @@ use Minion;
 package main;
 
 my $sorter = Sorter->new;
+
 is_deeply($sorter->sort([1 .. 4]), [4,3,2,1], 'required method present.');
 ok(! $sorter->can('cmp'), "Can't call private sub");
 
