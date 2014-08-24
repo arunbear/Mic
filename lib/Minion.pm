@@ -28,6 +28,8 @@ sub minionize {
 
     if ( $spec->{implementation} && ! ref $spec->{implementation} ) {
         my $pkg = $spec->{implementation};
+        $pkg ne $spec->{name}
+          or confess "$spec->{name} cannot be its own implementation.";
         $obj_stash = _get_stash($pkg);
 
         $spec->{implementation} = { 
