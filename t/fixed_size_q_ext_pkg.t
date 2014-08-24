@@ -13,7 +13,7 @@ is($q->size, 1);
 $q->push(2);
 is($q->size, 2);
 
-throws_ok { FixedSizeQueue->new() } qr/Assertion failure: max_size is provided/;
-throws_ok { FixedSizeQueue->new(max_size => 0) } qr/Assertion failure: max_size is positive_int/;
+throws_ok { FixedSizeQueue->new() } qr/Assertion failed: Param 'max_size' was not provided./;
+throws_ok { FixedSizeQueue->new(max_size => 0) } qr/Assertion failed: Attribute 'max_size' is not positive_int/;
 
 done_testing();
