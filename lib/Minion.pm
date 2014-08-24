@@ -71,7 +71,7 @@ sub _compose_roles {
         
         my $stash = _get_stash($role);
         my $meta = $stash->get_symbol('%__Meta');
-        assert($meta->{role}, "$role is a role");
+        assert($meta->{role}, "$role is not a role");
         $spec->{required}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || [], $from_role);
         
@@ -171,11 +171,11 @@ sub _add_class_methods {
             }
             my $obj = $class->__new__;
             for my $name ( keys %{ $spec->{has} } ) {
-                assert(defined $arg->{$name}, "$name is provided.");
+                assert(defined $arg->{$name}, "Param '$name' was not provided.");
                 my $meta = $spec->{has}{$name};
 
                 while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
-                    assert($code->($arg->{$name}),  "$name is $desc");
+                    assert($code->($arg->{$name}),  "Attribute '$name' is not $desc");
                 }
                 $obj->{"__$name"} = $arg->{$name};
             }
@@ -209,7 +209,7 @@ sub _add_methods {
 
 sub assert {
     my ($val, $desc) = @_;
-    $val or confess "Assertion failure: $desc";
+    $val or confess "Assertion failed: $desc";
 }
 
 1;
