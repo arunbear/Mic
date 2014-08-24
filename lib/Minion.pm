@@ -62,10 +62,10 @@ sub minionize {
 }
 
 sub _compose_roles {
-    my ($spec, $roles) = @_;
+    my ($spec, $roles, $from_role) = @_;
     
     $roles ||= $spec->{roles};
-    my %from_role;
+    $from_role ||= {};
     
     for my $role ( @{ $roles } ) {
         
@@ -73,10 +73,10 @@ sub _compose_roles {
         my $meta = $stash->get_symbol('%__Meta');
         assert($meta->{role}, "$role is a role");
         $spec->{required}{$role} = $meta->{requires};
-        _compose_roles($spec, $meta->{roles} || []);
+        _compose_roles($spec, $meta->{roles} || [], $from_role);
         
-        _add_role_items($spec, \ %from_role, $role, $meta->{has}, 'has');
-        _add_role_items($spec, \ %from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
+        _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
+        _add_role_items($spec, $from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
     }
 }
 
