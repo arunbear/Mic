@@ -71,6 +71,12 @@ sub _compose_roles {
     
     for my $role ( @{ $roles } ) {
         
+        if ( $spec->{composed_role}{$role} ) {
+            confess "Cannot compose role '$role' twice";
+        }
+        else {
+            $spec->{composed_role}{$role}++;
+        }
         my $stash = _get_stash($role);
         my $meta = $stash->get_symbol('%__Meta');
         assert($meta->{role}, "$role is not a role");
