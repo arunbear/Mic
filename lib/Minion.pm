@@ -201,17 +201,34 @@ sub _add_methods {
     my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
 
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
-        next unless $in_interface{$name};
 
-        if ( $meta->{reader} ) {
+        if ( $meta->{reader} && $in_interface{$name} ) {
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
             $spec->{implementation}{methods}{$name} = sub { $_[0]->{"__$name"} };
         }
+        _add_delegates($spec, $meta, $name);
     }
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         my $use_stash = $in_interface{$name} ? $stash : $private_stash;
         $use_stash->add_symbol("&$name", $sub);
+    }
+}
+
+sub _add_delegates {
+    my ($spec, $meta, $name) = @_;
+
+    if ( $meta->{handles} ) {
+        if ( ref $meta->{handles} eq 'ARRAY' ) {
+            foreach my $meth ( @{ $meta->{handles} } ) {
+                if ( defined $spec->{implementation}{methods}{$meth} ) {
+                    confess "Cannot override implemented method '$meth' with a delegated method";
+                }
+                else {
+                    $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$meth(@_) };
+                }
+            }
+        }
     }
 }
 
