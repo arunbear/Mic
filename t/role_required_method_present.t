@@ -26,7 +26,7 @@ use Minion;
     );
 
     # private sub
-    sub cmp {
+    sub cmp ($$) {
         my ($x, $y) = @_;
         $y <=> $x;    
     }
