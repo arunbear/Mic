@@ -81,15 +81,25 @@ sub _compose_roles {
         else {
             $spec->{composed_role}{$role}++;
         }
-        my $stash = _get_stash($role);
-        my $meta = $stash->get_symbol('%__Meta');
-        assert($meta->{role}, "$role is not a role");
+        
+        my ($stash, $meta, $method) = _load_role($role);
         $spec->{required}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || [], $from_role);
         
         _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
-        _add_role_items($spec, $from_role, $role, $stash->get_all_symbols('CODE'), 'methods');
+        _add_role_items($spec, $from_role, $role, $method, 'methods');
     }
+}
+
+sub _load_role {
+    my ($role) = @_;
+    
+    my $stash  = _get_stash($role);
+    my $meta   = $stash->get_symbol('%__Meta');
+    assert($meta->{role}, "$role is not a role");
+    
+    my $method = $stash->get_all_symbols('CODE');
+    return ($stash, $meta, $method);
 }
 
 sub _check_role_requirements {
@@ -129,6 +139,9 @@ sub _get_stash {
     if ( ! $stash->has_symbol('%__Meta') ) {
         require_module($pkg);
         $stash = Package::Stash->new($pkg);
+    }
+    if ( ! $stash->has_symbol('%__Meta') ) {
+        confess "Package $pkg has no %__Meta";
     }
     return $stash;
 }
