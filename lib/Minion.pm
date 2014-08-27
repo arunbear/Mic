@@ -55,7 +55,11 @@ sub minionize {
     _compose_roles($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
-    _add_object_maker($spec, $cls_stash, $private_stash, $obj_stash);
+    $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
+    $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
+    $cls_stash->add_symbol('%__Meta', $spec) if @_ > 0;
+    
+    $spec->{class_methods}{__new__} = _get_object_maker();
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     _check_role_requirements($spec);
@@ -145,22 +149,25 @@ sub _add_role_items {
     }
 }
 
-sub _add_object_maker {
-    my ($spec, $stash, $private_stash, $obj_stash) = @_;
+sub _get_object_maker {
 
-    $stash->add_symbol("&__new__", sub {
-        shift;
-        my %obj = ('!' => $private_stash->name);
+    sub {
+        my $class = shift;
+        
+        my $stash = Package::Stash->new($class);
+        my %obj = ('!' => ${ $stash->get_symbol('$__Private_pkg') });
 
+        my $spec = $stash->get_symbol('%__Meta');
+        
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
             $obj{"__$attr"} = ref $meta->{default} eq 'CODE'
               ? $meta->{default}->()
               : $meta->{default};
         }
-        bless \ %obj => $obj_stash->name;            
+        bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };            
         lock_keys(%obj);
         return \ %obj;
-    });
+    };
 }
 
 sub _add_class_methods {
@@ -226,6 +233,17 @@ sub _add_delegates {
                 }
                 else {
                     $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$meth(@_) };
+                }
+            }
+        }
+        elsif( ref $meta->{handles} eq 'HASH' ) {
+            foreach my $meth ( keys %{ $meta->{handles} } ) {
+                if ( defined $spec->{implementation}{methods}{$meth} ) {
+                    confess "Cannot override implemented method '$meth' with a delegated method";
+                }
+                else {
+                    my $target = $meta->{handles}{$meth};
+                    $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$target(@_) };
                 }
             }
         }
