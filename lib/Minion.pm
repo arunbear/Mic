@@ -82,7 +82,7 @@ sub _compose_roles {
             $spec->{composed_role}{$role}++;
         }
         
-        my ($stash, $meta, $method) = _load_role($role);
+        my ($meta, $method) = _load_role($role);
         $spec->{required}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || [], $from_role);
         
@@ -99,7 +99,7 @@ sub _load_role {
     assert($meta->{role}, "$role is not a role");
     
     my $method = $stash->get_all_symbols('CODE');
-    return ($stash, $meta, $method);
+    return ($meta, $method);
 }
 
 sub _check_role_requirements {
@@ -257,6 +257,17 @@ sub _add_delegates {
                 else {
                     my $target = $meta->{handles}{$meth};
                     $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$target(@_) };
+                }
+            }
+        }
+        elsif( ! ref $meta->{handles} ) {
+            my (undef, $method) = _load_role($meta->{handles});
+            foreach my $meth ( keys %{ $method } ) {
+                if ( defined $spec->{implementation}{methods}{$meth} ) {
+                    confess "Cannot override implemented method '$meth' with a delegated method";
+                }
+                else {
+                    $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$meth(@_) };
                 }
             }
         }
