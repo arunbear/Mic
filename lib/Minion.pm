@@ -239,36 +239,25 @@ sub _add_delegates {
     my ($spec, $meta, $name) = @_;
 
     if ( $meta->{handles} ) {
+        my $method;
+        my $target_method = {};
         if ( ref $meta->{handles} eq 'ARRAY' ) {
-            foreach my $meth ( @{ $meta->{handles} } ) {
-                if ( defined $spec->{implementation}{methods}{$meth} ) {
-                    confess "Cannot override implemented method '$meth' with a delegated method";
-                }
-                else {
-                    $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$meth(@_) };
-                }
-            }
+            $method = { map { $_ => 1 } @{ $meta->{handles} } };
         }
         elsif( ref $meta->{handles} eq 'HASH' ) {
-            foreach my $meth ( keys %{ $meta->{handles} } ) {
-                if ( defined $spec->{implementation}{methods}{$meth} ) {
-                    confess "Cannot override implemented method '$meth' with a delegated method";
-                }
-                else {
-                    my $target = $meta->{handles}{$meth};
-                    $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$target(@_) };
-                }
-            }
+            $method = $meta->{handles};
+            $target_method = $method;
         }
         elsif( ! ref $meta->{handles} ) {
-            my (undef, $method) = _load_role($meta->{handles});
-            foreach my $meth ( keys %{ $method } ) {
-                if ( defined $spec->{implementation}{methods}{$meth} ) {
-                    confess "Cannot override implemented method '$meth' with a delegated method";
-                }
-                else {
-                    $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$meth(@_) };
-                }
+            (undef, $method) = _load_role($meta->{handles});
+        }
+        foreach my $meth ( keys %{ $method } ) {
+            if ( defined $spec->{implementation}{methods}{$meth} ) {
+                confess "Cannot override implemented method '$meth' with a delegated method";
+            }
+            else {
+                my $target = $target_method->{$meth} || $meth;
+                $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$target(@_) };
             }
         }
     }
