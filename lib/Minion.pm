@@ -251,13 +251,18 @@ sub _add_delegates {
         elsif( ! ref $meta->{handles} ) {
             (undef, $method) = _load_role($meta->{handles});
         }
+        my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
+        
         foreach my $meth ( keys %{ $method } ) {
             if ( defined $spec->{implementation}{methods}{$meth} ) {
                 confess "Cannot override implemented method '$meth' with a delegated method";
             }
             else {
                 my $target = $target_method->{$meth} || $meth;
-                $spec->{implementation}{methods}{$meth} = sub { shift->{"__$name"}->$target(@_) };
+                $spec->{implementation}{methods}{$meth} =
+                  $in_interface{$meth}
+                    ? sub { shift->{"__$name"}->$target(@_) }
+                    : sub { shift; shift->{"__$name"}->$target(@_) };
             }
         }
     }
