@@ -23,7 +23,7 @@ use Minion;
     our %__Meta = (
         interface => [qw( greet name )],
         roles => [qw( Greeter )],
-        has => {
+        requires => {
             name => {},
         }
     );

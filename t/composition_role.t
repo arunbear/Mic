@@ -19,7 +19,7 @@ use Minion;
 
     our %__Meta = (
         interface => [qw( alpha bravo charlie delta )],
-        has => {
+        requires => {
             alphabet => {
                 handles => 'AlphabetRole',
             },
