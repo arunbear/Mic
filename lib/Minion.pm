@@ -50,7 +50,7 @@ sub minionize {
     my $class_meta = $cls_stash->get_symbol('%__Meta') || {};
     $spec->{implementation}{has} = {
         %{ $spec->{implementation}{has} || { } },
-        %{ $class_meta->{has} || { } },
+        %{ $class_meta->{requires} || { } },
     };
     _compose_roles($spec);
 
@@ -198,9 +198,9 @@ sub _add_class_methods {
                 $arg = { @_ };
             }
             my $obj = $class->__new__;
-            for my $name ( keys %{ $spec->{has} } ) {
+            for my $name ( keys %{ $spec->{requires} } ) {
                 assert(defined $arg->{$name}, "Param '$name' was not provided.");
-                my $meta = $spec->{has}{$name};
+                my $meta = $spec->{requires}{$name};
 
                 while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
                     assert($code->($arg->{$name}),  "Attribute '$name' is not $desc");
