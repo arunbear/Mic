@@ -206,6 +206,10 @@ sub _add_class_methods {
                 $class->__assert__($name, $arg->{$name});
                 $obj->{"__$name"} = $arg->{$name};
             }
+            
+            if ( my $builder = $obj->{'!'}->can('BUILD') ) {
+                $builder->(undef, $obj, $arg);
+            }
             return $obj;
         };
     }
