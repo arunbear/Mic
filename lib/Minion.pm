@@ -59,7 +59,6 @@ sub minionize {
     $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__Meta', $spec) if @_ > 0;
     
-    $spec->{class_methods}{__new__} = _get_object_maker();
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     _check_role_requirements($spec);
@@ -214,6 +213,8 @@ sub _add_class_methods {
             return $obj;
         };
     }
+    $spec->{class_methods}{__new__} = _get_object_maker();
+    
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
         $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
     }
