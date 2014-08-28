@@ -208,7 +208,7 @@ sub _add_class_methods {
             }
             
             if ( my $builder = $obj->{'!'}->can('BUILD') ) {
-                $builder->(undef, $obj, $arg);
+                $builder->($obj->{'!'}, $obj, $arg);
             }
             return $obj;
         };
