@@ -96,7 +96,8 @@ sub _load_role {
     
     my $stash  = _get_stash($role);
     my $meta   = $stash->get_symbol('%__Meta');
-    assert($meta->{role}, "$role is not a role");
+    $meta->{role}
+      or confess "$role is not a role";
     
     my $method = $stash->get_all_symbols('CODE');
     return ($meta, $method);
@@ -199,11 +200,14 @@ sub _add_class_methods {
             }
             my $obj = $class->__new__;
             for my $name ( keys %{ $spec->{requires} } ) {
-                assert(defined $arg->{$name}, "Param '$name' was not provided.");
+                defined $arg->{$name}
+                  or confess "Param '$name' was not provided.";
+                  
                 my $meta = $spec->{requires}{$name};
 
                 while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
-                    assert($code->($arg->{$name}),  "Attribute '$name' is not $desc");
+                    $code->($arg->{$name})
+                      or confess "Attribute '$name' is not $desc";
                 }
                 $obj->{"__$name"} = $arg->{$name};
             }
@@ -266,11 +270,6 @@ sub _add_delegates {
             }
         }
     }
-}
-
-sub assert {
-    my ($val, $desc) = @_;
-    $val or confess "Assertion failed: $desc";
 }
 
 1;
