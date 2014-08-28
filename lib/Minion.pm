@@ -6,6 +6,7 @@ use Carp;
 use Hash::Util qw( lock_keys );
 use Module::Runtime qw( require_module );
 use Package::Stash;
+use Sub::Name;
 
 our $VERSION = 0.000_001;
 
@@ -202,12 +203,7 @@ sub _add_class_methods {
                 defined $arg->{$name}
                   or confess "Param '$name' was not provided.";
                   
-                my $meta = $spec->{requires}{$name};
-
-                while ( my ($desc, $code) = each %{ $meta->{assert} || { } } ) {
-                    $code->($arg->{$name})
-                      or confess "Attribute '$name' is not $desc";
-                }
+                $class->__assert__($name, $arg->{$name});
                 $obj->{"__$name"} = $arg->{$name};
             }
             return $obj;
@@ -215,8 +211,22 @@ sub _add_class_methods {
     }
     $spec->{class_methods}{__new__} = _get_object_maker();
     
+    $spec->{class_methods}{__assert__} = sub {
+        my (undef, $slot, $val) = @_;
+        
+        return unless exists $spec->{implementation}{has}{$slot};
+        
+        my $meta = $spec->{implementation}{has}{$slot};
+        
+        while ( my ($desc, $code) = each %{ $meta->{assert} || {} } ) {
+            $code->($val)
+              or confess "Attribute '$slot' is not $desc";
+        }
+    };
+    
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
         $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
+        subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
     }
 }
 
