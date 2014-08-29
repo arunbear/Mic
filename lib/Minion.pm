@@ -249,7 +249,10 @@ sub _add_methods {
     }
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
-        my $use_stash = $in_interface{$name} ? $stash : $private_stash;
+        my $use_stash =
+          ($in_interface{$name} || $name eq 'DESTROY')
+            ? $stash
+            : $private_stash;
         $use_stash->add_symbol("&$name", $sub);
     }
 }
