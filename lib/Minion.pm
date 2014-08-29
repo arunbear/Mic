@@ -222,7 +222,8 @@ sub _add_class_methods {
         
         my $meta = $spec->{implementation}{has}{$slot};
         
-        while ( my ($desc, $code) = each %{ $meta->{assert} || {} } ) {
+        for my $desc ( keys %{ $meta->{assert} || {} } ) {
+            my $code = $meta->{assert}{$desc};
             $code->($val)
               or confess "Attribute '$slot' is not $desc";
         }
@@ -239,6 +240,8 @@ sub _add_methods {
 
     my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
 
+    $spec->{implementation}{methods}{ASSERT} = $spec->{class_methods}{__assert__};
+    
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
         if ( $meta->{reader} && $in_interface{$name} ) {
