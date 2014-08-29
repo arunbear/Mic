@@ -191,6 +191,13 @@ sub _add_class_methods {
     _add_default_constructor($spec);
     $spec->{class_methods}{__new__} = _get_object_maker();
     
+    $spec->{class_methods}{__build__} = sub {
+        my (undef, $obj, $arg) = @_;
+        if ( my $builder = $obj->{'!'}->can('BUILD') ) {
+            $builder->($obj->{'!'}, $obj, $arg);
+        }
+    };
+    
     $spec->{class_methods}{__assert__} = sub {
         my (undef, $slot, $val) = @_;
         
@@ -234,9 +241,7 @@ sub _add_default_constructor {
                 $obj->{"__$name"} = $arg->{$name};
             }
             
-            if ( my $builder = $obj->{'!'}->can('BUILD') ) {
-                $builder->($obj->{'!'}, $obj, $arg);
-            }
+            $class->__build__($obj, $arg);
             return $obj;
         };
         
