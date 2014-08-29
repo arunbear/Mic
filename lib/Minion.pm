@@ -187,6 +187,33 @@ sub _get_object_maker {
 sub _add_class_methods {
     my ($spec, $stash) = @_;
 
+    $spec->{class_methods} ||= $stash->get_all_symbols('CODE');
+    _add_default_constructor($spec);
+    $spec->{class_methods}{__new__} = _get_object_maker();
+    
+    $spec->{class_methods}{__assert__} = sub {
+        my (undef, $slot, $val) = @_;
+        
+        return unless exists $spec->{implementation}{has}{$slot};
+        
+        my $meta = $spec->{implementation}{has}{$slot};
+        
+        for my $desc ( keys %{ $meta->{assert} || {} } ) {
+            my $code = $meta->{assert}{$desc};
+            $code->($val)
+              or confess "Attribute '$slot' is not $desc";
+        }
+    };
+    
+    foreach my $sub ( keys %{ $spec->{class_methods} } ) {
+        $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
+        subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
+    }
+}
+
+sub _add_default_constructor {
+    my ($spec) = @_;
+    
     if ( ! exists $spec->{class_methods}{new} ) {
         $spec->{class_methods}{new} = sub {
             my $class = shift;
@@ -212,26 +239,16 @@ sub _add_class_methods {
             }
             return $obj;
         };
-    }
-    $spec->{class_methods}{__new__} = _get_object_maker();
-    
-    $spec->{class_methods}{__assert__} = sub {
-        my (undef, $slot, $val) = @_;
         
-        return unless exists $spec->{implementation}{has}{$slot};
-        
-        my $meta = $spec->{implementation}{has}{$slot};
-        
-        for my $desc ( keys %{ $meta->{assert} || {} } ) {
-            my $code = $meta->{assert}{$desc};
-            $code->($val)
-              or confess "Attribute '$slot' is not $desc";
+        if (exists $spec->{class_methods}{BUILDARGS}) {
+            my $build_args = $spec->{class_methods}{BUILDARGS};
+            my $prev_new = $spec->{class_methods}{new};
+            
+            $spec->{class_methods}{new} = sub {
+                my $class = shift;
+                $prev_new->($class, $build_args->($class, @_));
+            };
         }
-    };
-    
-    foreach my $sub ( keys %{ $spec->{class_methods} } ) {
-        $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
-        subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
     }
 }
 
