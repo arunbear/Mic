@@ -64,4 +64,14 @@ is($ab->bravo,   'bravo');
 is($ab->charlie, 'charlie');
 is($ab->delta,   'delta');
 
+ok($ab->DOES('Alpha'),   'does Alpha role');
+ok($ab->DOES('Bravo'),   'does Bravo role');
+ok($ab->DOES('Charlie'), 'does Charlie role');
+ok($ab->DOES('Delta'),   'does Delta role');
+
+ok((ref $ab)->DOES('Alpha'),   'does Alpha role');
+ok((ref $ab)->DOES('Bravo'),   'does Bravo role');
+ok((ref $ab)->DOES('Charlie'), 'does Charlie role');
+ok((ref $ab)->DOES('Delta'),   'does Delta role');
+
 done_testing();
