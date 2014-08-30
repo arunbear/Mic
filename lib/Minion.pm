@@ -260,13 +260,14 @@ sub _add_default_constructor {
 sub _add_methods {
     my ($spec, $stash, $private_stash) = @_;
 
-    my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
+    my $in_interface = _interface($spec);
 
     $spec->{implementation}{methods}{ASSERT} = $spec->{class_methods}{__assert__};
+    $spec->{implementation}{methods}{DOES}   = sub { my (undef, $r) = @_; $spec->{composed_role}{$r} };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
-        if ( $meta->{reader} && $in_interface{$name} ) {
+        if ( $meta->{reader} && $in_interface->{$name} ) {
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
             $spec->{implementation}{methods}{$name} = sub { $_[0]->{"__$name"} };
         }
@@ -274,8 +275,7 @@ sub _add_methods {
     }
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
-        my $use_stash =
-          ($in_interface{$name} || $name eq 'DESTROY')
+        my $use_stash = $in_interface->{$name}
             ? $stash
             : $private_stash;
         $use_stash->add_symbol("&$name", $sub);
@@ -298,7 +298,7 @@ sub _add_delegates {
         elsif( ! ref $meta->{handles} ) {
             (undef, $method) = _load_role($meta->{handles});
         }
-        my %in_interface = map { $_ => 1 } @{ $spec->{interface} };
+        my $in_interface = _interface($spec);
         
         foreach my $meth ( keys %{ $method } ) {
             if ( defined $spec->{implementation}{methods}{$meth} ) {
@@ -307,12 +307,17 @@ sub _add_delegates {
             else {
                 my $target = $target_method->{$meth} || $meth;
                 $spec->{implementation}{methods}{$meth} =
-                  $in_interface{$meth}
+                  $in_interface->{$meth}
                     ? sub { shift->{"__$name"}->$target(@_) }
                     : sub { shift; shift->{"__$name"}->$target(@_) };
             }
         }
     }
+}
+
+sub _interface {
+    my ($spec) = @_;
+    return { map { $_ => 1 } @{ $spec->{interface} }, 'DOES', 'DESTROY' };
 }
 
 1;
