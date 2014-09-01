@@ -23,9 +23,9 @@ use Minion;
     package SorterImpl;
 
     our %__Meta = (
+        semiprivate => ['cmp'],
     );
 
-    # private sub
     sub cmp ($$) {
         my ($x, $y) = @_;
         $y <=> $x;    
