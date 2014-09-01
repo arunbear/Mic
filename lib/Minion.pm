@@ -31,22 +31,17 @@ sub minionize {
         my $pkg = $spec->{implementation};
         $pkg ne $spec->{name}
           or confess "$spec->{name} cannot be its own implementation.";
-        $obj_stash = _get_stash($pkg);
+        my $stash = _get_stash($pkg);
 
         $spec->{implementation} = { 
             package => $pkg, 
-            methods => $obj_stash->get_all_symbols('CODE'),
+            methods => $stash->get_all_symbols('CODE'),
             has     => {
-                %{ $obj_stash->get_symbol('%__Meta')->{has} || { } },
+                %{ $stash->get_symbol('%__Meta')->{has} || { } },
             },
         };
-        for (keys %{ $spec->{implementation}{methods} }) {
-            $obj_stash->remove_symbol("&$_"); # repopulated later per interface
-        }        
     }
-    else {
-        $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
-    }
+    $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
     
     my $class_meta = $cls_stash->get_symbol('%__Meta') || {};
     $spec->{implementation}{has} = {
