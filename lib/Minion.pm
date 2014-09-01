@@ -4,11 +4,13 @@ use strict;
 use 5.008_005;
 use Carp;
 use Hash::Util qw( lock_keys );
+use List::MoreUtils qw( all );
 use Module::Runtime qw( require_module );
 use Package::Stash;
 use Sub::Name;
 
 use Exception::Class (
+    'Minion::Error::InterfaceMismatch',
     'Minion::Error::MethodDeclaration',
     'Minion::Error::RoleConflict',
 );
@@ -181,6 +183,11 @@ sub _add_role_methods {
     my $in_class_interface = _interface($spec);
     my $in_role_interface  = _interface($role_meta);
     my $is_semiprivate     = _interface($role_meta, 'semiprivate');
+
+    all { defined $in_class_interface->{$_} } keys %$in_role_interface
+      or Minion::Error::InterfaceMismatch->throw(
+        error => "Interfaces do not match: Class => $spec->{name}, Role => $role"
+      );
 
     for my $name ( keys %$code_for ) {
         if (    $in_role_interface->{$name}
