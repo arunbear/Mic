@@ -8,6 +8,11 @@ use Module::Runtime qw( require_module );
 use Package::Stash;
 use Sub::Name;
 
+use Exception::Class (
+    'Minion::Error::MethodDeclaration',
+    'Minion::Error::RoleConflict',
+);
+
 our $VERSION = 0.000_001;
 
 my $Class_count = 0;
@@ -33,13 +38,21 @@ sub minionize {
           or confess "$spec->{name} cannot be its own implementation.";
         my $stash = _get_stash($pkg);
 
+        my $meta = $stash->get_symbol('%__Meta');
         $spec->{implementation} = { 
             package => $pkg, 
             methods => $stash->get_all_symbols('CODE'),
             has     => {
-                %{ $stash->get_symbol('%__Meta')->{has} || { } },
+                %{ $meta->{has} || { } },
             },
         };
+        my $is_semiprivate = _interface($meta, 'semiprivate');
+
+        foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
+            if ( $is_semiprivate->{$sub} ) {
+                $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
+            }
+        }
     }
     $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
     
@@ -82,7 +95,7 @@ sub _compose_roles {
         _compose_roles($spec, $meta->{roles} || [], $from_role);
         
         _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
-        _add_role_items($spec, $from_role, $role, $method, 'methods');
+        _add_role_methods($spec, $from_role, $role, $meta, $method);
     }
 }
 
@@ -106,8 +119,12 @@ sub _check_role_requirements {
         my $required = $spec->{required}{$role};
 
         foreach my $name ( @{ $required->{methods} } ) {
-            defined $spec->{implementation}{methods}{$name}
-              or confess "Method '$name', required by role $role, is not implemented.";
+
+            unless (   defined $spec->{implementation}{methods}{$name}
+                    || defined $spec->{implementation}{semiprivate}{$name}
+                   ) {
+                confess "Method '$name', required by role $role, is not implemented.";
+            }
         }
         foreach my $name ( @{ $required->{attributes} } ) {
             defined $spec->{implementation}{has}{$name}
@@ -147,7 +164,7 @@ sub _add_role_items {
 
     for my $name ( keys %$item ) {
         if (my $other_role = $from_role->{$name}) {
-            confess "Cannot have '$name' in both $role and $other_role";
+            _raise_role_conflict($name, $role, $other_role);
         }
         else{
             if ( ! $spec->{implementation}{$type}{$name} ) {
@@ -156,6 +173,45 @@ sub _add_role_items {
             }
         }            
     }
+}
+
+sub _add_role_methods {
+    my ($spec, $from_role, $role, $role_meta, $code_for) = @_;
+
+    my $in_class_interface = _interface($spec);
+    my $in_role_interface  = _interface($role_meta);
+    my $is_semiprivate     = _interface($role_meta, 'semiprivate');
+
+    for my $name ( keys %$code_for ) {
+        if (    $in_role_interface->{$name}
+             || $in_class_interface->{$name}
+           ) {
+            if (my $other_role = $from_role->{method}{$name}) {
+                _raise_role_conflict($name, $role, $other_role);
+            }
+            if ( ! $spec->{implementation}{methods}{$name} ) {
+                $spec->{implementation}{methods}{$name} = $code_for->{$name};
+                $from_role->{method}{$name} = $role;
+            }
+        }
+        elsif ( $is_semiprivate->{$name} ) {
+            if (my $other_role = $from_role->{semiprivate}{$name}) {
+                _raise_role_conflict($name, $role, $other_role);
+            }
+            if ( ! $spec->{implementation}{semiprivate}{$name} ) {
+                $spec->{implementation}{semiprivate}{$name} = $code_for->{$name};
+                $from_role->{semiprivate}{$name} = $role;
+            }
+        }
+    }
+}
+
+sub _raise_role_conflict {
+    my ($name, $role, $other_role) = @_;
+
+    Minion::Error::RoleConflict->throw(
+        error => "Cannot have '$name' in both $role and $other_role"
+    );
 }
 
 sub _get_object_maker {
@@ -257,7 +313,7 @@ sub _add_methods {
 
     my $in_interface = _interface($spec);
 
-    $spec->{implementation}{methods}{ASSERT} = $spec->{class_methods}{__assert__};
+    $spec->{implementation}{semiprivate}{ASSERT} = $spec->{class_methods}{__assert__};
     $spec->{implementation}{methods}{DOES}   = sub { my (undef, $r) = @_; $spec->{composed_role}{$r} };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
@@ -270,10 +326,10 @@ sub _add_methods {
     }
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
-        my $use_stash = $in_interface->{$name}
-            ? $stash
-            : $private_stash;
-        $use_stash->add_symbol("&$name", $sub);
+        $stash->add_symbol("&$name", $sub);
+    }
+    while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
+        $private_stash->add_symbol("&$name", $sub);
     }
 }
 
@@ -311,8 +367,14 @@ sub _add_delegates {
 }
 
 sub _interface {
-    my ($spec) = @_;
-    return { map { $_ => 1 } @{ $spec->{interface} }, 'DOES', 'DESTROY' };
+    my ($spec, $type) = @_;
+
+    $type ||= 'interface';
+    my %must_allow = (
+        interface   => [qw( DOES DESTROY )],
+        semiprivate => [qw( BUILD )],
+    );
+    return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
 }
 
 1;
