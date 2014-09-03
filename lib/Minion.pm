@@ -44,6 +44,7 @@ sub minionize {
         $spec->{implementation} = { 
             package => $pkg, 
             methods => $stash->get_all_symbols('CODE'),
+            roles   => $meta->{roles},
             has     => {
                 %{ $meta->{has} || { } },
             },
@@ -80,7 +81,18 @@ sub minionize {
 sub _compose_roles {
     my ($spec, $roles, $from_role) = @_;
     
-    $roles ||= $spec->{roles};
+    if ( ! $roles ) {
+        $roles = $spec->{roles};
+        
+        # An implementation may be needed to resolve
+        # a role conflict, so implementations and roles
+        # are not mutually exclusive
+        if ( $spec->{implementation}{roles} ) {
+            push @{ $roles }, @{ $spec->{implementation}{roles} };
+        }
+        
+    }
+    
     $from_role ||= {};
     
     for my $role ( @{ $roles } ) {
