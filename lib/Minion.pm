@@ -275,9 +275,9 @@ sub _add_class_methods {
     $spec->{class_methods}{__assert__} = sub {
         my (undef, $slot, $val) = @_;
         
-        return unless exists $spec->{implementation}{has}{$slot};
+        return unless exists $spec->{requires}{$slot};
         
-        my $meta = $spec->{implementation}{has}{$slot};
+        my $meta = $spec->{requires}{$slot};
         
         for my $desc ( keys %{ $meta->{assert} || {} } ) {
             my $code = $meta->{assert}{$desc};
@@ -339,8 +339,20 @@ sub _add_methods {
 
     my $in_interface = _interface($spec);
 
-    $spec->{implementation}{semiprivate}{ASSERT} = $spec->{class_methods}{__assert__};
-    $spec->{implementation}{methods}{DOES}   = sub { my (undef, $r) = @_; $spec->{composed_role}{$r} };
+    $spec->{implementation}{semiprivate}{ASSERT} = sub {
+        my (undef, $slot, $val) = @_;
+        
+        return unless exists $spec->{implementation}{has}{$slot};
+        
+        my $meta = $spec->{implementation}{has}{$slot};
+        
+        for my $desc ( keys %{ $meta->{assert} || {} } ) {
+            my $code = $meta->{assert}{$desc};
+            $code->($val)
+              or confess "Attribute '$slot' is not $desc";
+        }
+    };
+    $spec->{implementation}{methods}{DOES} = sub { my (undef, $r) = @_; $spec->{composed_role}{$r} };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
