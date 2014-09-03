@@ -60,10 +60,13 @@ sub minionize {
     $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
     
     my $class_meta = $cls_stash->get_symbol('%__Meta') || {};
-    $spec->{implementation}{has} = {
-        %{ $spec->{implementation}{has} || { } },
-        %{ $class_meta->{requires} || { } },
-    };
+    
+    for my $name ( keys %{ $class_meta->{requires} } ) {
+        my $meta = $class_meta->{requires}{$name};
+        if ( $meta->{attribute} ) {
+            $spec->{implementation}{has}{$name} = $meta;
+        }
+    }
     _compose_roles($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
@@ -239,7 +242,7 @@ sub _get_object_maker {
         my $class = shift;
         
         my $stash = Package::Stash->new($class);
-        my %obj = ('!' => ${ $stash->get_symbol('$__Private_pkg') });
+        my %obj = ( '!' => ${ $stash->get_symbol('$__Private_pkg') } );
 
         my $spec = $stash->get_symbol('%__Meta');
         
@@ -248,6 +251,7 @@ sub _get_object_maker {
               ? $meta->{default}->()
               : $meta->{default};
         }
+        
         bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };            
         lock_keys(%obj);
         return \ %obj;
@@ -308,7 +312,10 @@ sub _add_default_constructor {
                   or confess "Param '$name' was not provided.";
                   
                 $class->__assert__($name, $arg->{$name});
-                $obj->{"__$name"} = $arg->{$name};
+                my $meta = $spec->{requires}{$name};
+                if ( $meta->{attribute} ) {
+                    $obj->{"__$name"} = $arg->{$name};
+                }
             }
             
             $class->__build__($obj, $arg);
