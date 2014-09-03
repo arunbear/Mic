@@ -12,7 +12,8 @@ use Minion;
         roles => [qw( AlphabetRole )],
         requires => {
             code => {
-                assert => { 'valid code' => sub { $_[0] eq 'en' } }
+                assert => { 'valid code' => sub { $_[0] eq 'en' } },
+                attribute => 1,
             },
         }
     );
@@ -27,7 +28,8 @@ use Minion;
         requires => {
             alphabet => {
                 handles => [qw( alpha bravo charlie delta )],
-                assert => { 'isa Alphabet' => sub { $_[0]->isa('Alphabet::__Minion') } }
+                assert => { 'isa Alphabet' => sub { $_[0]->isa('Alphabet::__Minion') } },
+                attribute => 1,
             },
         },
     );

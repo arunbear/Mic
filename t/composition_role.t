@@ -22,6 +22,7 @@ use Minion;
         requires => {
             alphabet => {
                 handles => 'AlphabetRole',
+                attribute => 1,
             },
         },
     );

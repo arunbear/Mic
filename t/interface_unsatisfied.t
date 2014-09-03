@@ -24,7 +24,7 @@ use Minion;
         interface => [qw( greet name )],
         roles => [qw( Greeter )],
         requires => {
-            name => {},
+            name => { attribute => 1 },
         }
     );
     our $Error;

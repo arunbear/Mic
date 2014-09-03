@@ -9,6 +9,7 @@ our %__Meta = (
     requires  => {
         max_size => { 
             assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
+            attribute => 1,
             reader => 1,
         },
     }, 

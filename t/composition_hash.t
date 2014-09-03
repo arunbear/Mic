@@ -27,6 +27,7 @@ use Minion;
                     gamma => 'charlie',
                     delta => 'delta',
                 },
+                attribute => 1,
             },
         },
     );

@@ -24,7 +24,10 @@ use Minion;
         interface => [qw( greet name )],
         roles => [qw( Greeter )],
         requires => {
-            name => { reader => 1 },
+            name => {
+                reader => 1,
+                attribute => 1,
+            },
         }
     );
     Minion->minionize;
