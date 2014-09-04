@@ -352,7 +352,10 @@ sub _add_methods {
               or confess "Attribute '$slot' is not $desc";
         }
     };
-    $spec->{implementation}{methods}{DOES} = sub { my (undef, $r) = @_; $spec->{composed_role}{$r} };
+    $spec->{implementation}{methods}{DOES} = sub {
+        my (undef, $r) = @_;
+        $spec->{name} eq $r || $spec->{composed_role}{$r};
+    };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
@@ -364,10 +367,10 @@ sub _add_methods {
     }
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
-        $stash->add_symbol("&$name", $sub);
+        $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub);
     }
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
-        $private_stash->add_symbol("&$name", $sub);
+        $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
     }
 }
 
