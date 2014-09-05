@@ -114,7 +114,7 @@ Minion - build and organise minions declaratively.
 # DESCRIPTION
 
 Minion is a class builder that simplifies programming in the Object Oriented style _as it was originally envisioned_
-i.e. where objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
+i.e. where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/) for further context).
 
@@ -139,12 +139,14 @@ An exception is raised if this is empty or missing.
 The messages named in this array must have corresponding subroutine definitions in a declared implementation
 or role package, otherwise an exception is raised.
 
-### implementation => STRING
+### implementation => STRING | HASHREF
 
 The name of a package that defines the subroutines declared in the interface.
 
 The package may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the `$minion->command(...)` syntax.
+
+An implementation package (or hash) need not be specified if Roles are used to provide an implementation.
 
 ### roles => ARRAYREF
 
@@ -152,6 +154,27 @@ A reference to an array containing the names of one or more Role packages that d
 
 The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the `$minion->command(...)` syntax.
+
+### requires => HASHREF
+
+A reference to a hash whose keys are the names of keyword parameters that must be passed to the default constructor.
+
+The values these keys are mapped to are themselves hash refs which can have the following keys.
+
+#### assert => HASHREF
+
+A hash that maps a description to a unary predicate (i.e. a sub ref that takes one value and returns true or false).
+The default constructor will call these predicates to validate the parameters passed to it.
+
+#### attribute => BOOLEAN
+
+If true, this key will become an attribute in the implementation.
+
+#### reader => SCALAR
+
+This can be a string which if present, and if this key was declared to be an attribute
+will be the name of a generated reader method. This can also be the numerical value 1
+in which case the generated reader method will have the same name as the key.
 
 # AUTHOR
 
