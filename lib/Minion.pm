@@ -436,6 +436,7 @@ Minion - build and organise minions declaratively.
     
     my %Class = (
         interface => [qw( next )],
+    
         implementation => {
             methods => {
                 next => sub {
@@ -467,6 +468,7 @@ Minion - build and organise minions declaratively.
     my %Class = (
         name => 'Counter',
         interface => [qw( next )],
+    
         implementation => {
             methods => {
                 next => sub {
@@ -542,6 +544,10 @@ i.e. where in the words of Alan Kay (who coined the term "Object Oriented Progra
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/> for further context).
 
+This way of building is more likely to result in systems that are loosely coupled, modular, scalable and easy to maintain.
+
+The words "minion" and "object" are used interchangeably in the rest of this documentation.
+
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as other packages that provide the implementation of these commands.
 
@@ -581,7 +587,7 @@ These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 
 =head3 requires => HASHREF
 
-A reference to a hash whose keys are the names of keyword parameters that must be passed to the default constructor.
+An optional reference to a hash whose keys are the names of keyword parameters that must be passed to the default constructor.
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
 
@@ -590,9 +596,11 @@ The values these keys are mapped to are themselves hash refs which can have the 
 A hash that maps a description to a unary predicate (i.e. a sub ref that takes one value and returns true or false).
 The default constructor will call these predicates to validate the parameters passed to it.
 
-=head4 attribute => BOOLEAN
+=head4 attribute => SCALAR
 
-If true, this key will become an attribute in the implementation.
+If this is present and has the numerical value 1, this key will become an attribute in the implementation,
+having the same name as the key. Use any other true value to give the attribute a different
+name.
 
 =head4 reader => SCALAR
 
