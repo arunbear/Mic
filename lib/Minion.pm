@@ -615,7 +615,17 @@ An implementation package can also be configured with a C<%__Meta> hash with the
 
 =head3 has => HASHREF
 
-This declares attributes of the implementation, mapping the name of an attribute to a hash with the following keys:
+This declares attributes of the implementation, mapping the name of an attribute to a hash with keys described in
+the following sub sections.
+
+An attribute called "foo" can be accessed via it's object like this:
+
+    $obj->{__foo}
+
+i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
+and are locked down to allow only keys declared in the "has" (implementation or role level)
+or "requires" (class level) declarations. This is done to prevent accidents like 
+mis-spelling an attribute name.
 
 =head4 default => SCALAR | CODEREF
 
@@ -650,7 +660,8 @@ The scalar is assumed to be a role, and methods provided by the role will be for
 =head4 reader => SCALAR
 
 This is like the reader declaration already described above (except that in this case the key in
-question is an attribute).
+question is an attribute). Readers should only be created if they are logically part of the
+class API.
 
 =head3 semiprivate => ARRAYREF
 
