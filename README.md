@@ -186,7 +186,7 @@ in which case the generated reader method will have the same name as the key.
 
 ## Configuring an implementation package
 
-An implementation package can also be configured with a `%__Meta` hash with the following keys:
+An implementation package can also be configured with a package variable `%__Meta` with the following keys:
 
 ### has => HASHREF
 
@@ -247,7 +247,7 @@ can be called using the syntax:
 
 ## Configuring a role package
 
-A role package must be configured with a `%__Meta` hash with the following keys (of which only "role"
+A role package must be configured with a package variable `%__Meta` with the following keys (of which only "role"
 is mandatory):
 
 ### role => 1 (Mandatory)

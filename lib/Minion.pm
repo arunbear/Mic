@@ -611,7 +611,7 @@ in which case the generated reader method will have the same name as the key.
 
 =head2 Configuring an implementation package
 
-An implementation package can also be configured with a C<%__Meta> hash with the following keys:
+An implementation package can also be configured with a package variable C<%__Meta> with the following keys:
 
 =head3 has => HASHREF
 
@@ -672,7 +672,7 @@ can be called using the syntax:
 
 =head2 Configuring a role package
 
-A role package must be configured with a C<%__Meta> hash with the following keys (of which only "role"
+A role package must be configured with a package variable C<%__Meta> with the following keys (of which only "role"
 is mandatory):
  
 =head3 role => 1 (Mandatory)
