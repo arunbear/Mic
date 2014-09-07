@@ -64,6 +64,7 @@ sub minionize {
     for my $name ( keys %{ $class_meta->{requires} } ) {
         my $meta = $class_meta->{requires}{$name};
         if ( $meta->{attribute} ) {
+            my $attr_name = $meta->{attribute} == 1 ? $name : $meta->{attribute};
             $spec->{implementation}{has}{$name} = $meta;
         }
     }
@@ -539,7 +540,7 @@ Minion - build and organise minions declaratively.
     
 =head1 DESCRIPTION
 
-Minion is a class builder that simplifies programming in the Object Oriented style I<as it was originally envisioned>
+Minion is a class builder that simplifies programming in the Object Oriented style as it was originally envisioned
 i.e. where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/> for further context).
@@ -548,7 +549,7 @@ This way of building is more likely to result in systems that are loosely couple
 
 The words "minion" and "object" are used interchangeably in the rest of this documentation.
 
-Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
+Classes are built from a specification hash that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as other packages that provide the implementation of these commands.
 
 =head1 USAGE
@@ -607,6 +608,25 @@ name.
 This can be a string which if present, and if this key was declared to be an attribute
 will be the name of a generated reader method. This can also be the numerical value 1
 in which case the generated reader method will have the same name as the key.
+
+=head2 Configuring an implementation package
+
+An implementation package can also be configured with a C<%__Meta> hash with the following keys:
+
+=head3 has => HASHREF
+
+This declares attributes of the implementation, mapping the name of an attribute to a hash with the following keys:
+
+=head4 default => SCALAR | CODEREF
+
+The default value assigned to the attribute when the object is created. This can be an anonymous sub,
+which will be excecuted to build the the default value (this would be needed if the default value is a reference,
+to prevent all objects from sharing the same reference).
+
+=head4 assert => HASHREF
+
+This is like the C<assert> declared in a class package, except that these assertions are not run at
+construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
 
 =head1 AUTHOR
 
