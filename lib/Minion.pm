@@ -628,6 +628,49 @@ to prevent all objects from sharing the same reference).
 This is like the C<assert> declared in a class package, except that these assertions are not run at
 construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
 
+=head4 handles => ARRAYREF | HASHREF | SCALAR
+
+This declares that methods can be forwarded from the object to this attribute in one of three ways
+described below. These forwarding methods are generated as public methods if they are declared in
+the interface, and as semiprivate routines otherwise.
+
+=head4 handles => ARRAYREF
+
+All methods in the given array will be forwarded.
+
+=head4 handles => HASHREF
+
+Method forwarding will be set up such that a method with a key in the given hash will be
+forwarded to a method with the corresponding value in the hash.
+
+=head4 handles => SCALAR
+
+The scalar is assumed to be a role, and methods provided by the role will be forwarded.
+
+=head3 semiprivate => ARRAYREF
+
+Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
+can be called using the syntax:
+
+    $obj->{'!'}->do_something(...)
+
+=head2 Configuring a role package
+
+A role package must be configured with a C<%__Meta> hash with the following keys (of which only "role"
+is mandatory):
+ 
+=head3 role => 1 (Mandatory)
+
+This indicates that the package is a Role.
+
+=head3 has => HASHREF
+
+This works the same way as in an implementation package.
+
+=head3 semiprivate => ARRAYREF
+
+This works the same way as in an implementation package.
+
 =head1 AUTHOR
 
 Arun Prasaad E<lt>arunbear@cpan.orgE<gt>
