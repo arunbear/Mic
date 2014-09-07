@@ -647,6 +647,11 @@ forwarded to a method whose name is the corresponding value in the hash.
 
 The scalar is assumed to be a role, and methods provided by the role will be forwarded.
 
+=head4 reader => SCALAR
+
+This is like the reader declaration already described above (except that in this case the key in
+question is an attribute).
+
 =head3 semiprivate => ARRAYREF
 
 Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
