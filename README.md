@@ -215,8 +215,8 @@ All methods in the given array will be forwarded.
 
 #### handles => HASHREF
 
-Method forwarding will be set up such that a method with a key in the given hash will be
-forwarded to a method with the corresponding value in the hash.
+Method forwarding will be set up such that a method whose name is a key in the given hash will be
+forwarded to a method whose name is the corresponding value in the hash.
 
 #### handles => SCALAR
 
@@ -245,6 +245,19 @@ This works the same way as in an implementation package.
 ### semiprivate => ARRAYREF
 
 This works the same way as in an implementation package.
+
+### requires => HASHREF
+
+A hash with keys:
+
+#### methods => ARRAYREF
+
+Any methods listed here must be provided by an implementation package or a role.
+
+#### attributes => ARRAYREF
+
+Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
+definition in the class.
 
 # AUTHOR
 
