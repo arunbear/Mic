@@ -58,7 +58,7 @@ $q->push(2);
 is($q->size, 2);
 
 throws_ok { FixedSizeQueue->new() } qr/Param 'max_size' was not provided./;
-throws_ok { FixedSizeQueue->new(max_size => 0) } qr/Attribute 'max_size' is not positive_int/;
+throws_ok { FixedSizeQueue->new(max_size => 0) } 'Minion::Error::AssertionFailure';
 
 done_testing();
 exit 0;

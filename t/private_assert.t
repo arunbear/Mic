@@ -46,8 +46,8 @@ use Minion;
 
 package main;
 
-throws_ok { my $counter = Counter->new() } qr/Attribute 'count' is not integer/;
-throws_ok { my $counter = Counter->new(start => 'asd') } qr/Attribute 'count' is not integer/;
+throws_ok { my $counter = Counter->new() } 'Minion::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 'asd') } 'Minion::Error::AssertionFailure';
 lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
 
 done_testing();
