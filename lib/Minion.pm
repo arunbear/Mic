@@ -10,6 +10,7 @@ use Package::Stash;
 use Sub::Name;
 
 use Exception::Class (
+    'Minion::Error::AssertionFailure' => { alias => 'assert_failed' },
     'Minion::Error::InterfaceMismatch',
     'Minion::Error::MethodDeclaration',
     'Minion::Error::RoleConflict',
@@ -283,7 +284,7 @@ sub _add_class_methods {
         for my $desc ( keys %{ $meta->{assert} || {} } ) {
             my $code = $meta->{assert}{$desc};
             $code->($val)
-              or confess "Attribute '$slot' is not $desc";
+              or assert_failed error => "Parameter '$slot' failed check '$desc'";
         }
     };
     
@@ -350,7 +351,7 @@ sub _add_methods {
         for my $desc ( keys %{ $meta->{assert} || {} } ) {
             my $code = $meta->{assert}{$desc};
             $code->($val)
-              or confess "Attribute '$slot' is not $desc";
+              or assert_failed error => "Attribute '$slot' failed check '$desc'";
         }
     };
     $spec->{implementation}{methods}{DOES} = sub {
