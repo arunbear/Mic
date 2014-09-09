@@ -355,8 +355,13 @@ sub _add_methods {
         }
     };
     $spec->{implementation}{methods}{DOES} = sub {
-        my (undef, $r) = @_;
-        $spec->{name} eq $r || $spec->{composed_role}{$r};
+        my ($self, $r) = @_;
+        
+        if ( ! $r ) {
+            return ($spec->{name}, sort keys %{ $spec->{composed_role} });
+        }
+        
+        $spec->{name} eq $r || $spec->{composed_role}{$r} || $self->isa($r);
     };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
