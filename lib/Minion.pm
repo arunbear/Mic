@@ -427,11 +427,36 @@ __END__
 
 =head1 NAME
 
-Minion - build and organise minions declaratively.
+Minion - Spartans! What is I<your> API?
 
 =head1 SYNOPSIS
 
-    # Create and use a class
+    use Minion;
+    use v5.10;
+    
+    Minion->minionize({
+        name => 'Spartan',
+        interface => [qw( fight train party )],
+    
+        implementation => {
+            methods => {
+                fight => sub { say "Spartan $_[0]->{__id} is fighting" },
+                train => sub { say "Spartan $_[0]->{__id} is training" },
+                party => sub { say "Spartan $_[0]->{__id} is partying" },
+            },
+            has  => {
+                id => { default => sub { ++$main::_Count } },
+            }, 
+        },
+    });
+    my @spartans = map { Spartan->new } 1 .. 300;
+    
+    foreach my $spartan ( @spartans ) {
+        $spartan->fight;
+    }
+    # ... other horrible events
+    
+    # Now some 'normal' examples
     
     use Test::Most tests => 4;
     use Minion;
