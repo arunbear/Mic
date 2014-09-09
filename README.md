@@ -9,8 +9,9 @@ Minion - Spartans! What is _your_ API?
       
       Minion->minionize({
           name => 'Spartan',
-          interface => [qw( fight train party )],
+          interface => [qw( fight train party )], # This is what Spartans do
       
+          # And this is how they do it:
           implementation => {
               methods => {
                   fight => sub { say "Spartan $_[0]->{__id} is fighting" },
