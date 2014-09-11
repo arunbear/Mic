@@ -687,7 +687,7 @@ forwarded to a method whose name is the corresponding value in the hash.
 
 =head4 handles => SCALAR
 
-The scalar is assumed to be a role, and methods provided by the role will be forwarded.
+The scalar is assumed to be a role, and methods provided directly (i.e. not including methods in sub-roles) by the role will be forwarded.
 
 =head4 reader => SCALAR
 
@@ -731,6 +731,49 @@ Any methods listed here must be provided by an implementation package or a role.
 
 Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
 definition in the class.
+
+=head2 Special Class Methods
+
+These special class methods are useful in cases where the default constructor is not flexible enough
+and you need to write your own constructor.
+
+=head3 __new__
+
+This creates a new instance, in which attributes with declared defaults are populated with those defaults,
+and all others are populated with undef.
+
+=head3 __build__
+
+This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
+is created.
+
+=head3 __assert__
+
+Given the name of a declared attribute and a value, this routine validates the value using any assertions
+declared with the attribute.
+
+=head2 Constructor Hooks
+
+These are optional routines that can be used to customise the default construction process. 
+
+=head3 BUILDARGS
+
+If this class method is defined, it will receive all parameters intended for C<new()>, and its
+result (which should be a hash list or hashref) will be passed to C<new()>.
+
+This is useful when the constructor requires positional rather than keyword parameters.
+
+=head3 BUILD
+
+If this semiprivate method is defined, it will be called by the default constructor and
+will receive the object and a hashref of named parameters that were passed to the constructor.
+
+This is useful for carrying out any post-construction logic e.g. object validation.
+
+=head1 BUGS
+
+Please report any bugs or feature requests via the GitHub web interface at 
+L<https://github.com/arunbear/perl5-minion/issues>.
 
 =head1 AUTHOR
 
