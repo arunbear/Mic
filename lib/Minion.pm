@@ -62,13 +62,6 @@ sub minionize {
     
     my $class_meta = $cls_stash->get_symbol('%__Meta') || {};
     
-    for my $name ( keys %{ $class_meta->{requires} } ) {
-        my $meta = $class_meta->{requires}{$name};
-        if ( $meta->{attribute} ) {
-            my $attr_name = $meta->{attribute} == 1 ? $name : $meta->{attribute};
-            $spec->{implementation}{has}{$name} = $meta;
-        }
-    }
     _compose_roles($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
@@ -277,9 +270,9 @@ sub _add_class_methods {
     $spec->{class_methods}{__assert__} = sub {
         my (undef, $slot, $val) = @_;
         
-        return unless exists $spec->{requires}{$slot};
+        return unless exists $spec->{construct_with}{$slot};
         
-        my $meta = $spec->{requires}{$slot};
+        my $meta = $spec->{construct_with}{$slot};
         
         for my $desc ( keys %{ $meta->{assert} || {} } ) {
             my $code = $meta->{assert}{$desc};
@@ -309,14 +302,20 @@ sub _add_default_constructor {
                 $arg = { @_ };
             }
             my $obj = $class->__new__;
-            for my $name ( keys %{ $spec->{requires} } ) {
-                defined $arg->{$name}
-                  or confess "Param '$name' was not provided.";
-                  
+            for my $name ( keys %{ $spec->{construct_with} } ) {
+
+                if ( $spec->{construct_with}{$name}{required} && ! defined $arg->{$name} ) {
+                    confess "Param '$name' was not provided.";
+                }
                 $class->__assert__($name, $arg->{$name});
-                my $meta = $spec->{requires}{$name};
-                if ( $meta->{attribute} ) {
-                    $obj->{"__$name"} = $arg->{$name};
+
+                my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name } 
+                                        keys %{ $spec->{implementation}{has} };
+                if ( $dup ) {
+                    confess "Cannot have same init_arg '$name' for attributes '$attr' and '$dup'";
+                }
+                if ( $attr ) {
+                    $obj->{"__$attr"} = $arg->{$name};
                 }
             }
             
@@ -618,11 +617,15 @@ A reference to an array containing the names of one or more Role packages that d
 The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 
-=head3 requires => HASHREF
+=head3 construct_with => HASHREF
 
-An optional reference to a hash whose keys are the names of keyword parameters that must be passed to the default constructor.
+An optional reference to a hash whose keys are the names of keyword parameters are must be passed to the default constructor.
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
+
+=head4 required => BOOLEAN
+
+If this is set to a true value, then the corresponding value passed to the constructor must be defined.
 
 =head4 assert => HASHREF
 
@@ -656,7 +659,7 @@ An attribute called "foo" can be accessed via it's object like this:
 
 i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
-or "requires" (class level) declarations. This is done to prevent accidents like 
+declarations. This is done to prevent accidents like 
 mis-spelling an attribute name.
 
 =head4 default => SCALAR | CODEREF
