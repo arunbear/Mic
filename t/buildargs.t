@@ -7,14 +7,13 @@ package FixedSizeQueue;
 
 our %__Meta = (
     interface => [qw(push size max_size)],
-    implementation => 'FixedSizeQueueImpl',
-    requires => {
+    construct_with => {
         max_size => { 
+            required => 1,
             assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
-            attribute => 1,
-            reader => 1,
         },
     }, 
+    implementation => 'FixedSizeQueueImpl',
 );
 
 sub BUILDARGS {

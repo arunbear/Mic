@@ -18,14 +18,22 @@ use Minion;
 }
 
 {
+    package PersonImpl;
+    our %__Meta = (
+        has => { name => { init_arg => 'name' } }
+    );
+}
+
+{
     package Person;
 
     our %__Meta = (
         interface => [qw( greet )],
+        construct_with => {
+            name => { required => 1 },
+        },
         roles => [qw( Greeter )],
-        requires => {
-            name => { attribute => 1 },
-        }
+        implementation => 'PersonImpl',
     );
     Minion->minionize;
 }

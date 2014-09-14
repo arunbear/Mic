@@ -8,7 +8,6 @@ use Minion;
 
     our %__Meta = (
         role => 1,
-        requires => { attributes => ['name'] }
     );
 
     sub greet {
@@ -22,10 +21,10 @@ use Minion;
 
     our %__Meta = (
         interface => [qw( greet name )],
+        construct_with => {
+            name => { required => 1 },
+        },
         roles => [qw( Greeter )],
-        requires => {
-            name => { attribute => 1 },
-        }
     );
     our $Error;
     

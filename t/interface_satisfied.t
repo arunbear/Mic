@@ -8,7 +8,12 @@ use Minion;
 
     our %__Meta = (
         role => 1,
-        requires => { attributes => ['name'] }
+        has => { 
+            name => { 
+                init_arg => 'name',
+                reader => 1,
+            }
+        }
     );
 
     sub greet {
@@ -22,13 +27,10 @@ use Minion;
 
     our %__Meta = (
         interface => [qw( greet name )],
+        construct_with => {
+            name => { required => 1 },
+        },
         roles => [qw( Greeter )],
-        requires => {
-            name => {
-                reader => 1,
-                attribute => 1,
-            },
-        }
     );
     Minion->minionize;
 }

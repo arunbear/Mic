@@ -5,6 +5,10 @@ use strict;
 our %__Meta = (
     has  => {
         q => { default => sub { [ ] } },
+        max_size => { 
+            init_arg => 'max_size',
+            reader => 1,
+        },
     }, 
 );
 
