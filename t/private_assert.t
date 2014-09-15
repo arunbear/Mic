@@ -24,13 +24,13 @@ use Minion;
         my (undef, $self, $arg) = @_;
 
         $self->{'!'}->ASSERT('count', $arg->{start});
-        $self->{__count} = $arg->{start};
+        $self->{$$}{count} = $arg->{start};
     }
     
     sub next {
         my ($self) = @_;
 
-        $self->{__count}++;
+        $self->{$$}{count}++;
     }
 }
 

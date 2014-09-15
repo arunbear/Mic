@@ -9,7 +9,7 @@ my %Class = (
             my ($class, $start) = @_;
 
             my $obj = $class->__new__;
-            $obj->{__count} = $start;
+            $obj->{$$}{count} = $start;
             return $obj;
         },
     },
@@ -21,7 +21,7 @@ my %Class = (
             next => sub {
                 my ($self) = @_;
 
-                $self->{__count}++;
+                $self->{$$}{count}++;
             }
         },
     },

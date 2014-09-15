@@ -237,15 +237,19 @@ sub _get_object_maker {
         my $class = shift;
         
         my $stash = Package::Stash->new($class);
-        my %obj = ( '!' => ${ $stash->get_symbol('$__Private_pkg') } );
+        my %obj = ( 
+            '!' => ${ $stash->get_symbol('$__Private_pkg') },
+            $$  => {}, 
+        );
 
         my $spec = $stash->get_symbol('%__Meta');
         
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            $obj{"__$attr"} = ref $meta->{default} eq 'CODE'
+            $obj{$$}{$attr} = ref $meta->{default} eq 'CODE'
               ? $meta->{default}->()
               : $meta->{default};
         }
+        lock_keys(%{ $obj{$$} });
         
         bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };            
         lock_keys(%obj);
@@ -315,7 +319,7 @@ sub _add_default_constructor {
                     confess "Cannot have same init_arg '$name' for attributes '$attr' and '$dup'";
                 }
                 if ( $attr ) {
-                    $obj->{"__$attr"} = $arg->{$name};
+                    $obj->{$$}{$attr} = $arg->{$name};
                 }
             }
             
@@ -367,7 +371,7 @@ sub _add_methods {
 
         if ( $meta->{reader} && $in_interface->{$name} ) {
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
-            $spec->{implementation}{methods}{$name} = sub { $_[0]->{"__$name"} };
+            $spec->{implementation}{methods}{$name} = sub { $_[0]->{$$}{$name} };
         }
         _add_delegates($spec, $meta, $name);
     }
@@ -406,8 +410,8 @@ sub _add_delegates {
                 my $target = $target_method->{$meth} || $meth;
                 $spec->{implementation}{methods}{$meth} =
                   $in_interface->{$meth}
-                    ? sub { shift->{"__$name"}->$target(@_) }
-                    : sub { shift; shift->{"__$name"}->$target(@_) };
+                    ? sub { shift->{$$}{$name}->$target(@_) }
+                    : sub { shift; shift->{$$}{$name}->$target(@_) };
             }
         }
     }
@@ -445,9 +449,9 @@ Minion - Spartans! What is I<your> API?
         # And this is how they do it:
         implementation => {
             methods => {
-                fight => sub { say "Spartan $_[0]->{__id} is fighting" },
-                train => sub { say "Spartan $_[0]->{__id} is training" },
-                party => sub { say "Spartan $_[0]->{__id} is partying" },
+                fight => sub { say "Spartan $_[0]->{$$}{id} is fighting" },
+                train => sub { say "Spartan $_[0]->{$$}{id} is training" },
+                party => sub { say "Spartan $_[0]->{$$}{id} is partying" },
             },
             has  => {
                 id => { default => sub { ++$main::_Count } },
@@ -474,7 +478,7 @@ Minion - Spartans! What is I<your> API?
                 next => sub {
                     my ($self) = @_;
     
-                    $self->{__count}++;
+                    $self->{$$}{count}++;
                 }
             },
             has  => {
@@ -506,7 +510,7 @@ Minion - Spartans! What is I<your> API?
                 next => sub {
                     my ($self) = @_;
     
-                    $self->{__count}++;
+                    $self->{$$}{count}++;
                 }
             },
             has  => {
@@ -564,7 +568,7 @@ Minion - Spartans! What is I<your> API?
     sub next {
         my ($self) = @_;
     
-        $self->{__count}++;
+        $self->{$$}{count}++;
     }
     
     1;    
@@ -655,7 +659,7 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object like this:
 
-    $obj->{__foo}
+    $obj->{$$}{foo}
 
 i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)

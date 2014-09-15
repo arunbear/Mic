@@ -14,9 +14,9 @@ Minion - Spartans! What is _your_ API?
           # And this is how they do it:
           implementation => {
               methods => {
-                  fight => sub { say "Spartan $_[0]->{__id} is fighting" },
-                  train => sub { say "Spartan $_[0]->{__id} is training" },
-                  party => sub { say "Spartan $_[0]->{__id} is partying" },
+                  fight => sub { say "Spartan $_[0]->{$$}{id} is fighting" },
+                  train => sub { say "Spartan $_[0]->{$$}{id} is training" },
+                  party => sub { say "Spartan $_[0]->{$$}{id} is partying" },
               },
               has  => {
                   id => { default => sub { ++$main::_Count } },
@@ -43,7 +43,7 @@ Minion - Spartans! What is _your_ API?
                   next => sub {
                       my ($self) = @_;
       
-                      $self->{__count}++;
+                      $self->{$$}{count}++;
                   }
               },
               has  => {
@@ -75,7 +75,7 @@ Minion - Spartans! What is _your_ API?
                   next => sub {
                       my ($self) = @_;
       
-                      $self->{__count}++;
+                      $self->{$$}{count}++;
                   }
               },
               has  => {
@@ -133,7 +133,7 @@ Minion - Spartans! What is _your_ API?
       sub next {
           my ($self) = @_;
       
-          $self->{__count}++;
+          $self->{$$}{count}++;
       }
       
       1;    
@@ -187,11 +187,15 @@ A reference to an array containing the names of one or more Role packages that d
 The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the `$minion->command(...)` syntax.
 
-### requires => HASHREF
+### construct\_with => HASHREF
 
-An optional reference to a hash whose keys are the names of keyword parameters that must be passed to the default constructor.
+An optional reference to a hash whose keys are the names of keyword parameters are must be passed to the default constructor.
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
+
+#### required => BOOLEAN
+
+If this is set to a true value, then the corresponding value passed to the constructor must be defined.
 
 #### assert => HASHREF
 
@@ -221,11 +225,11 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object like this:
 
-    $obj->{__foo}
+    $obj->{$$}{foo}
 
 i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
-or "requires" (class level) declarations. This is done to prevent accidents like 
+declarations. This is done to prevent accidents like 
 mis-spelling an attribute name.
 
 #### default => SCALAR | CODEREF
@@ -256,7 +260,7 @@ forwarded to a method whose name is the corresponding value in the hash.
 
 #### handles => SCALAR
 
-The scalar is assumed to be a role, and methods provided by the role will be forwarded.
+The scalar is assumed to be a role, and methods provided directly (i.e. not including methods in sub-roles) by the role will be forwarded.
 
 #### reader => SCALAR
 
@@ -300,6 +304,49 @@ Any methods listed here must be provided by an implementation package or a role.
 
 Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
 definition in the class.
+
+## Special Class Methods
+
+These special class methods are useful in cases where the default constructor is not flexible enough
+and you need to write your own constructor.
+
+### \_\_new\_\_
+
+This creates a new instance, in which attributes with declared defaults are populated with those defaults,
+and all others are populated with undef.
+
+### \_\_build\_\_
+
+This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
+is created.
+
+### \_\_assert\_\_
+
+Given the name of a declared attribute and a value, this routine validates the value using any assertions
+declared with the attribute.
+
+## Constructor Hooks
+
+These are optional routines that can be used to customise the default construction process. 
+
+### BUILDARGS
+
+If this class method is defined, it will receive all parameters intended for `new()`, and its
+result (which should be a hash list or hashref) will be passed to `new()`.
+
+This is useful when the constructor requires positional rather than keyword parameters.
+
+### BUILD
+
+If this semiprivate method is defined, it will be called by the default constructor and
+will receive the object and a hashref of named parameters that were passed to the constructor.
+
+This is useful for carrying out any post-construction logic e.g. object validation.
+
+# BUGS
+
+Please report any bugs or feature requests via the GitHub web interface at 
+[https://github.com/arunbear/perl5-minion/issues](https://github.com/arunbear/perl5-minion/issues).
 
 # AUTHOR
 

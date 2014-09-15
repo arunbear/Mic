@@ -14,13 +14,13 @@ our %__Meta = (
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{__q} };
+    scalar @{ $self->{$$}{q} };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{__q} }, $val;
+    push @{ $self->{$$}{q} }, $val;
 }
 
 1;

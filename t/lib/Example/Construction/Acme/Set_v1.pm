@@ -9,12 +9,12 @@ our %__Meta = (
 
 sub has {
     my ($self, $e) = @_;
-    exists $self->{__set}{$e};
+    exists $self->{$$}{set}{$e};
 }
 
 sub add {
     my ($self, $e) = @_;
-    ++$self->{__set}{$e};
+    ++$self->{$$}{set}{$e};
 }
 
 1;

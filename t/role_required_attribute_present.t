@@ -13,7 +13,7 @@ use Minion;
 
     sub greet {
         my ($self) = @_;
-        return "Hello, I am $self->{__name}";
+        return "Hello, I am $self->{$$}{name}";
     }
 }
 

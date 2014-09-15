@@ -17,18 +17,18 @@ use Minion;
     sub BUILD {
         my (undef, $self, $arg) = @_;
 
-        $self->{__max_size} = $arg->{max_size};
+        $self->{$$}{max_size} = $arg->{max_size};
     }
     
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{__q} };
+        scalar @{ $self->{$$}{q} };
     }
     
     sub push {
         my ($self, $val) = @_;
     
-        push @{ $self->{__q} }, $val;
+        push @{ $self->{$$}{q} }, $val;
     }
 }
 
@@ -50,7 +50,7 @@ package main;
 
 my $q = FixedSizeQueue->new(max_size => 3);
 
-is($q->{__max_size}, 3);
+is($q->{$$}{max_size}, 3);
 
 $q->push(1);
 is($q->size, 1);

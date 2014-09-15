@@ -12,7 +12,7 @@ my %Class = (
             next => sub {
                 my ($self) = @_;
 
-                $self->{__count}++;
+                $self->{$$}{count}++;
             }
         },
     },
@@ -39,7 +39,7 @@ my %Named_class = (
             next => sub {
                 my ($self) = @_;
 
-                $self->{__count}++;
+                $self->{$$}{count}++;
             }
         },
     }, 
