@@ -15,16 +15,28 @@ use Minion;
 }
 
 {
+    package KeyboardImpl;
+    our %__Meta = (
+        has => { 
+            alphabet => {
+                handles  => 'AlphabetRole',
+                init_arg => 'alphabet' 
+            }
+        }
+    );
+}
+
+{
     package Keyboard;
 
     our %__Meta = (
         interface => [qw( alpha bravo charlie delta )],
-        requires => {
+        construct_with => {
             alphabet => {
-                handles => 'AlphabetRole',
-                attribute => 1,
+                required => 1,
             },
         },
+        implementation => 'KeyboardImpl',
     );
     Minion->minionize();
 }

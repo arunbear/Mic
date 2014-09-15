@@ -21,17 +21,29 @@ use Minion;
 }
 
 {
+    package KeyboardImpl;
+    our %__Meta = (
+        has => { 
+            alphabet => {
+                handles => [qw( alpha bravo charlie delta )],
+                init_arg => 'alphabet' 
+            }
+        }
+    );
+}
+
+{
     package Keyboard;
 
     our %__Meta = (
         interface => [qw( alpha bravo charlie delta )],
-        requires => {
+        construct_with => {
             alphabet => {
-                handles => [qw( alpha bravo charlie delta )],
+                required => 1,
                 assert => { 'isa Alphabet' => sub { $_[0]->isa('Alphabet::__Minion') } },
-                attribute => 1,
             },
         },
+        implementation => 'KeyboardImpl',
     );
     Minion->minionize();
 }

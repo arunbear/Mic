@@ -15,11 +15,9 @@ use Minion;
 }
 
 {
-    package Keyboard;
-
+    package KeyboardImpl;
     our %__Meta = (
-        interface => [qw( alpha beta gamma delta )],
-        requires => {
+        has => { 
             alphabet => {
                 handles => {
                     alpha => 'alpha',
@@ -27,9 +25,21 @@ use Minion;
                     gamma => 'charlie',
                     delta => 'delta',
                 },
-                attribute => 1,
-            },
+                init_arg => 'alphabet' 
+            }
+        }
+    );
+}
+
+{
+    package Keyboard;
+
+    our %__Meta = (
+        interface => [qw( alpha beta gamma delta )],
+        construct_with => {
+            alphabet => { required => 1 },
         },
+        implementation => 'KeyboardImpl',
     );
     Minion->minionize;
 }
