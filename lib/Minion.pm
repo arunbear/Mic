@@ -369,7 +369,10 @@ sub _add_methods {
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
-        if ( $meta->{reader} && $in_interface->{$name} ) {
+        if ( !  $spec->{implementation}{methods}{$name}
+             && $meta->{reader} 
+             && $in_interface->{$name} ) {
+
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
             $spec->{implementation}{methods}{$name} = sub { $_[0]->{$$}{$name} };
         }
