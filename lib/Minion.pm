@@ -376,6 +376,20 @@ sub _add_methods {
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
             $spec->{implementation}{methods}{$name} = sub { $_[0]->{$$}{$name} };
         }
+
+        if ( !  $spec->{implementation}{methods}{$name}
+             && $meta->{writer}
+             && $in_interface->{$name} ) {
+
+            my $name = $meta->{writer} == 1 ? $name : $meta->{writer};
+            $spec->{implementation}{methods}{$name} = sub {
+                my ($self, $new_val) = @_;
+
+                $self->{'!'}->ASSERT($name, $new_val);
+                $self->{$$}{$name} = $new_val;
+                return $self;
+            };
+        }
         _add_delegates($spec, $meta, $name);
     }
 
