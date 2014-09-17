@@ -529,10 +529,12 @@ Minion - Spartans! What is I<your> API?
     
 =head1 DESCRIPTION
 
-Minion is a class builder that simplifies programming in the Object Oriented style as it was originally envisioned
-i.e. where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
+Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
+
+The Object Oriented way as it was originally envisioned was more concerned with messaging,
+where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
-(see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/> for further context).
+(see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/> for further inspiration).
 
 This way of building is more likely to result in systems that are loosely coupled, modular, scalable and easy to maintain.
 
