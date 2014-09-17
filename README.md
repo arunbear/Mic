@@ -4,147 +4,86 @@ Minion - Spartans! What is _your_ API?
 
 # SYNOPSIS
 
-      use Minion;
-      use v5.10;
-      
-      Minion->minionize({
-          name => 'Spartan',
-          interface => [qw( fight train party )], # This is what Spartans do
-      
-          # And this is how they do it:
-          implementation => {
-              methods => {
-                  fight => sub { say "Spartan $_[0]->{$$}{id} is fighting" },
-                  train => sub { say "Spartan $_[0]->{$$}{id} is training" },
-                  party => sub { say "Spartan $_[0]->{$$}{id} is partying" },
-              },
-              has  => {
-                  id => { default => sub { ++$main::_Count } },
-              }, 
-          },
-      });
-      my @spartans = map { Spartan->new } 1 .. 300;
-      
-      foreach my $spartan ( @spartans ) {
-          $spartan->fight;
-      }
-      # ... other horrible events
-      
-      # Now some 'normal' examples
-      
-      use Test::Most tests => 4;
-      use Minion;
-      
-      my %Class = (
-          interface => [qw( next )],
-      
-          implementation => {
-              methods => {
-                  next => sub {
-                      my ($self) = @_;
-      
-                      $self->{$$}{count}++;
-                  }
-              },
-              has  => {
-                  count => { default => 0 },
-              }, 
-          },
-      );
-      
-      my $counter = Minion->minionize(\%Class)->new;
-      
-      is $counter->next => 0;
-      is $counter->next => 1;
-      is $counter->next => 2;
-      
-      throws_ok { $counter->new } qr/Can't locate object method "new"/;
-      
-      
-      # Like above but give the class a name
+    use Minion;
+    use v5.10;
     
-      use Test::Most tests => 4;
-      use Minion;
-      
-      my %Class = (
-          name => 'Counter',
-          interface => [qw( next )],
-      
-          implementation => {
-              methods => {
-                  next => sub {
-                      my ($self) = @_;
-      
-                      $self->{$$}{count}++;
-                  }
-              },
-              has  => {
-                  count => { default => 0 },
-              }, 
-          },
-      );
-      
-      Minion->minionize(\%Class);
-      my $counter = Counter->new;
-      
-      is $counter->next => 0;
-      is $counter->next => 1;
-      
-      throws_ok { $counter->new } qr/Can't locate object method "new"/;
-      throws_ok { Counter->next } qr/Can't locate object method "next" via package "Counter"/;
-      
-      
-      # Or put code in packages
-      
-      package Example::Synopsis::Counter;
-      
-      use strict;
-      use Minion;
-      
-      our %__Meta = (
-          interface => [qw( next )],
-          implementation => 'Example::Synopsis::Acme::Counter',
-      );
-      Minion->minionize;  
-      
-      # In a script near by ...
-      
-      use Test::Most tests => 3;
-      use Example::Synopsis::Counter;
-      
-      my $counter = Example::Synopsis::Counter->new;
-      
-      is $counter->next => 0;
-      is $counter->next => 1;
-      is $counter->next => 2;
-      
-      # And the implementation for this class:
-      
-      package Example::Synopsis::Acme::Counter;
-      
-      use strict;
-      
-      our %__Meta = (
-          has  => {
-              count => { default => 0 },
-          }, 
-      );
-      
-      sub next {
-          my ($self) = @_;
-      
-          $self->{$$}{count}++;
-      }
-      
-      1;    
-      
+    Minion->minionize({
+        name => 'Spartan',
+        interface => [qw( fight train party )], # This is what Spartans do
+    
+        # And this is how they do it:
+        implementation => {
+            methods => {
+                fight => sub { say "Spartan $_[0]->{$$}{id} is fighting" },
+                train => sub { say "Spartan $_[0]->{$$}{id} is training" },
+                party => sub { say "Spartan $_[0]->{$$}{id} is partying" },
+            },
+            has  => {
+                id => { default => sub { ++$main::_Count } },
+            }, 
+        },
+    });
+    my @spartans = map { Spartan->new } 1 .. 300;
+    
+    foreach my $spartan ( @spartans ) {
+        $spartan->fight;
+    }
+    # ... other horrible events
+    
+    # Now some 'normal' examples
+    
+    package Example::Synopsis::Counter;
+    
+    use strict;
+    use Minion;
+    
+    our %__Meta = (
+        interface => [qw( next )],
+    
+        implementation => 'Example::Synopsis::Acme::Counter',
+    );
+    Minion->minionize;  
+    
+    # In a script near by ...
+    
+    use Test::Most tests => 3;
+    use Example::Synopsis::Counter;
+    
+    my $counter = Example::Synopsis::Counter->new;
+    
+    is $counter->next => 0;
+    is $counter->next => 1;
+    is $counter->next => 2;
+    
+    # And the implementation for this class:
+    
+    package Example::Synopsis::Acme::Counter;
+    
+    use strict;
+    
+    our %__Meta = (
+        has  => {
+            count => { default => 0 },
+        }, 
+    );
+    
+    sub next {
+        my ($self) = @_;
+    
+        $self->{$$}{count}++;
+    }
+    
+    1;    
+    
 
 # DESCRIPTION
 
-Minion is a class builder that simplifies programming in the Object Oriented style as it was originally envisioned
-i.e. where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
+Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
+
+The Object Oriented way as it was originally envisioned was more concerned with messaging,
+where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
-(see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/) for further context).
+(see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/) for further inspiration).
 
 This way of building is more likely to result in systems that are loosely coupled, modular, scalable and easy to maintain.
 
