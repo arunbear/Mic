@@ -308,7 +308,7 @@ sub _add_default_constructor {
             my $obj = $class->__new__;
             for my $name ( keys %{ $spec->{construct_with} } ) {
 
-                if ( $spec->{construct_with}{$name}{required} && ! defined $arg->{$name} ) {
+                if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
                     confess "Param '$name' was not provided.";
                 }
                 $class->__assert__($name, $arg->{$name});

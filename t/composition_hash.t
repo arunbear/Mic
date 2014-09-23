@@ -37,7 +37,7 @@ use Minion;
     our %__Meta = (
         interface => [qw( alpha beta gamma delta )],
         construct_with => {
-            alphabet => { required => 1 },
+            alphabet => {  },
         },
         implementation => 'KeyboardImpl',
     );

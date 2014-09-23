@@ -39,7 +39,6 @@ use Minion;
         interface => [qw( alpha bravo charlie delta )],
         construct_with => {
             alphabet => {
-                required => 1,
                 assert => { 'isa Alphabet' => sub { $_[0]->isa('Alphabet::__Minion') } },
             },
         },

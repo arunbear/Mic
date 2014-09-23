@@ -30,7 +30,7 @@ use Minion;
     our %__Meta = (
         interface => [qw( greet )],
         construct_with => {
-            name => { required => 1 },
+            name => { },
         },
         roles => [qw( Greeter )],
         implementation => 'PersonImpl',

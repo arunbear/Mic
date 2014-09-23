@@ -10,7 +10,6 @@ our %__Meta = (
     implementation => 'FixedSizeQueueImplWithRole',
     construct_with => {
         max_size => { 
-            required => 1,
             assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
         },
     }, 
