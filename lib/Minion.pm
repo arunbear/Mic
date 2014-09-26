@@ -561,6 +561,21 @@ An exception is raised if this is empty or missing.
 The messages named in this array must have corresponding subroutine definitions in a declared implementation
 or role package, otherwise an exception is raised.
 
+=head3 construct_with => HASHREF
+
+An optional reference to a hash whose keys are the names of keyword parameters that are passed to the default constructor.
+
+The values these keys are mapped to are themselves hash refs which can have the following keys.
+
+=head4 optional => BOOLEAN
+
+If this is set to a true value, then the corresponding key/value pair need not be passed to the constructor.
+
+=head4 assert => HASHREF
+
+A hash that maps a description to a unary predicate (i.e. a sub ref that takes one value and returns true or false).
+The default constructor will call these predicates to validate the parameters passed to it.
+
 =head3 implementation => STRING | HASHREF
 
 The name of a package that defines the subroutines declared in the interface.
@@ -577,33 +592,6 @@ A reference to an array containing the names of one or more Role packages that d
 The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 
-=head3 construct_with => HASHREF
-
-An optional reference to a hash whose keys are the names of keyword parameters are must be passed to the default constructor.
-
-The values these keys are mapped to are themselves hash refs which can have the following keys.
-
-=head4 required => BOOLEAN
-
-If this is set to a true value, then the corresponding value passed to the constructor must be defined.
-
-=head4 assert => HASHREF
-
-A hash that maps a description to a unary predicate (i.e. a sub ref that takes one value and returns true or false).
-The default constructor will call these predicates to validate the parameters passed to it.
-
-=head4 attribute => SCALAR
-
-If this is present and has the numerical value 1, this key will become an attribute in the implementation,
-having the same name as the key. Use any other true value to give the attribute a different
-name.
-
-=head4 reader => SCALAR
-
-This can be a string which if present, and if this key was declared to be an attribute
-will be the name of a generated reader method. This can also be the numerical value 1
-in which case the generated reader method will have the same name as the key.
-
 =head2 Configuring an implementation package
 
 An implementation package can also be configured with a package variable C<%__Meta> with the following keys:
@@ -615,7 +603,7 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object like this:
 
-    $obj->{$$}{foo}
+    $self->{$$}{foo}
 
 i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
@@ -654,9 +642,11 @@ The scalar is assumed to be a role, and methods provided directly (i.e. not incl
 
 =head4 reader => SCALAR
 
-This is like the reader declaration already described above (except that in this case the key in
-question is an attribute). Readers should only be created if they are logically part of the
-class API.
+This can be a string which if present will be the name of a generated reader method.
+
+This can also be the numerical value 1 in which case the generated reader method will have the same name as the key.
+
+Readers should only be created if they are logically part of the class API.
 
 =head3 semiprivate => ARRAYREF
 
