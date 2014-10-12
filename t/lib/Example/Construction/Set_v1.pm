@@ -2,7 +2,7 @@
 package Example::Construction::Set_v1;
 
 use strict;
-use Minion;
+use Minion ();
 
 our %__Meta = (
     interface => [qw( add has )],

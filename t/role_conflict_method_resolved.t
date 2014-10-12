@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion;
+use Minion ();
 
 {
     package Camper;

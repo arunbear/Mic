@@ -1,6 +1,6 @@
 use strict;
 use Test::Most tests => 4;
-use Minion;
+use Minion ();
 
 my %Class = (
     name => 'Counter',

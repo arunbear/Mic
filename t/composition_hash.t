@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::Most;
 use AlphabetRole;
-use Minion;
+use Minion ();
 
 {
     package Alphabet;

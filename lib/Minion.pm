@@ -20,6 +20,11 @@ our $VERSION = 0.000_001;
 
 my $Class_count = 0;
 
+sub import {
+    my ($class, %arg) = @_;
+    $class->minionize(%arg);
+}
+
 sub minionize {
     my (undef, $spec) = @_;
 

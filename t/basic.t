@@ -1,6 +1,6 @@
 use strict;
 use Test::Most tests => 9;
-use Minion;
+use Minion ();
 
 my %Class = (
     interface => [qw(next)],

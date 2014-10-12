@@ -1,6 +1,6 @@
 use strict;
 use Test::More;
-use Minion;
+use Minion ();
 
 package Counter::Impl;
 
