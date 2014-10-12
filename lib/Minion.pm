@@ -556,9 +556,38 @@ as well as other packages that provide the implementation of these commands.
 
 =head1 USAGE
 
+=head2 Via Import
+
+A class can be defined when importing Minion e.g.
+
+    package Foo;
+
+    use Minion
+        interface => [ qw( list of methods ) ],
+        construct_with => {
+            arg_name => {
+                assert => {
+                    desc => sub {
+                        # return true if arg is valid
+                        # or false otherwise
+                    }
+                },
+                optional => $boolean,
+            },
+            # ... other args
+        },
+
+        # Provide at least one of these
+        implementation => 'An::Implementation::Package',
+        roles => [ qw( list of role packages ) ]
+        ;
+    1;
+
 =head2 Minion->minionize([HASHREF])
 
-To build a classs, call the C<minionize()> class method, with an optional hashref that specifies the class.
+A class can also be defined by calling the C<minionize()> class method, with an optional hashref that 
+specifies the class as outlined above.
+
 If the hashref is not given, the specification is read from a package variable named C<%__Meta> in the package
 from which C<minionize()> was called.
 
@@ -578,7 +607,7 @@ An optional reference to a hash whose keys are the names of keyword parameters t
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
 
-=head4 optional => BOOLEAN
+=head4 optional => BOOLEAN (Default: false)
 
 If this is set to a true value, then the corresponding key/value pair need not be passed to the constructor.
 
@@ -595,6 +624,8 @@ The package may also contain other subroutines not declared in the interface tha
 These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 
 An implementation package (or hash) need not be specified if Roles are used to provide an implementation.
+
+Alternatively an implementation can be hashref as shown in the synopsis above.
 
 =head3 roles => ARRAYREF
 

@@ -4,7 +4,7 @@ Minion - Spartans! What is _your_ API?
 
 # SYNOPSIS
 
-    use Minion;
+    use Minion ();
     use v5.10;
     
     Minion->minionize({
@@ -30,30 +30,32 @@ Minion - Spartans! What is _your_ API?
     }
     # ... other horrible events
     
-    # Now some 'normal' examples
+    # Now a more 'normal' example
     
     package Example::Synopsis::Counter;
-    
-    use strict;
-    use Minion;
-    
-    our %__Meta = (
-        interface => [qw( next )],
-    
-        implementation => 'Example::Synopsis::Acme::Counter',
-    );
-    Minion->minionize;  
+
+    use Minion
+        interface => [ qw( next ) ],
+        implementation => 'Example::Synopsis::Acme::Counter';
+
+    1;
     
     # In a script near by ...
     
-    use Test::Most tests => 3;
+    use Test::Most tests => 5;
     use Example::Synopsis::Counter;
-    
+
     my $counter = Example::Synopsis::Counter->new;
-    
+
     is $counter->next => 0;
     is $counter->next => 1;
     is $counter->next => 2;
+
+    throws_ok { $counter->new } qr/Can't locate object method "new"/;
+    
+    throws_ok { Example::Synopsis::Counter->next } 
+              qr/Can't locate object method "next" via package "Example::Synopsis::Counter"/;
+
     
     # And the implementation for this class:
     
@@ -94,9 +96,38 @@ as well as other packages that provide the implementation of these commands.
 
 # USAGE
 
+## Via Import
+
+A class can be defined when importing Minion e.g.
+
+    package Foo;
+
+    use Minion
+        interface => [ qw( list of methods ) ],
+        construct_with => {
+            arg_name => {
+                assert => {
+                    desc => sub {
+                        # return true if arg is valid
+                        # or false otherwise
+                    }
+                },
+                optional => $boolean,
+            },
+            # ... other args
+        },
+
+        # Provide at least one of these
+        implementation => 'An::Implementation::Package',
+        roles => [ qw( list of role packages ) ]
+        ;
+    1;
+
 ## Minion->minionize(\[HASHREF\])
 
-To build a classs, call the `minionize()` class method, with an optional hashref that specifies the class.
+A class can also be defined by calling the `minionize()` class method, with an optional hashref that 
+specifies the class as outlined above.
+
 If the hashref is not given, the specification is read from a package variable named `%__Meta` in the package
 from which `minionize()` was called.
 
@@ -116,7 +147,7 @@ An optional reference to a hash whose keys are the names of keyword parameters t
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
 
-#### optional => BOOLEAN
+#### optional => BOOLEAN (Default: false)
 
 If this is set to a true value, then the corresponding key/value pair need not be passed to the constructor.
 
@@ -133,6 +164,8 @@ The package may also contain other subroutines not declared in the interface tha
 These won't be callable using the `$minion->command(...)` syntax.
 
 An implementation package (or hash) need not be specified if Roles are used to provide an implementation.
+
+Alternatively an implementation can be hashref as shown in the synopsis above.
 
 ### roles => ARRAYREF
 
