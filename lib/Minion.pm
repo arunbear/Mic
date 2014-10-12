@@ -22,17 +22,21 @@ my $Class_count = 0;
 
 sub import {
     my ($class, %arg) = @_;
-    $class->minionize(%arg);
+    $class->minionize(\%arg);
 }
 
 sub minionize {
     my (undef, $spec) = @_;
 
     my $cls_stash;
-    if ( ! $spec ) {
+    if ( ! $spec->{name} ) {
         my $caller_pkg = (caller)[0];
+
+        if ( $caller_pkg eq __PACKAGE__ ) {
+            $caller_pkg = (caller 1)[0];
+        }
         $cls_stash = Package::Stash->new($caller_pkg);
-        $spec  = $cls_stash->get_symbol('%__Meta');
+        $spec = { %$spec, %{ $cls_stash->get_symbol('%__Meta') || {} } };
         $spec->{name} = $caller_pkg;
     }
     $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
@@ -461,7 +465,7 @@ Minion - Spartans! What is I<your> API?
 
 =head1 SYNOPSIS
 
-    use Minion;
+    use Minion ();
     use v5.10;
     
     Minion->minionize({
@@ -487,30 +491,32 @@ Minion - Spartans! What is I<your> API?
     }
     # ... other horrible events
     
-    # Now some 'normal' examples
+    # Now a more 'normal' example
     
     package Example::Synopsis::Counter;
-    
-    use strict;
-    use Minion;
-    
-    our %__Meta = (
-        interface => [qw( next )],
-    
-        implementation => 'Example::Synopsis::Acme::Counter',
-    );
-    Minion->minionize;  
+
+    use Minion
+        interface => [ qw( next ) ],
+        implementation => 'Example::Synopsis::Acme::Counter';
+
+    1;
     
     # In a script near by ...
     
-    use Test::Most tests => 3;
+    use Test::Most tests => 5;
     use Example::Synopsis::Counter;
-    
+
     my $counter = Example::Synopsis::Counter->new;
-    
+
     is $counter->next => 0;
     is $counter->next => 1;
     is $counter->next => 2;
+
+    throws_ok { $counter->new } qr/Can't locate object method "new"/;
+    
+    throws_ok { Example::Synopsis::Counter->next } 
+              qr/Can't locate object method "next" via package "Example::Synopsis::Counter"/;
+
     
     # And the implementation for this class:
     

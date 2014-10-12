@@ -1,10 +1,7 @@
 package Example::Synopsis::Counter;
 
-use strict;
-use Minion ();
+use Minion
+    interface => [ qw( next ) ],
+    implementation => 'Example::Synopsis::Acme::Counter';
 
-our %__Meta = (
-    interface => [qw(next)],
-    implementation => 'Example::Synopsis::Acme::Counter',
-);
-Minion->minionize;
+1;
