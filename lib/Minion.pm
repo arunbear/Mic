@@ -69,8 +69,6 @@ sub minionize {
     }
     $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
     
-    my $class_meta = $cls_stash->get_symbol('%__Meta') || {};
-    
     _compose_roles($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
@@ -564,6 +562,7 @@ A class can be defined when importing Minion e.g.
 
     use Minion
         interface => [ qw( list of methods ) ],
+
         construct_with => {
             arg_name => {
                 assert => {
@@ -577,9 +576,7 @@ A class can be defined when importing Minion e.g.
             # ... other args
         },
 
-        # Provide at least one of these
         implementation => 'An::Implementation::Package',
-        roles => [ qw( list of role packages ) ]
         ;
     1;
 
