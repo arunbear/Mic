@@ -23,14 +23,19 @@ use Minion ();
 }
 
 {
+    package PersonImpl;
+
+    our %__Meta = (
+        roles => [qw( Greeter )],
+    );
+}
+
+{
     package Person;
 
     our %__Meta = (
         interface => [qw( greet name )],
-        roles => [qw( Greeter )],
-        requires => {
-            name => { reader => 1 },
-        }
+        implementation => 'PersonImpl',
     );
     our $Error;
     

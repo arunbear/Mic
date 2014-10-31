@@ -28,11 +28,19 @@ use Minion ();
 }
 
 {
+    package BusyDudeImpl;
+
+    our %__Meta = (
+        roles => [qw( Camper BaseballPro )],
+    );
+}
+
+{
     package BusyDude;
 
     our %__Meta = (
         interface => [qw( pitch )],
-        roles => [qw( Camper BaseballPro )],
+        implementation => 'BusyDudeImpl'
     );
 }
 package main;

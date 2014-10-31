@@ -3,11 +3,17 @@ use Test::Lib;
 use Test::Most;
 use Minion ();
 
+package FixedSizeQueueImpl;
+
+our %__Meta = (
+    roles => ['FixedSizeQueueRole'],
+);
+
 package FixedSizeQueue;
 
 our %__Meta = (
     interface => [qw(push size max_size)],
-    roles => ['FixedSizeQueueRole'],
+    implementation => 'FixedSizeQueueImpl',
     construct_with => {
         max_size => { 
             assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 

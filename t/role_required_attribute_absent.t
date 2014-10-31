@@ -18,11 +18,19 @@ use Minion ();
 }
 
 {
+    package PersonImpl;
+
+    our %__Meta = (
+        roles => [qw( Greeter )],
+    );
+}
+
+{
     package Person;
 
     our %__Meta = (
         interface => [qw( greet )],
-        roles => [qw( Greeter )],
+        implementation => 'PersonImpl',
     );
 }
 

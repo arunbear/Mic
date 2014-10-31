@@ -4,7 +4,7 @@ use Test::Most;
 use Minion ();
 
 {
-    package SetRole;
+    package SetImpl;
 
     our %__Meta = (
         role => 1,
@@ -28,7 +28,7 @@ use Minion ();
 
     our %__Meta = (
         interface => [qw( has )],
-        roles => [qw( SetRole )],
+        implementation => 'SetImpl',
     );
     Minion->minionize;
 }

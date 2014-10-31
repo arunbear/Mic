@@ -4,10 +4,9 @@ use Test::Most;
 use Minion ();
 
 {
-    package FixedSizeQueueRole;
+    package FixedSizeQueueImpl;
     
     our %__Meta = (
-        role => 1,
         has  => {
             q => { default => sub { [ ] } },
             max_size => {},
@@ -36,7 +35,7 @@ package FixedSizeQueue;
 
 our %__Meta = (
     interface => [qw( push size )],
-    roles => ['FixedSizeQueueRole'],
+    implementation => 'FixedSizeQueueImpl',
     construct_with => {
         max_size => { 
             assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 

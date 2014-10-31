@@ -4,10 +4,9 @@ use Test::Most;
 use Minion ();
 
 {
-    package Greeter;
+    package PersonImpl;
 
     our %__Meta = (
-        role => 1,
         has => { 
             name => { 
                 init_arg => 'name',
@@ -30,7 +29,7 @@ use Minion ();
         construct_with => {
             name => { },
         },
-        roles => [qw( Greeter )],
+        implementation => 'PersonImpl',
     );
     Minion->minionize;
 }

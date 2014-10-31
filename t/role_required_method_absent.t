@@ -22,6 +22,7 @@ use Minion ();
     package SorterImpl;
 
     our %__Meta = (
+        roles => [qw( SorterRole )],
     );
 }
 
@@ -30,7 +31,7 @@ use Minion ();
 
     our %__Meta = (
         interface => [qw( sort )],
-        roles => [qw( SorterRole )],
+        implementation => 'SorterImpl',
     );
 }
 

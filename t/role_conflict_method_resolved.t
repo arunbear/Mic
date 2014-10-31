@@ -31,6 +31,7 @@ use Minion ();
     package BusyDudeImpl;
 
     our %__Meta = (
+        roles => [qw( Camper BaseballPro )],
     );
 
     sub pitch {
@@ -44,7 +45,6 @@ use Minion ();
 
     our %__Meta = (
         interface => [qw( pitch )],
-        roles => [qw( Camper BaseballPro )],
         implementation => 'BusyDudeImpl'
     );
     Minion->minionize;

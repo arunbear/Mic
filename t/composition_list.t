@@ -5,17 +5,19 @@ use AlphabetRole;
 use Minion ();
 
 {
+    package AlphabetImpl;
+
+    our %__Meta = (
+        roles => [qw( AlphabetRole )],
+    );
+}
+
+{
     package Alphabet;
 
     our %__Meta = (
         interface => [qw( alpha bravo charlie delta )],
-        roles => [qw( AlphabetRole )],
-        requires => {
-            code => {
-                assert => { 'valid code' => sub { $_[0] eq 'en' } },
-                attribute => 1,
-            },
-        }
+        implementation => 'AlphabetImpl',
     );
     Minion->minionize;
 }
@@ -49,7 +51,7 @@ use Minion ();
 
 package main;
 
-my $kb = Keyboard->new(alphabet => Alphabet->new(code=>'en'));
+my $kb = Keyboard->new(alphabet => Alphabet->new);
 can_ok($kb, qw( alpha bravo charlie delta ));
 is($kb->alpha,   'alpha');
 is($kb->bravo,   'bravo');

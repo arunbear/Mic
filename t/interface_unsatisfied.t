@@ -4,10 +4,9 @@ use Test::Most;
 use Minion ();
 
 {
-    package Greeter;
+    package PersonImpl;
 
     our %__Meta = (
-        role => 1,
     );
 
     sub greet {
@@ -21,10 +20,7 @@ use Minion ();
 
     our %__Meta = (
         interface => [qw( greet name )],
-        construct_with => {
-            name => { },
-        },
-        roles => [qw( Greeter )],
+        implementation => 'PersonImpl',
     );
     our $Error;
     

@@ -47,11 +47,19 @@ use Minion ();
 }
 
 {
+    package AlphabetImpl;
+
+    our %__Meta = (
+        roles => [qw( Alpha )],
+    );
+}
+
+{
     package Alphabet;
 
     our %__Meta = (
         interface => [qw( alpha bravo charlie delta )],
-        roles => [qw( Alpha )],
+        implementation => 'AlphabetImpl',
     );
     our $Error;
 

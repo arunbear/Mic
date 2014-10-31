@@ -5,11 +5,19 @@ use AlphabetRole;
 use Minion ();
 
 {
+    package AlphabetImpl;
+
+    our %__Meta = (
+        roles => [qw( AlphabetRole )],
+    );
+}
+
+{
     package Alphabet;
 
     our %__Meta = (
         interface => [qw( alpha bravo charlie delta )],
-        roles => [qw( AlphabetRole )],
+        implementation => 'AlphabetImpl',
     );
     Minion->minionize;
 }

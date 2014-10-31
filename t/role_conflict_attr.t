@@ -26,11 +26,19 @@ use Minion ();
 }
 
 {
+    package BusyDudeImpl;
+
+    our %__Meta = (
+        roles => [qw( Lawyer Server )],
+    );
+}
+
+{
     package BusyDude;
 
     our %__Meta = (
         interface => [qw( serve )],
-        roles => [qw( Lawyer Server )],
+        implementation => 'BusyDudeImpl'
     );
 }
 package main;
