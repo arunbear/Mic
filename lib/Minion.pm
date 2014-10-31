@@ -6,6 +6,7 @@ use Carp;
 use Hash::Util qw( lock_keys );
 use List::MoreUtils qw( all );
 use Module::Runtime qw( require_module );
+use Params::Validate qw(:all);
 use Package::Stash;
 use Sub::Name;
 
@@ -40,11 +41,20 @@ sub minionize {
         $spec->{name} = $caller_pkg;
     }
     $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
+
+    my @args = %$spec;
+    validate(@args, {
+        interface => { type => ARRAYREF },
+        implementation => { type => SCALAR | HASHREF },
+        construct_with => { type => HASHREF, optional => 1 },
+        class_methods  => { type => HASHREF, optional => 1 },
+        name => { type => SCALAR, optional => 1 },
+    });
     $cls_stash    ||= Package::Stash->new($spec->{name});
     
     my $obj_stash;
 
-    if ( $spec->{implementation} && ! ref $spec->{implementation} ) {
+    if ( ! ref $spec->{implementation} ) {
         my $pkg = $spec->{implementation};
         $pkg ne $spec->{name}
           or confess "$spec->{name} cannot be its own implementation.";
