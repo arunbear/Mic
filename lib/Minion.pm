@@ -54,11 +54,11 @@ sub minionize {
         $spec->{implementation} = { 
             package => $pkg, 
             methods => $stash->get_all_symbols('CODE'),
-            roles   => $meta->{roles},
             has     => {
                 %{ $meta->{has} || { } },
             },
         };
+        $spec->{roles} = $meta->{roles};
         my $is_semiprivate = _interface($meta, 'semiprivate');
 
         foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
@@ -88,14 +88,6 @@ sub _compose_roles {
     
     if ( ! $roles ) {
         $roles = $spec->{roles};
-        
-        # An implementation may be needed to resolve
-        # a role conflict, so implementations and roles
-        # are not mutually exclusive
-        if ( $spec->{implementation}{roles} ) {
-            push @{ $roles }, @{ $spec->{implementation}{roles} };
-        }
-        
     }
     
     $from_role ||= {};
