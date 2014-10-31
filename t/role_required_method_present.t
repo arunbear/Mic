@@ -24,6 +24,7 @@ use Minion ();
 
     our %__Meta = (
         semiprivate => ['cmp'],
+        roles => [qw( SorterRole )],
     );
 
     sub cmp ($$) {
@@ -38,7 +39,6 @@ use Minion ();
     our %__Meta = (
         interface => [qw( sort )],
         implementation => 'SorterImpl',
-        roles => [qw( SorterRole )],
     );
     Minion->minionize;
 }

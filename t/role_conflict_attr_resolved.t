@@ -29,6 +29,7 @@ use Minion ();
     package BusyDudeImpl;
 
     our %__Meta = (
+        roles => [qw( Lawyer Server )],
         has  => { clients => { default => sub { [] } } } 
     );
 }
@@ -38,7 +39,6 @@ use Minion ();
 
     our %__Meta = (
         interface => [qw( serve )],
-        roles => [qw( Lawyer Server )],
         implementation => 'BusyDudeImpl'
     );
     Minion->minionize;

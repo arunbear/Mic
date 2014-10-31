@@ -20,6 +20,7 @@ use Minion ();
 {
     package PersonImpl;
     our %__Meta = (
+        roles => [qw( Greeter )],
         has => { name => { init_arg => 'name' } }
     );
 }
@@ -32,7 +33,6 @@ use Minion ();
         construct_with => {
             name => { },
         },
-        roles => [qw( Greeter )],
         implementation => 'PersonImpl',
     );
     Minion->minionize;
