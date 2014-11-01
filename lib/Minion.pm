@@ -20,10 +20,20 @@ use Exception::Class (
 our $VERSION = 0.000_001;
 
 my $Class_count = 0;
+my %Implementation_of;
 
 sub import {
     my ($class, %arg) = @_;
-    $class->minionize(\%arg);
+
+    if ( my $bindings = $arg{bind} ) {
+
+        foreach my $class ( keys %$bindings ) {
+            $Implementation_of{$class} = $bindings->{$class};
+        }
+    }
+    else {
+        $class->minionize(\%arg);
+    }
 }
 
 sub minionize {
@@ -55,7 +65,7 @@ sub minionize {
     my $obj_stash;
 
     if ( ! ref $spec->{implementation} ) {
-        my $pkg = $spec->{implementation};
+        my $pkg = $Implementation_of{ $spec->{name} } || $spec->{implementation};
         $pkg ne $spec->{name}
           or confess "$spec->{name} cannot be its own implementation.";
         my $stash = _get_stash($pkg);
