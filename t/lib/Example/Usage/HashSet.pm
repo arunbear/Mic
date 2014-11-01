@@ -3,7 +3,7 @@ package Example::Usage::HashSet;
 use strict;
 
 our %__Meta = (
-    has => { set => { default => sub { {} }, reader => 1 } },
+    has => { set => { default => sub { {} } } },
 );
 
 sub has {
