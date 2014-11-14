@@ -21,6 +21,7 @@ our $VERSION = 0.000_001;
 
 my $Class_count = 0;
 my %Bound_implementation_of;
+my %Interface_for;
 
 sub import {
     my ($class, %arg) = @_;
@@ -30,6 +31,10 @@ sub import {
         foreach my $class ( keys %$bindings ) {
             $Bound_implementation_of{$class} = $bindings->{$class};
         }
+    }
+    elsif ( my $methods = $arg{declare_interface} ) {
+        my $caller_pkg = (caller)[0];
+        $Interface_for{$caller_pkg} = $methods;
     }
     else {
         $class->minionize(\%arg);
@@ -54,7 +59,7 @@ sub minionize {
 
     my @args = %$spec;
     validate(@args, {
-        interface => { type => ARRAYREF },
+        interface => { type => ARRAYREF | SCALAR },
         implementation => { type => SCALAR | HASHREF },
         construct_with => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
@@ -89,6 +94,7 @@ sub minionize {
     }
     $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
     
+    _prep_interface($spec);
     _compose_roles($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
@@ -101,6 +107,27 @@ sub minionize {
     _check_role_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
+}
+
+sub _prep_interface {
+    my ($spec) = @_;
+
+    return if ref $spec->{interface};
+    my $count = 0;
+    {
+
+        if (my $methods = $Interface_for{ $spec->{interface} }) {
+            $spec->{interface_name} = $spec->{interface};        
+            $spec->{interface} = $methods;        
+        }
+        else {
+            $count > 0 
+              and confess "Invalid interface: $spec->{interface}";
+            require_module($spec->{interface});
+            $count++;
+            redo;
+        }
+    }
 }
 
 sub _compose_roles {
@@ -380,10 +407,14 @@ sub _add_methods {
         my ($self, $r) = @_;
         
         if ( ! $r ) {
-            return ($spec->{name}, sort keys %{ $spec->{composed_role} });
+            return (( $spec->{interface_name} ? $spec->{interface_name} : () ), 
+                    $spec->{name}, sort keys %{ $spec->{composed_role} });
         }
         
-        $spec->{name} eq $r || $spec->{composed_role}{$r} || $self->isa($r);
+        return    $r eq $spec->{interface_name}
+               || $spec->{name} eq $r 
+               || $spec->{composed_role}{$r} 
+               || $self->isa($r);
     };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
