@@ -1,5 +1,5 @@
 package Example::Usage::SetInterface;
 
-use Minion
+use Class::Minion
     declare_interface => [qw( add has )];
 1;

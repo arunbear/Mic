@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package Greeter;
@@ -37,7 +37,7 @@ use Minion ();
 package main;
 
 throws_ok {
-    Minion->minionize(\ %Person::__Meta);
+    Class::Minion->minionize(\ %Person::__Meta);
 } qr/Attribute 'name', required by role Greeter, is not defined./;
 
 done_testing();

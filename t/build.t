@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package SetImpl;
@@ -30,7 +30,7 @@ use Minion ();
         interface => [qw( has )],
         implementation => 'SetImpl',
     );
-    Minion->minionize;
+    Class::Minion->minionize;
 }
 
 package main;

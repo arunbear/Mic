@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package Camper;
@@ -46,7 +46,7 @@ use Minion ();
 package main;
 
 throws_ok {
-    Minion->minionize(\ %BusyDude::__Meta);
+    Class::Minion->minionize(\ %BusyDude::__Meta);
 } qr/Cannot have 'pitch' in both BaseballPro and Camper/;
 
 done_testing();

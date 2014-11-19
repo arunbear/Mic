@@ -1,6 +1,6 @@
 package Example::Usage::SetReuseInterface;
 
-use Minion
+use Class::Minion
     interface => 'Example::Usage::SetInterface',
 
     implementation => 'Example::Usage::ArraySet',

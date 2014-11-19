@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package Alpha;
@@ -60,7 +60,7 @@ use Minion ();
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
     );
-    Minion->minionize;
+    Class::Minion->minionize;
 }
 
 package main;

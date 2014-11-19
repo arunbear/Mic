@@ -1,6 +1,6 @@
 use strict;
 use Test::Most tests => 4;
-use Minion ();
+use Class::Minion ();
 
 my %Class = (
     name => 'Counter',
@@ -19,7 +19,7 @@ my %Class = (
     },
 );
 
-Minion->minionize(\%Class);
+Class::Minion->minionize(\%Class);
 my $counter = Counter->new;
 
 is $counter->next => 0;

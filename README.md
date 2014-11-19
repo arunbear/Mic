@@ -1,13 +1,13 @@
 # NAME
 
-Minion - Spartans! What is _your_ API?
+Class::Minion - Spartans! What is _your_ API?
 
 # SYNOPSIS
 
-    use Minion ();
+    use Class::Minion ();
     use v5.10;
     
-    Minion->minionize({
+    Class::Minion->minionize({
         name => 'Spartan',
         interface => [qw( fight train party )], # This is what Spartans do
     
@@ -34,7 +34,7 @@ Minion - Spartans! What is _your_ API?
     
     package Example::Synopsis::Counter;
 
-    use Minion
+    use Class::Minion
         interface => [ qw( next ) ],
         implementation => 'Example::Synopsis::Acme::Counter';
 
@@ -80,7 +80,7 @@ Minion - Spartans! What is _your_ API?
 
 # DESCRIPTION
 
-Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
+Class::Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
 
 The Object Oriented way as it was originally envisioned was more concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
@@ -98,11 +98,11 @@ as well as other packages that provide the implementation of these commands.
 
 ## Via Import
 
-A class can be defined when importing Minion e.g.
+A class can be defined when importing Class::Minion e.g.
 
     package Foo;
 
-    use Minion
+    use Class::Minion
         interface => [ qw( list of methods ) ],
         construct_with => {
             arg_name => {
@@ -123,7 +123,7 @@ A class can be defined when importing Minion e.g.
         ;
     1;
 
-## Minion->minionize(\[HASHREF\])
+## Class::Minion->minionize(\[HASHREF\])
 
 A class can also be defined by calling the `minionize()` class method, with an optional hashref that 
 specifies the class as outlined above.
@@ -187,7 +187,7 @@ An attribute called "foo" can be accessed via it's object like this:
 
     $self->{$$}{foo}
 
-i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
+i.e. the attribute name preceeded by two underscores. Objects created by Class::Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
 declarations. This is done to prevent accidents like 
 mis-spelling an attribute name.

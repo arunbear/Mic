@@ -1,6 +1,6 @@
 use strict;
 use Test::More;
-use Minion ();
+use Class::Minion ();
 
 my %Class = (
     interface => [qw(next)],
@@ -27,7 +27,7 @@ my %Class = (
     },
 );
 
-my $counter = Minion->minionize(\%Class)->new(1);
+my $counter = Class::Minion->minionize(\%Class)->new(1);
 
 is($counter->next, 1);
 is($counter->next, 2);

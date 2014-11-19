@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package SorterRole;
@@ -40,7 +40,7 @@ use Minion ();
         interface => [qw( sort )],
         implementation => 'SorterImpl',
     );
-    Minion->minionize;
+    Class::Minion->minionize;
 }
 
 package main;

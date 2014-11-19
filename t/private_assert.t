@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package CounterImpl;
@@ -41,13 +41,13 @@ use Minion ();
         interface => [qw( next )],
         implementation => 'CounterImpl',
     );
-    Minion->minionize;
+    Class::Minion->minionize;
 }
 
 package main;
 
-throws_ok { my $counter = Counter->new() } 'Minion::Error::AssertionFailure';
-throws_ok { my $counter = Counter->new(start => 'asd') } 'Minion::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new() } 'Class::Minion::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 'asd') } 'Class::Minion::Error::AssertionFailure';
 lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
 
 done_testing();

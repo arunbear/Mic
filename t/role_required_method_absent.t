@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package SorterRole;
@@ -38,7 +38,7 @@ use Minion ();
 package main;
 
 throws_ok {
-    Minion->minionize(\ %Sorter::__Meta);
+    Class::Minion->minionize(\ %Sorter::__Meta);
 } qr/Method 'cmp', required by role SorterRole, is not implemented./;
 
 done_testing();

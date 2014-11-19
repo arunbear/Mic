@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minion ();
+use Class::Minion ();
 
 {
     package Camper;
@@ -47,7 +47,7 @@ use Minion ();
         interface => [qw( pitch )],
         implementation => 'BusyDudeImpl'
     );
-    Minion->minionize;
+    Class::Minion->minionize;
 }
 
 package main;

@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::Most;
 use AlphabetRole;
-use Minion ();
+use Class::Minion ();
 
 {
     package AlphabetImpl;
@@ -19,7 +19,7 @@ use Minion ();
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
     );
-    Minion->minionize;
+    Class::Minion->minionize;
 }
 
 {
@@ -41,12 +41,12 @@ use Minion ();
         interface => [qw( alpha bravo charlie delta )],
         construct_with => {
             alphabet => {
-                assert => { 'isa Alphabet' => sub { $_[0]->isa('Alphabet::__Minion') } },
+                assert => { 'isa Alphabet' => sub { $_[0]->isa('Alphabet::__Class::Minion') } },
             },
         },
         implementation => 'KeyboardImpl',
     );
-    Minion->minionize();
+    Class::Minion->minionize();
 }
 
 package main;

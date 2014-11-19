@@ -1,4 +1,4 @@
-package Minion;
+package Class::Minion;
 
 use strict;
 use 5.008_005;
@@ -11,10 +11,10 @@ use Package::Stash;
 use Sub::Name;
 
 use Exception::Class (
-    'Minion::Error::AssertionFailure' => { alias => 'assert_failed' },
-    'Minion::Error::InterfaceMismatch',
-    'Minion::Error::MethodDeclaration',
-    'Minion::Error::RoleConflict',
+    'Class::Minion::Error::AssertionFailure' => { alias => 'assert_failed' },
+    'Class::Minion::Error::InterfaceMismatch',
+    'Class::Minion::Error::MethodDeclaration',
+    'Class::Minion::Error::RoleConflict',
 );
 
 our $VERSION = 0.000_001;
@@ -55,7 +55,7 @@ sub minionize {
         $spec = { %$spec, %{ $cls_stash->get_symbol('%__Meta') || {} } };
         $spec->{name} = $caller_pkg;
     }
-    $spec->{name} ||= "Minion::Class_${\ ++$Class_count }";
+    $spec->{name} ||= "Class::Minion::Class_${\ ++$Class_count }";
 
     my @args = %$spec;
     validate(@args, {
@@ -92,7 +92,7 @@ sub minionize {
             }
         }
     }
-    $obj_stash = Package::Stash->new("$spec->{name}::__Minion");
+    $obj_stash = Package::Stash->new("$spec->{name}::__Class::Minion");
     
     _prep_interface($spec);
     _compose_roles($spec);
@@ -241,7 +241,7 @@ sub _add_role_methods {
     my $is_semiprivate     = _interface($role_meta, 'semiprivate');
 
     all { defined $in_class_interface->{$_} } keys %$in_role_interface
-      or Minion::Error::InterfaceMismatch->throw(
+      or Class::Minion::Error::InterfaceMismatch->throw(
         error => "Interfaces do not match: Class => $spec->{name}, Role => $role"
       );
 
@@ -272,7 +272,7 @@ sub _add_role_methods {
 sub _raise_role_conflict {
     my ($name, $role, $other_role) = @_;
 
-    Minion::Error::RoleConflict->throw(
+    Class::Minion::Error::RoleConflict->throw(
         error => "Cannot have '$name' in both $role and $other_role"
     );
 }
@@ -502,13 +502,13 @@ __END__
 
 =head1 NAME
 
-Minion - Spartans! What is I<your> API?
+Class::Minion - Spartans! What is I<your> API?
 
 =head1 SYNOPSIS
 
     package Example::Synopsis::Counter;
 
-    use Minion
+    use Class::Minion
         interface => [ qw( next ) ],
         implementation => 'Example::Synopsis::Acme::Counter';
 
@@ -553,7 +553,7 @@ Minion - Spartans! What is I<your> API?
     
 =head1 DESCRIPTION
 
-Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
+Class::Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
@@ -569,11 +569,11 @@ This way of building is more likely to result in systems that are loosely couple
 
 =head2 Via Import
 
-A class can be defined when importing Minion e.g.
+A class can be defined when importing Class::Minion e.g.
 
     package Foo;
 
-    use Minion
+    use Class::Minion
         interface => [ qw( list of methods ) ],
 
         construct_with => {
@@ -593,7 +593,7 @@ A class can be defined when importing Minion e.g.
         ;
     1;
 
-=head2 Minion->minionize([HASHREF])
+=head2 Class::Minion->minionize([HASHREF])
 
 A class can also be defined by calling the C<minionize()> class method, with an optional hashref that 
 specifies the class.
@@ -604,7 +604,7 @@ from which C<minionize()> was called.
 The class defined in the SYNOPSIS could also be defined like this
 
     use Test::Most tests => 4;
-    use Minion ();
+    use Class::Minion ();
 
     my %Class = (
         name => 'Counter',
@@ -623,7 +623,7 @@ The class defined in the SYNOPSIS could also be defined like this
         },
     );
 
-    Minion->minionize(\%Class);
+    Class::Minion->minionize(\%Class);
     my $counter = Counter->new;
 
     is $counter->next => 0;
@@ -681,7 +681,7 @@ An attribute called "foo" can be accessed via it's object like this:
 
     $self->{$$}{foo}
 
-i.e. the attribute name preceeded by two underscores. Objects created by Minion are hashes,
+i.e. the attribute name preceeded by two underscores. Objects created by Class::Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
 declarations. This is done to prevent accidents like 
 mis-spelling an attribute name.
