@@ -17,7 +17,7 @@ use Exception::Class (
     'Class::Minion::Error::RoleConflict',
 );
 
-our $VERSION = 0.000_001;
+our $VERSION = 0.000_002;
 
 my $Class_count = 0;
 my %Bound_implementation_of;
@@ -822,7 +822,7 @@ Copyright 2014- Arun Prasaad
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v3.
+it under the terms of the GNU public license, version 3.
 
 =head1 SEE ALSO
 
