@@ -19,7 +19,7 @@ my %Class = (
     },
 );
 
-Minion->minionize(\%Class)->new;
+Minion->minionize(\%Class);
 my $counter = Counter->new;
 
 is $counter->next => 0;
