@@ -4,34 +4,6 @@ Class::Minion - Spartans! What is _your_ API?
 
 # SYNOPSIS
 
-    use Class::Minion ();
-    use v5.10;
-    
-    Class::Minion->minionize({
-        name => 'Spartan',
-        interface => [qw( fight train party )], # This is what Spartans do
-    
-        # And this is how they do it:
-        implementation => {
-            methods => {
-                fight => sub { say "Spartan $_[0]->{$$}{id} is fighting" },
-                train => sub { say "Spartan $_[0]->{$$}{id} is training" },
-                party => sub { say "Spartan $_[0]->{$$}{id} is partying" },
-            },
-            has  => {
-                id => { default => sub { ++$main::_Count } },
-            }, 
-        },
-    });
-    my @spartans = map { Spartan->new } 1 .. 300;
-    
-    foreach my $spartan ( @spartans ) {
-        $spartan->fight;
-    }
-    # ... other horrible events
-    
-    # Now a more 'normal' example
-    
     package Example::Synopsis::Counter;
 
     use Class::Minion
@@ -82,17 +54,15 @@ Class::Minion - Spartans! What is _your_ API?
 
 Class::Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
 
+Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
+as well as a package that provide the implementation of these commands.
+
 The Object Oriented way as it was originally envisioned was more concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/) for further inspiration).
 
-This way of building is more likely to result in systems that are loosely coupled, modular, scalable and easy to maintain.
-
-The words "minion" and "object" are used interchangeably in the rest of this documentation.
-
-Classes are built from a specification hash that declares the interface of the class (i.e. what commands minions of the classs respond to),
-as well as other packages that provide the implementation of these commands.
+This way of building is more likely to result in systems that are loosely coupled, modular and easy to maintain.
 
 # USAGE
 
@@ -104,6 +74,7 @@ A class can be defined when importing Class::Minion e.g.
 
     use Class::Minion
         interface => [ qw( list of methods ) ],
+
         construct_with => {
             arg_name => {
                 assert => {
@@ -117,19 +88,50 @@ A class can be defined when importing Class::Minion e.g.
             # ... other args
         },
 
-        # Provide at least one of these
         implementation => 'An::Implementation::Package',
-        roles => [ qw( list of role packages ) ]
         ;
     1;
 
 ## Class::Minion->minionize(\[HASHREF\])
 
 A class can also be defined by calling the `minionize()` class method, with an optional hashref that 
-specifies the class as outlined above.
+specifies the class.
 
 If the hashref is not given, the specification is read from a package variable named `%__Meta` in the package
 from which `minionize()` was called.
+
+The class defined in the SYNOPSIS could also be defined like this
+
+    use Test::Most tests => 4;
+    use Class::Minion ();
+
+    my %Class = (
+        name => 'Counter',
+        interface => [qw( next )],
+        implementation => {
+            methods => {
+                next => sub {
+                    my ($self) = @_;
+
+                    $self->{$$}{count}++;
+                }
+            },
+            has  => {
+                count => { default => 0 },
+            }, 
+        },
+    );
+
+    Class::Minion->minionize(\%Class);
+    my $counter = Counter->new;
+
+    is $counter->next => 0;
+    is $counter->next => 1;
+
+    throws_ok { $counter->new } qr/Can't locate object method "new"/;
+    throws_ok { Counter->next } qr/Can't locate object method "next" via package "Counter"/;
+
+## Specification
 
 The meaning of the keys in the specification hash are described next.
 
@@ -138,8 +140,8 @@ The meaning of the keys in the specification hash are described next.
 A reference to an array containing the messages that minions belonging to this class should respond to.
 An exception is raised if this is empty or missing.
 
-The messages named in this array must have corresponding subroutine definitions in a declared implementation
-or role package, otherwise an exception is raised.
+The messages named in this array must have corresponding subroutine definitions in a declared implementation,
+otherwise an exception is raised.
 
 ### construct\_with => HASHREF
 
@@ -163,16 +165,7 @@ The name of a package that defines the subroutines declared in the interface.
 The package may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the `$minion->command(...)` syntax.
 
-An implementation package (or hash) need not be specified if Roles are used to provide an implementation.
-
 Alternatively an implementation can be hashref as shown in the synopsis above.
-
-### roles => ARRAYREF
-
-A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
-
-The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
-These won't be callable using the `$minion->command(...)` syntax.
 
 ## Configuring an implementation package
 
@@ -236,6 +229,13 @@ Any subroutines in this list will be semiprivate, i.e. they will not be callable
 can be called using the syntax:
 
     $obj->{'!'}->do_something(...)
+
+### roles => ARRAYREF
+
+A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
+
+The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
+These won't be callable using the `$minion->command(...)` syntax.
 
 ## Configuring a role package
 
@@ -321,6 +321,6 @@ Copyright 2014- Arun Prasaad
 # LICENSE
 
 This library is free software; you can redistribute it and/or modify
-it under the terms of the GPL v3.
+it under the terms of the GNU public license, version 3.
 
 # SEE ALSO
