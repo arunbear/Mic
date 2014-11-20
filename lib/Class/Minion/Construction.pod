@@ -61,6 +61,61 @@ to constrain the value of the 'start' parameter.
 
 Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
 
-This can be acheieved using the BUILDARGS special class method
+This can be acheieved using the "build_args" declaration, with which we use a sub to convert the argument array into a hash:
 
+    package Example::Construction::Set_v1;
 
+    use Class::Minion
+
+        interface => [qw( add has )],
+        construct_with => { items => {} },
+
+        build_args => sub {
+            my ($class, @items) = @_;
+
+            return { items => { map { $_ => 1 } @items } };
+        },
+
+        implementation => 'Example::Construction::Acme::Set_v1',
+    ;
+
+    1;
+
+The implementation is
+
+    package Example::Construction::Acme::Set_v1;
+
+    use strict;
+
+    our %__Meta = (
+        has => { 
+            set => { 
+                default => sub { {} },
+                init_arg => 'items',
+            } 
+        },
+    );
+
+    sub has {
+        my ($self, $e) = @_;
+        exists $self->{$$}{set}{$e};
+    }
+
+    sub add {
+        my ($self, $e) = @_;
+        ++$self->{$$}{set}{$e};
+    }
+
+    1;
+
+And to test this
+
+    use Test::More tests => 3;
+    use Example::Construction::Set_v1;
+
+    my $set = Example::Construction::Set_v1->new(1 .. 4);
+
+    ok $set->has(1);
+    ok ! $set->has(5);
+    $set->add(5);
+    ok $set->has(5);
