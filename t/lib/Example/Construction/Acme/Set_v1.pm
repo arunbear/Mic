@@ -1,10 +1,14 @@
-
 package Example::Construction::Acme::Set_v1;
 
 use strict;
 
 our %__Meta = (
-    has => { set => { default => sub { {} } } },
+    has => { 
+        set => { 
+            default => sub { {} },
+            init_arg => 'items',
+        } 
+    },
 );
 
 sub has {

@@ -57,3 +57,10 @@ Now we can test it
 Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration. We also used an assert declaration
 to constrain the value of the 'start' parameter.
 
+=head2 Positional parameters
+
+Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
+
+This can be acheieved using the BUILDARGS special class method
+
+

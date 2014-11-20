@@ -1,12 +1,17 @@
-
 package Example::Construction::Set_v1;
 
-use strict;
-use Class::Minion ();
+sub BUILDARGS {
+    my ($class, @items) = @_;
 
-our %__Meta = (
+    return { items => { map { $_ => 1 } @items } };
+}
+
+use Class::Minion
+
     interface => [qw( add has )],
+    #construct_with => { items => {} },
 
     implementation => 'Example::Construction::Acme::Set_v1',
-);
-Class::Minion->minionize;
+;
+
+1;
