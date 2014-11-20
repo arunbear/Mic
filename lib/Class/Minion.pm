@@ -632,6 +632,16 @@ The class defined in the SYNOPSIS could also be defined like this
     throws_ok { $counter->new } qr/Can't locate object method "new"/;
     throws_ok { Counter->next } qr/Can't locate object method "next" via package "Counter"/;
 
+=head2 Examples
+
+Further examples of usage can be found in the following documents
+
+=over 4
+
+=item L<Class::Minion::Construction>
+
+=back
+
 =head2 Specification
 
 The meaning of the keys in the specification hash are described next.

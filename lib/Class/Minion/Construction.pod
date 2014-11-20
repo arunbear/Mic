@@ -1,0 +1,59 @@
+=head1 The Default constructor
+
+The Default constructor will accept any named parameters defined by 'construct_with'. In the absence of a 'construct_with'
+declaration, any parameters passed to the default constructor are ignored.
+
+The example counter in the L<Class::Minion/SYNOPSIS> always starts at zero. Let's upgrade it to start from a user supplied value.
+
+    package Example::Construction::Counter;
+
+    use Class::Minion
+        interface => [ qw( next ) ],
+
+        construct_with => {
+            start => {
+                assert => {
+                    is_integer => sub { $_[0] =~ /^\d+$/ }
+                },
+            },
+        },
+        implementation => 'Example::Construction::Acme::Counter';
+
+    1;
+
+    package Example::Construction::Acme::Counter;
+
+    use strict;
+
+    our %__Meta = (
+        has  => {
+            count => { init_arg => 'start' },
+        }, 
+    );
+
+    sub next {
+        my ($self) = @_;
+
+        $self->{$$}{count}++;
+    }
+
+    1;
+
+Now we can test it
+
+    use Test::Most tests => 5;
+    use Example::Construction::Counter;
+
+    my $counter = Example::Construction::Counter->new(start => 10);
+
+    is $counter->next => 10;
+    is $counter->next => 11;
+    is $counter->next => 12;
+
+    throws_ok { Example::Construction::Counter->new } qr/Param 'start' was not provided/;
+    throws_ok { Example::Construction::Counter->new(start => 'abc') } 
+            qr/Parameter 'start' failed check 'is_integer'/;
+
+Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration. We also used an assert declaration
+to constrain the value of the 'start' parameter.
+
