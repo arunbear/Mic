@@ -9,7 +9,7 @@ sub BUILDARGS {
 use Class::Minion
 
     interface => [qw( add has )],
-    #construct_with => { items => {} },
+    construct_with => { items => {} },
 
     implementation => 'Example::Construction::Acme::Set_v1',
 ;
