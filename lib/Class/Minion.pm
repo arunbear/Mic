@@ -63,6 +63,7 @@ sub minionize {
         implementation => { type => SCALAR | HASHREF },
         construct_with => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
+        build_args     => { type => CODEREF, optional => 1 },
         name => { type => SCALAR, optional => 1 },
     });
     $cls_stash    ||= Package::Stash->new($spec->{name});
@@ -373,8 +374,8 @@ sub _add_default_constructor {
             return $obj;
         };
         
-        if (exists $spec->{class_methods}{BUILDARGS}) {
-            my $build_args = $spec->{class_methods}{BUILDARGS};
+        my $build_args = $spec->{build_args} || $spec->{class_methods}{BUILDARGS};
+        if ( $build_args ) {
             my $prev_new = $spec->{class_methods}{new};
             
             $spec->{class_methods}{new} = sub {
