@@ -61,7 +61,7 @@ to constrain the value of the 'start' parameter.
 
 Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
 
-This can be acheieved using the "build_args" declaration, with which we use a sub to wrap the argument array in a hash:
+This can be acheieved using the "build_args" declaration, with which we use a sub to wrap the argument array in a hash. This sub is itself wrapped around the default constructor, so that the positional arguments given by a user are passed to the constructor in the keyword style it expects.
 
     package Example::Construction::Set_v1;
 
