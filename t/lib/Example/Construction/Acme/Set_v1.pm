@@ -7,6 +7,7 @@ our %__Meta = (
         set => { 
             default => sub { {} },
             init_arg => 'items',
+            map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
         } 
     },
 );

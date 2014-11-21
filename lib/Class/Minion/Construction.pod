@@ -61,7 +61,7 @@ to constrain the value of the 'start' parameter.
 
 Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
 
-This can be acheieved using the "build_args" declaration, with which we use a sub to convert the argument array into a hash:
+This can be acheieved using the "build_args" declaration, with which we use a sub to wrap the argument array in a hash:
 
     package Example::Construction::Set_v1;
 
@@ -73,7 +73,7 @@ This can be acheieved using the "build_args" declaration, with which we use a su
         build_args => sub {
             my ($class, @items) = @_;
 
-            return { items => { map { $_ => 1 } @items } };
+            return { items => \@items };
         },
 
         implementation => 'Example::Construction::Acme::Set_v1',
@@ -81,7 +81,7 @@ This can be acheieved using the "build_args" declaration, with which we use a su
 
     1;
 
-The implementation is
+In the implementation, we convert the argument array to a hash
 
     package Example::Construction::Acme::Set_v1;
 
@@ -92,6 +92,7 @@ The implementation is
             set => { 
                 default => sub { {} },
                 init_arg => 'items',
+                map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
             } 
         },
     );

@@ -8,7 +8,7 @@ use Class::Minion
     build_args => sub {
         my ($class, @items) = @_;
 
-        return { items => { map { $_ => 1 } @items } };
+        return { items => \@items };
     },
 
     implementation => 'Example::Construction::Acme::Set_v1',
