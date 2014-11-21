@@ -331,7 +331,7 @@ sub _add_class_methods {
               or assert_failed error => "Parameter '$slot' failed check '$desc'";
         }
     };
-    
+
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
         $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
         subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
@@ -366,7 +366,8 @@ sub _add_default_constructor {
                     confess "Cannot have same init_arg '$name' for attributes '$attr' and '$dup'";
                 }
                 if ( $attr ) {
-                    $obj->{$$}{$attr} = $arg->{$name};
+                    my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
+                    $obj->{$$}{$attr} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
             }
             
