@@ -120,3 +120,67 @@ And to test this
     ok ! $set->has(5);
     $set->add(5);
     ok $set->has(5);
+
+=head2 Bring your own constructor
+
+If the default constructor is not flexible enough and you need to write your own constructor, here is an example of how to do it.
+
+We'll rewrite the counter example above and also show the more manual way of using Class::Minion
+
+    package Example::Construction::Counter_v2;
+
+    use strict;
+    use Class::Minion ();
+
+    our %__Meta = (
+        interface => [ qw( next ) ],
+
+        construct_with => {
+            start => {
+                assert => {
+                    is_integer => sub { $_[0] =~ /^\d+$/ }
+                },
+            },
+        },
+        implementation => 'Example::Construction::Acme::Counter',
+    );
+
+    sub new {
+        my ($class, $start) = @_;
+
+        $class->__assert__('start' => $start);
+        my $obj = $class->__new__;
+        $obj->{$$}{count} = $start;
+        return $obj;
+    }
+
+    Class::Minion->minionize;
+
+This can be simplified using the 'class_methods' declaration
+
+    package Example::Construction::Counter_v3;
+
+    use Class::Minion
+        interface => [ qw( next ) ],
+
+        construct_with => {
+            start => {
+                assert => {
+                    is_integer => sub { $_[0] =~ /^\d+$/ }
+                },
+            },
+        },
+        class_methods => {
+            new => sub {
+                my ($class, $start) = @_;
+
+                $class->__assert__('start' => $start);
+                my $obj = $class->__new__;
+                $obj->{$$}{count} = $start;
+                return $obj;
+            },
+        },
+
+        implementation => 'Example::Construction::Acme::Counter';
+
+    1;
