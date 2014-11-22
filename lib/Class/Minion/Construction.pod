@@ -121,7 +121,7 @@ And to test this
     $set->add(5);
     ok $set->has(5);
 
-=head2 Bring your own constructor
+=head1 Bring your own constructor
 
 If the default constructor is not flexible enough and you need to write your own constructor, here is an example of how to do it.
 
