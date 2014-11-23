@@ -560,12 +560,12 @@ Class::Minion is a class builder that simplifies the creation of loosely coupled
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
 
+This separation of interface from implementation is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
+
 The Object Oriented way as it was originally envisioned was more concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/> for further inspiration).
-
-This way of building is more likely to result in systems that are loosely coupled, modular and easy to maintain.
 
 =head1 USAGE
 
@@ -693,10 +693,9 @@ An attribute called "foo" can be accessed via it's object like this:
 
     $self->{$$}{foo}
 
-i.e. the attribute name preceeded by two underscores. Objects created by Class::Minion are hashes,
+Objects created by Class::Minion are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
-declarations. This is done to prevent accidents like 
-mis-spelling an attribute name.
+declarations. This is done to prevent accidents like mis-spelling an attribute name.
 
 =head4 default => SCALAR | CODEREF
 
