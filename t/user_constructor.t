@@ -8,7 +8,8 @@ my %Class = (
         new => sub {
             my ($class, $start) = @_;
 
-            my $obj = $class->__new__;
+            my $utility_class = Class::Minion::utility_class($class);
+            my $obj = $utility_class->__new__;
             $obj->{$$}{count} = $start;
             return $obj;
         },
