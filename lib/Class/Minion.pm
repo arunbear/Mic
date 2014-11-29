@@ -22,6 +22,7 @@ our $VERSION = 0.000_002;
 my $Class_count = 0;
 my %Bound_implementation_of;
 my %Interface_for;
+my %Util_class;
 
 sub import {
     my ($class, %arg) = @_;
@@ -103,11 +104,19 @@ sub minionize {
     $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__Meta', $spec) if @_ > 0;
     
+    _make_util_class($spec);
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     _check_role_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
+}
+
+sub utility_class {
+    my ($class) = @_;
+    
+    return $Util_class{ $class }
+      or confess "Unknown class: $class";
 }
 
 sub _prep_interface {
@@ -281,7 +290,9 @@ sub _raise_role_conflict {
 sub _get_object_maker {
 
     sub {
-        my $class = shift;
+        my $utility_class = shift;
+
+        my $class = $utility_class->__mainclass__;
         
         my $stash = Package::Stash->new($class);
         my %obj = ( 
@@ -309,16 +320,33 @@ sub _add_class_methods {
 
     $spec->{class_methods} ||= $stash->get_all_symbols('CODE');
     _add_default_constructor($spec);
-    $spec->{class_methods}{__new__} = _get_object_maker();
+
+    foreach my $sub ( keys %{ $spec->{class_methods} } ) {
+        $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
+        subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
+    }
+}
+
+sub _make_util_class {
+    my ($spec) = @_;
     
-    $spec->{class_methods}{__build__} = sub {
+    my $stash = Package::Stash->new("$spec->{name}::__Util");
+    $Util_class{ $spec->{name} } = $stash->name;
+
+    my %method = (
+        __new__ => _get_object_maker(),
+    );
+
+    $method{__mainclass__} = sub { $spec->{name} };
+    
+    $method{__build__} = sub {
         my (undef, $obj, $arg) = @_;
         if ( my $builder = $obj->{'!'}->can('BUILD') ) {
             $builder->($obj->{'!'}, $obj, $arg);
         }
     };
     
-    $spec->{class_methods}{__assert__} = sub {
+    $method{__assert__} = sub {
         my (undef, $slot, $val) = @_;
         
         return unless exists $spec->{construct_with}{$slot};
@@ -332,9 +360,19 @@ sub _add_class_methods {
         }
     };
 
-    foreach my $sub ( keys %{ $spec->{class_methods} } ) {
-        $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
-        subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
+    $method{__getvar__} = sub {
+        my ($class, $name) = @_;
+        $stash->get_symbol($name);
+    };
+
+    $method{__setvar__} = sub {
+        my ($class, $name, $val) = @_;
+        $stash->add_symbol($name, $val);
+    };
+
+    foreach my $sub ( keys %method ) {
+        $stash->add_symbol("&$sub", $method{$sub});
+        subname $stash->name."::$sub", $method{$sub};
     }
 }
 
@@ -352,13 +390,15 @@ sub _add_default_constructor {
             elsif ( scalar @_ > 1 ) {
                 $arg = { @_ };
             }
-            my $obj = $class->__new__;
+
+            my $utility_class = utility_class($class);
+            my $obj = $utility_class->__new__;
             for my $name ( keys %{ $spec->{construct_with} } ) {
 
                 if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
                     confess "Param '$name' was not provided.";
                 }
-                $class->__assert__($name, $arg->{$name});
+                $utility_class->__assert__($name, $arg->{$name});
 
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name } 
                                         keys %{ $spec->{implementation}{has} };
@@ -371,7 +411,7 @@ sub _add_default_constructor {
                 }
             }
             
-            $class->__build__($obj, $arg);
+            $utility_class->__build__($obj, $arg);
             return $obj;
         };
         
