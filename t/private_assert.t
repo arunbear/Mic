@@ -3,6 +3,8 @@ use Test::Lib;
 use Test::Most;
 use Class::Minion ();
 
+my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0] == int $_[0] });
+
 {
     package CounterImpl;
     use Scalar::Util;
@@ -11,10 +13,11 @@ use Class::Minion ();
         has  => {
             count => {
                 default => 0,
-                assert  => {
-                    integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0] == int $_[0] },
-                },
+                assert  => { %Assert },
             },
+            step => {
+                init_arg => 'step',
+            }
         }, 
     );
     
@@ -24,6 +27,7 @@ use Class::Minion ();
         my (undef, $self, $arg) = @_;
 
         $self->{'!'}->ASSERT('count', $arg->{start});
+        $self->{'!'}->ASSERT('step',  $arg->{'-step'}) if $arg->{'-step'};
         $self->{$$}{count} = $arg->{start};
     }
     
@@ -39,6 +43,12 @@ use Class::Minion ();
 
     our %__Meta = (
         interface => [qw( next )],
+        construct_with => {
+            step => {
+                optional => 1,
+                assert  => { %Assert },
+            }
+        },
         implementation => 'CounterImpl',
     );
     Class::Minion->minionize;
@@ -48,6 +58,8 @@ package main;
 
 throws_ok { my $counter = Counter->new() } 'Class::Minion::Error::AssertionFailure';
 throws_ok { my $counter = Counter->new(start => 'asd') } 'Class::Minion::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } 'Class::Minion::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } 'Class::Minion::Error::AssertionFailure';
 lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
 
 done_testing();

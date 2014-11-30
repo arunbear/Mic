@@ -400,7 +400,9 @@ sub _add_default_constructor {
                 if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
                     confess "Param '$name' was not provided.";
                 }
-                $utility_class->assert($name, $arg->{$name});
+                if ( defined $arg->{$name} ) {
+                    $utility_class->assert($name, $arg->{$name});
+                }
 
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name } 
                                         keys %{ $spec->{implementation}{has} };
@@ -408,6 +410,7 @@ sub _add_default_constructor {
                     confess "Cannot have same init_arg '$name' for attributes '$attr' and '$dup'";
                 }
                 if ( $attr ) {
+                    _copy_assertions($spec, $name, $attr);
                     my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
                     $obj->{$$}{$attr} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
@@ -426,6 +429,18 @@ sub _add_default_constructor {
                 $prev_new->($class, $build_args->($class, @_));
             };
         }
+    }
+}
+
+sub _copy_assertions {
+    my ($spec, $name, $attr) = @_;
+
+    my $meta = $spec->{construct_with}{$name};
+    
+    for my $desc ( keys %{ $meta->{assert} || {} } ) {
+        next if exists $spec->{implementation}{has}{$attr}{assert}{$desc};
+
+        $spec->{implementation}{has}{$attr}{assert}{$desc} = $meta->{assert}{$desc};
     }
 }
 
