@@ -121,6 +121,48 @@ And to test this
     $set->add(5);
     ok $set->has(5);
 
+=head2 BUILD
+
+BUILD can be used for validating the relation between attributes
+
+    package My::Game::Implementation;
+
+    sub BUILD {
+        my (undef, $self) = @_;
+
+        $self->{$$}{team1} != $self->{$$}{team2}
+          or confess "Teams must be different";
+
+        $self->{$$}{team1}->number_of_players 
+          == 
+        $self->{$$}{team2}->number_of_players
+          or confess "Teams must have the same number of players";
+    }
+
+    ...
+
+It can also be used to process constructor arguments, e.g. the counter implementation
+above can also be written using BUILD instead of init_arg (though init_arg 
+is preferable due being more concise).
+
+    package Example::Construction::Acme::Counter_v2;
+
+    use strict;
+
+    our %__Meta = (
+        has  => {
+            count => { },
+        }, 
+    );
+
+    sub BUILD {
+        my (undef, $self, $arg) = @_;
+
+        $self->{$$}{count} = $arg->{start};
+    }
+
+    ...
+
 =head1 Bring your own constructor
 
 If the default constructor is not flexible enough and you need to write your own constructor, here is an example of how to do it.
