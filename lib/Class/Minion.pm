@@ -292,7 +292,7 @@ sub _get_object_maker {
     sub {
         my $utility_class = shift;
 
-        my $class = $utility_class->__mainclass__;
+        my $class = $utility_class->main_class;
         
         my $stash = Package::Stash->new($class);
         my %obj = ( 
@@ -334,19 +334,19 @@ sub _make_util_class {
     $Util_class{ $spec->{name} } = $stash->name;
 
     my %method = (
-        __new__ => _get_object_maker(),
+        new_object => _get_object_maker(),
     );
 
-    $method{__mainclass__} = sub { $spec->{name} };
+    $method{main_class} = sub { $spec->{name} };
     
-    $method{__build__} = sub {
+    $method{build} = sub {
         my (undef, $obj, $arg) = @_;
         if ( my $builder = $obj->{'!'}->can('BUILD') ) {
             $builder->($obj->{'!'}, $obj, $arg);
         }
     };
     
-    $method{__assert__} = sub {
+    $method{assert} = sub {
         my (undef, $slot, $val) = @_;
         
         return unless exists $spec->{construct_with}{$slot};
@@ -360,14 +360,16 @@ sub _make_util_class {
         }
     };
 
-    $method{__getvar__} = sub {
+    my $class_var_stash = Package::Stash->new("$spec->{name}::__ClassVar");
+    
+    $method{get_var} = sub {
         my ($class, $name) = @_;
-        $stash->get_symbol($name);
+        $class_var_stash->get_symbol($name);
     };
 
-    $method{__setvar__} = sub {
+    $method{set_var} = sub {
         my ($class, $name, $val) = @_;
-        $stash->add_symbol($name, $val);
+        $class_var_stash->add_symbol($name, $val);
     };
 
     foreach my $sub ( keys %method ) {
@@ -392,13 +394,13 @@ sub _add_default_constructor {
             }
 
             my $utility_class = utility_class($class);
-            my $obj = $utility_class->__new__;
+            my $obj = $utility_class->new_object;
             for my $name ( keys %{ $spec->{construct_with} } ) {
 
                 if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
                     confess "Param '$name' was not provided.";
                 }
-                $utility_class->__assert__($name, $arg->{$name});
+                $utility_class->assert($name, $arg->{$name});
 
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name } 
                                         keys %{ $spec->{implementation}{has} };
@@ -411,7 +413,7 @@ sub _add_default_constructor {
                 }
             }
             
-            $utility_class->__build__($obj, $arg);
+            $utility_class->build($obj, $arg);
             return $obj;
         };
         
@@ -824,17 +826,17 @@ definition in the class.
 These special class methods are useful in cases where the default constructor is not flexible enough
 and you need to write your own constructor.
 
-=head3 __new__
+=head3 new_object
 
 This creates a new instance, in which attributes with declared defaults are populated with those defaults,
 and all others are populated with undef.
 
-=head3 __build__
+=head3 build
 
 This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
 is created.
 
-=head3 __assert__
+=head3 assert
 
 Given the name of a declared attribute and a value, this routine validates the value using any assertions
 declared with the attribute.

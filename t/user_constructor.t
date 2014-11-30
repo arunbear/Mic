@@ -9,7 +9,7 @@ my %Class = (
             my ($class, $start) = @_;
 
             my $utility_class = Class::Minion::utility_class($class);
-            my $obj = $utility_class->__new__;
+            my $obj = $utility_class->new_object;
             $obj->{$$}{count} = $start;
             return $obj;
         },
