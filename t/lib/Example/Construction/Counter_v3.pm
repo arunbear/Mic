@@ -15,8 +15,9 @@ use Class::Minion
         new => sub {
             my ($class, $start) = @_;
 
-            $class->__assert__('start' => $start);
-            my $obj = $class->__new__;
+            my $utility_class = Class::Minion::utility_class($class);
+            $utility_class->assert('start' => $start);
+            my $obj = $utility_class->new_object;
             $obj->{$$}{count} = $start;
             return $obj;
         },
