@@ -20,4 +20,4 @@ nytprof.out
 *.un~
 *.swp
 .perl-version
-Class-Minion-*
+Minions-*
