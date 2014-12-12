@@ -1,4 +1,4 @@
-package Class::Minion;
+package Minions;
 
 use strict;
 use 5.008_005;
@@ -11,10 +11,10 @@ use Package::Stash;
 use Sub::Name;
 
 use Exception::Class (
-    'Class::Minion::Error::AssertionFailure' => { alias => 'assert_failed' },
-    'Class::Minion::Error::InterfaceMismatch',
-    'Class::Minion::Error::MethodDeclaration',
-    'Class::Minion::Error::RoleConflict',
+    'Minions::Error::AssertionFailure' => { alias => 'assert_failed' },
+    'Minions::Error::InterfaceMismatch',
+    'Minions::Error::MethodDeclaration',
+    'Minions::Error::RoleConflict',
 );
 
 our $VERSION = 0.000_002;
@@ -56,7 +56,7 @@ sub minionize {
         $spec = { %$spec, %{ $cls_stash->get_symbol('%__Meta') || {} } };
         $spec->{name} = $caller_pkg;
     }
-    $spec->{name} ||= "Class::Minion::Class_${\ ++$Class_count }";
+    $spec->{name} ||= "Minions::Class_${\ ++$Class_count }";
 
     my @args = %$spec;
     validate(@args, {
@@ -94,7 +94,7 @@ sub minionize {
             }
         }
     }
-    $obj_stash = Package::Stash->new("$spec->{name}::__Class::Minion");
+    $obj_stash = Package::Stash->new("$spec->{name}::__Minions");
     
     _prep_interface($spec);
     _compose_roles($spec);
@@ -251,7 +251,7 @@ sub _add_role_methods {
     my $is_semiprivate     = _interface($role_meta, 'semiprivate');
 
     all { defined $in_class_interface->{$_} } keys %$in_role_interface
-      or Class::Minion::Error::InterfaceMismatch->throw(
+      or Minions::Error::InterfaceMismatch->throw(
         error => "Interfaces do not match: Class => $spec->{name}, Role => $role"
       );
 
@@ -282,7 +282,7 @@ sub _add_role_methods {
 sub _raise_role_conflict {
     my ($name, $role, $other_role) = @_;
 
-    Class::Minion::Error::RoleConflict->throw(
+    Minions::Error::RoleConflict->throw(
         error => "Cannot have '$name' in both $role and $other_role"
     );
 }
@@ -561,13 +561,13 @@ __END__
 
 =head1 NAME
 
-Class::Minion - Spartans! What is I<your> API?
+Minions - Spartans! What is I<your> API?
 
 =head1 SYNOPSIS
 
     package Example::Synopsis::Counter;
 
-    use Class::Minion
+    use Minions
         interface => [ qw( next ) ],
         implementation => 'Example::Synopsis::Acme::Counter';
 
@@ -616,7 +616,7 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Class::Minion is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>.
+Minions is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>.
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
@@ -632,11 +632,11 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 =head2 Via Import
 
-A class can be defined when importing Class::Minion e.g.
+A class can be defined when importing Minions e.g.
 
     package Foo;
 
-    use Class::Minion
+    use Minions
         interface => [ qw( list of methods ) ],
 
         construct_with => {
@@ -656,7 +656,7 @@ A class can be defined when importing Class::Minion e.g.
         ;
     1;
 
-=head2 Class::Minion->minionize([HASHREF])
+=head2 Minions->minionize([HASHREF])
 
 A class can also be defined by calling the C<minionize()> class method, with an optional hashref that 
 specifies the class.
@@ -667,7 +667,7 @@ from which C<minionize()> was called.
 The class defined in the SYNOPSIS could also be defined like this
 
     use Test::Most tests => 4;
-    use Class::Minion ();
+    use Minions ();
 
     my %Class = (
         name => 'Counter',
@@ -686,7 +686,7 @@ The class defined in the SYNOPSIS could also be defined like this
         },
     );
 
-    Class::Minion->minionize(\%Class);
+    Minions->minionize(\%Class);
     my $counter = Counter->new;
 
     is $counter->next => 0;
@@ -701,7 +701,7 @@ Further examples of usage can be found in the following documents
 
 =over 4
 
-=item L<Class::Minion::Construction>
+=item L<Minions::Construction>
 
 =back
 
@@ -754,7 +754,7 @@ An attribute called "foo" can be accessed via it's object like this:
 
     $self->{$$}{foo}
 
-Objects created by Class::Minion are hashes,
+Objects created by Minions are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
 declarations. This is done to prevent accidents like mis-spelling an attribute name.
 

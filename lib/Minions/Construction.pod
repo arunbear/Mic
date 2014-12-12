@@ -3,11 +3,11 @@
 The Default constructor will accept any named parameters defined by 'construct_with'. In the absence of a 'construct_with'
 declaration, any parameters passed to the default constructor are ignored.
 
-The example counter in the L<Class::Minion/SYNOPSIS> always starts at zero. Let's upgrade it to start from a user supplied value.
+The example counter in the L<Minions/SYNOPSIS> always starts at zero. Let's upgrade it to start from a user supplied value.
 
     package Example::Construction::Counter;
 
-    use Class::Minion
+    use Minions
         interface => [ qw( next ) ],
 
         construct_with => {
@@ -65,7 +65,7 @@ This can be acheieved using the "build_args" declaration, with which we use a su
 
     package Example::Construction::Set_v1;
 
-    use Class::Minion
+    use Minions
 
         interface => [qw( add has )],
         construct_with => { items => {} },
@@ -196,12 +196,12 @@ declared with the attribute.
 
 =head2 Examples
 
-We'll rewrite the counter example above and also show the more manual way of using Class::Minion
+We'll rewrite the counter example above and also show the more manual way of using Minions
 
     package Example::Construction::Counter_v2;
 
     use strict;
-    use Class::Minion ();
+    use Minions ();
 
     our %__Meta = (
         interface => [ qw( next ) ],
@@ -219,20 +219,20 @@ We'll rewrite the counter example above and also show the more manual way of usi
     sub new {
         my ($class, $start) = @_;
 
-        my $utility_class = Class::Minion::utility_class($class);
+        my $utility_class = Minions::utility_class($class);
         $utility_class->assert('start' => $start);
         my $obj = $utility_class->new_object;
         $obj->{$$}{count} = $start;
         return $obj;
     }
 
-    Class::Minion->minionize;
+    Minions->minionize;
 
 This can be simplified using the 'class_methods' declaration
 
     package Example::Construction::Counter_v3;
 
-    use Class::Minion
+    use Minions
         interface => [ qw( next ) ],
 
         construct_with => {
@@ -246,7 +246,7 @@ This can be simplified using the 'class_methods' declaration
             new => sub {
                 my ($class, $start) = @_;
 
-                my $utility_class = Class::Minion::utility_class($class);
+                my $utility_class = Minions::utility_class($class);
                 $utility_class->assert('start' => $start);
                 my $obj = $utility_class->new_object;
 
