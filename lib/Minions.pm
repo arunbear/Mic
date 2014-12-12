@@ -561,7 +561,7 @@ __END__
 
 =head1 NAME
 
-Minions - Spartans! What is I<your> API?
+Minions - What is I<your> API?
 
 =head1 SYNOPSIS
 
