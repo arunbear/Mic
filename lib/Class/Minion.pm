@@ -610,19 +610,23 @@ Class::Minion - Spartans! What is I<your> API?
     
     1;    
     
+=head1 STATUS
+
+This is an early release available for testing and feedback and as such is subject to change.
+
 =head1 DESCRIPTION
 
-Class::Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
+Class::Minion is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>.
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
 
-This separation of interface from implementation is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
+This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
 
-The Object Oriented way as it was originally envisioned was more concerned with messaging,
+It is not a coincidence that the Object Oriented way as it was originally envisioned was mainly concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
-(see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/> for further inspiration).
+(see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/>).
 
 =head1 USAGE
 
@@ -835,44 +839,6 @@ Any methods listed here must be provided by an implementation package or a role.
 
 Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
 definition in the class.
-
-=head2 Special Class Methods
-
-These special class methods are useful in cases where the default constructor is not flexible enough
-and you need to write your own constructor.
-
-=head3 new_object
-
-This creates a new instance, in which attributes with declared defaults are populated with those defaults,
-and all others are populated with undef.
-
-=head3 build
-
-This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
-is created.
-
-=head3 assert
-
-Given the name of a declared attribute and a value, this routine validates the value using any assertions
-declared with the attribute.
-
-=head2 Constructor Hooks
-
-These are optional routines that can be used to customise the default construction process. 
-
-=head3 BUILDARGS
-
-If this class method is defined, it will receive all parameters intended for C<new()>, and its
-result (which should be a hash list or hashref) will be passed to C<new()>.
-
-This is useful when the constructor requires positional rather than keyword parameters.
-
-=head3 BUILD
-
-If this semiprivate method is defined, it will be called by the default constructor and
-will receive the object and a hashref of named parameters that were passed to the constructor.
-
-This is useful for carrying out any post-construction logic e.g. object validation.
 
 =head1 BUGS
 

@@ -123,6 +123,11 @@ And to test this
 
 =head2 BUILD
 
+If this subroutine is defined, it will be called by the default constructor and
+will receive (as its 2nd and 3rd arguments) the object and a hashref of named parameters that were passed to the constructor.
+
+This is useful for carrying out any post-construction logic e.g. object validation.
+
 BUILD can be used for validating the relation between attributes
 
     package My::Game::Implementation;
@@ -165,7 +170,31 @@ is preferable due being more concise).
 
 =head1 Bring your own constructor
 
-If the default constructor is not flexible enough and you need to write your own constructor, here is an example of how to do it.
+If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of the utility class.
+
+=head2 The utility class
+
+Each class has a corresponding utility class. Within a class method, the utility class
+is obtained by calling the C<utility_class> routine (see example below). 
+
+The utility_class has the following construction related methods
+
+=head3 new_object
+
+This creates a new instance, in which attributes with declared defaults are populated with those defaults,
+and all others are populated with undef.
+
+=head3 build
+
+This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
+is created.
+
+=head3 assert
+
+Given the name of a declared attribute and a value, this routine validates the value using any assertions
+declared with the attribute.
+
+=head2 Examples
 
 We'll rewrite the counter example above and also show the more manual way of using Class::Minion
 
