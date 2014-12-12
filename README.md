@@ -1,12 +1,12 @@
 # NAME
 
-Class::Minion - Spartans! What is _your_ API?
+Minions - What is _your_ API?
 
 # SYNOPSIS
 
     package Example::Synopsis::Counter;
 
-    use Class::Minion
+    use Minions
         interface => [ qw( next ) ],
         implementation => 'Example::Synopsis::Acme::Counter';
 
@@ -50,29 +50,33 @@ Class::Minion - Spartans! What is _your_ API?
     1;    
     
 
+# STATUS
+
+This is an early release available for testing and feedback and as such is subject to change.
+
 # DESCRIPTION
 
-Class::Minion is a class builder that simplifies the creation of loosely coupled Object Oriented systems.
+Minions is a class builder that makes it easy to create classes that are [modular](http://en.wikipedia.org/wiki/Modular_programming).
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
 
-The Object Oriented way as it was originally envisioned was more concerned with messaging,
+This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
+
+It is not a coincidence that the Object Oriented way as it was originally envisioned was mainly concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
-(see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/) for further inspiration).
-
-This way of building is more likely to result in systems that are loosely coupled, modular and easy to maintain.
+(see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/)).
 
 # USAGE
 
 ## Via Import
 
-A class can be defined when importing Class::Minion e.g.
+A class can be defined when importing Minions e.g.
 
     package Foo;
 
-    use Class::Minion
+    use Minions
         interface => [ qw( list of methods ) ],
 
         construct_with => {
@@ -92,7 +96,7 @@ A class can be defined when importing Class::Minion e.g.
         ;
     1;
 
-## Class::Minion->minionize(\[HASHREF\])
+## Minions->minionize(\[HASHREF\])
 
 A class can also be defined by calling the `minionize()` class method, with an optional hashref that 
 specifies the class.
@@ -103,7 +107,7 @@ from which `minionize()` was called.
 The class defined in the SYNOPSIS could also be defined like this
 
     use Test::Most tests => 4;
-    use Class::Minion ();
+    use Minions ();
 
     my %Class = (
         name => 'Counter',
@@ -122,7 +126,7 @@ The class defined in the SYNOPSIS could also be defined like this
         },
     );
 
-    Class::Minion->minionize(\%Class);
+    Minions->minionize(\%Class);
     my $counter = Counter->new;
 
     is $counter->next => 0;
@@ -130,6 +134,12 @@ The class defined in the SYNOPSIS could also be defined like this
 
     throws_ok { $counter->new } qr/Can't locate object method "new"/;
     throws_ok { Counter->next } qr/Can't locate object method "next" via package "Counter"/;
+
+## Examples
+
+Further examples of usage can be found in the following documents
+
+- [Minions::Construction](https://metacpan.org/pod/Minions::Construction)
 
 ## Specification
 
@@ -180,10 +190,9 @@ An attribute called "foo" can be accessed via it's object like this:
 
     $self->{$$}{foo}
 
-i.e. the attribute name preceeded by two underscores. Objects created by Class::Minion are hashes,
+Objects created by Minions are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)
-declarations. This is done to prevent accidents like 
-mis-spelling an attribute name.
+declarations. This is done to prevent accidents like mis-spelling an attribute name.
 
 #### default => SCALAR | CODEREF
 
@@ -266,44 +275,6 @@ Any methods listed here must be provided by an implementation package or a role.
 
 Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
 definition in the class.
-
-## Special Class Methods
-
-These special class methods are useful in cases where the default constructor is not flexible enough
-and you need to write your own constructor.
-
-### \_\_new\_\_
-
-This creates a new instance, in which attributes with declared defaults are populated with those defaults,
-and all others are populated with undef.
-
-### \_\_build\_\_
-
-This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
-is created.
-
-### \_\_assert\_\_
-
-Given the name of a declared attribute and a value, this routine validates the value using any assertions
-declared with the attribute.
-
-## Constructor Hooks
-
-These are optional routines that can be used to customise the default construction process. 
-
-### BUILDARGS
-
-If this class method is defined, it will receive all parameters intended for `new()`, and its
-result (which should be a hash list or hashref) will be passed to `new()`.
-
-This is useful when the constructor requires positional rather than keyword parameters.
-
-### BUILD
-
-If this semiprivate method is defined, it will be called by the default constructor and
-will receive the object and a hashref of named parameters that were passed to the constructor.
-
-This is useful for carrying out any post-construction logic e.g. object validation.
 
 # BUGS
 
