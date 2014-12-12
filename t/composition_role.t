@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::Most;
 use AlphabetRole;
-use Class::Minion ();
+use Minions ();
 
 {
     package AlphabetImpl;
@@ -19,7 +19,7 @@ use Class::Minion ();
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
     );
-    Class::Minion->minionize;
+    Minions->minionize;
 }
 
 {
@@ -44,7 +44,7 @@ use Class::Minion ();
         },
         implementation => 'KeyboardImpl',
     );
-    Class::Minion->minionize();
+    Minions->minionize();
 }
 
 package main;

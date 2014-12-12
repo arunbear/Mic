@@ -1,7 +1,7 @@
 package Example::Construction::Counter_v3;
 
 use strict;
-use Class::Minion
+use Minions
     interface => [ qw( next ) ],
 
     construct_with => {
@@ -15,7 +15,7 @@ use Class::Minion
         new => sub {
             my ($class, $start) = @_;
 
-            my $utility_class = Class::Minion::utility_class($class);
+            my $utility_class = Minions::utility_class($class);
             $utility_class->assert('start' => $start);
             my $obj = $utility_class->new_object;
             $obj->{$$}{count} = $start;

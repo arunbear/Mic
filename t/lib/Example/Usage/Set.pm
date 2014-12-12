@@ -1,6 +1,6 @@
 package Example::Usage::Set;
 
-use Class::Minion
+use Minions
     interface => [qw( add has )],
 
     implementation => 'Example::Usage::ArraySet',

@@ -2,7 +2,7 @@ use strict;
 use Scalar::Util qw( reftype );
 use Test::Lib;
 use Test::More tests => 3;
-use Class::Minion
+use Minions
     bind => { 'Example::Usage::Set' => 'Example::Usage::HashSet' };
 
 use Example::Usage::Set;

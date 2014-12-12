@@ -1,6 +1,6 @@
 package Example::Construction::Counter_v4;
 
-use Class::Minion
+use Minions
     interface => [ qw( next ) ],
 
     construct_with => {

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 {
     package Greeter;
@@ -39,12 +39,12 @@ use Class::Minion ();
     );
     our $Error;
     
-    eval { Class::Minion->minionize }
+    eval { Minions->minionize }
       or $Error = $@;
 }
 
 package main;
 
-isa_ok($Person::Error, 'Class::Minion::Error::InterfaceMismatch');
+isa_ok($Person::Error, 'Minions::Error::InterfaceMismatch');
 
 done_testing();

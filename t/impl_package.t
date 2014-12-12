@@ -1,6 +1,6 @@
 use strict;
 use Test::More;
-use Class::Minion ();
+use Minions ();
 
 package Counter::Impl;
 
@@ -22,7 +22,7 @@ our %__Meta = (
     interface => [qw(next)],
     implementation => 'Counter::Impl',
 );
-Class::Minion->minionize;
+Minions->minionize;
 
 package main;
 

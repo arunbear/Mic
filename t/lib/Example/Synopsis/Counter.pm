@@ -1,6 +1,6 @@
 package Example::Synopsis::Counter;
 
-use Class::Minion
+use Minions
     interface => [ qw( next ) ],
     implementation => 'Example::Synopsis::Acme::Counter';
 

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 {
     package PersonImpl;
@@ -24,7 +24,7 @@ use Class::Minion ();
     );
     our $Error;
     
-    eval { Class::Minion->minionize}
+    eval { Minions->minionize}
       or $Error = $@;
 }
 

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 {
     package Lawyer;
@@ -44,7 +44,7 @@ use Class::Minion ();
 package main;
 
 throws_ok {
-    Class::Minion->minionize(\ %BusyDude::__Meta);
+    Minions->minionize(\ %BusyDude::__Meta);
 } qr/Cannot have 'clients' in both Server and Lawyer/;
 
 done_testing();

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0] == int $_[0] });
 
@@ -51,15 +51,15 @@ my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0
         },
         implementation => 'CounterImpl',
     );
-    Class::Minion->minionize;
+    Minions->minionize;
 }
 
 package main;
 
-throws_ok { my $counter = Counter->new() } 'Class::Minion::Error::AssertionFailure';
-throws_ok { my $counter = Counter->new(start => 'asd') } 'Class::Minion::Error::AssertionFailure';
-throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } 'Class::Minion::Error::AssertionFailure';
-throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } 'Class::Minion::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new() } 'Minions::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 'asd') } 'Minions::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } 'Minions::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } 'Minions::Error::AssertionFailure';
 lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
 
 done_testing();

@@ -1,7 +1,7 @@
 package FixedSizeQueue;
 
 use strict;
-use Class::Minion ();
+use Minions ();
 
 our %__Meta = (
     interface => [qw(push size max_size)],
@@ -12,4 +12,4 @@ our %__Meta = (
         },
     }, 
 );
-Class::Minion->minionize;
+Minions->minionize;

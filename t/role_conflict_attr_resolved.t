@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 {
     package Lawyer;
@@ -41,7 +41,7 @@ use Class::Minion ();
         interface => [qw( serve )],
         implementation => 'BusyDudeImpl'
     );
-    Class::Minion->minionize;
+    Minions->minionize;
 }
 
 package main;

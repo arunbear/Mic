@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 package FixedSizeQueue;
 
@@ -14,7 +14,7 @@ our %__Meta = (
         },
     }, 
 );
-Class::Minion->minionize;
+Minions->minionize;
 
 package main;
 
@@ -29,6 +29,6 @@ $q->push(2);
 is($q->size, 2);
 
 throws_ok { FixedSizeQueue->new() } qr/Param 'max_size' was not provided./;
-throws_ok { FixedSizeQueue->new(max_size => 0) } 'Class::Minion::Error::AssertionFailure';
+throws_ok { FixedSizeQueue->new(max_size => 0) } 'Minions::Error::AssertionFailure';
 
 done_testing();

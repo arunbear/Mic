@@ -1,6 +1,6 @@
 package Example::Construction::Set_v1;
 
-use Class::Minion
+use Minions
 
     interface => [qw( add has )],
     construct_with => { items => {} },

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Class::Minion ();
+use Minions ();
 
 {
     package PersonImpl;
@@ -31,7 +31,7 @@ use Class::Minion ();
         },
         implementation => 'PersonImpl',
     );
-    Class::Minion->minionize;
+    Minions->minionize;
 }
 
 package main;
