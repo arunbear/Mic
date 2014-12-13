@@ -62,6 +62,16 @@ to constrain the value of the 'start' parameter.
 
 Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
 
+    use Test::More tests => 3;
+    use Example::Construction::Set_v1;
+
+    my $set = Example::Construction::Set_v1->new(1 .. 4);
+
+    ok $set->has(1);
+    ok ! $set->has(5);
+    $set->add(5);
+    ok $set->has(5);
+
 This can be acheieved using the "build_args" declaration, with which we use a sub to wrap the argument array in a hash. This sub is itself wrapped around the default constructor, so that the positional arguments given by a user are passed to the constructor in the keyword style it expects.
 
     package Example::Construction::Set_v1;
@@ -109,18 +119,6 @@ In the implementation, we convert the argument array to a hash
     }
 
     1;
-
-And to test this
-
-    use Test::More tests => 3;
-    use Example::Construction::Set_v1;
-
-    my $set = Example::Construction::Set_v1->new(1 .. 4);
-
-    ok $set->has(1);
-    ok ! $set->has(5);
-    $set->add(5);
-    ok $set->has(5);
 
 =head2 BUILD
 
