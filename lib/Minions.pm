@@ -17,7 +17,8 @@ use Exception::Class (
     'Minions::Error::RoleConflict',
 );
 
-our $VERSION = 0.000_003;
+our $VERSION = '0.000_004';
+$VERSION = eval $VERSION;
 
 my $Class_count = 0;
 my %Bound_implementation_of;
@@ -628,6 +629,15 @@ where in the words of Alan Kay (who coined the term "Object Oriented Programming
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/>).
 
+=head1 RATIONALE
+
+Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
+perhaps the most popular being the L<Moose> family. Moose is very effective at class building but acheives this at the
+expense of Encapsulation (the hiding of implementation details from end users). E.g. if we wrote the counter example above
+using idiomatic Moose, we would expose the count attribute via a method even though end users don't need to know about it. 
+
+Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require encapsulation to be sacrificed.
+
 =head1 USAGE
 
 =head2 Via Import
@@ -701,7 +711,7 @@ Further examples of usage can be found in the following documents
 
 =over 4
 
-=item L<Minions::Construction>
+=item L<Minions::Manual::Construction>
 
 =back
 
@@ -741,7 +751,7 @@ These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 
 Alternatively an implementation can be hashref as shown in the synopsis above.
 
-L<Minions::Implementations> describes how implementations are configured.
+L<Minions::Manual::Implementations> describes how implementations are configured.
 
 =head2 Configuring a role package
 
