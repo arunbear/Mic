@@ -633,8 +633,9 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
 perhaps the most popular being the L<Moose> family. Moose is very effective at class building but acheives this at the
-expense of Encapsulation (the hiding of implementation details from end users). E.g. if we wrote the counter example above
-using idiomatic Moose, we would expose the count attribute via a method even though end users don't need to know about it. 
+expense of Encapsulation (the hiding of implementation details from end users). 
+E.g. idiomatic Moose code exposes all of an object's attributes via methods. If we wrote the counter example above
+using this approach, we would expose the count attribute via a method even though end users shouldn't need to know about it. 
 
 Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require encapsulation to be sacrificed.
 
