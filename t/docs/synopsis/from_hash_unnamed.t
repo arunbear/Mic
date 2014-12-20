@@ -9,7 +9,7 @@ my %Class = (
             next => sub {
                 my ($self) = @_;
 
-                $self->{$$}{count}++;
+                $self->{-count}++;
             }
         },
         has  => {

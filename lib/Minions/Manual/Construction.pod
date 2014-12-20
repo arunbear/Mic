@@ -50,7 +50,7 @@ and we change the implementation to make use of this starting value.
     sub next {
         my ($self) = @_;
 
-        $self->{$$}{count}++;
+        $self->{-count}++;
     }
 
     1;
@@ -110,12 +110,12 @@ In the implementation, we convert the argument array to a hash
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$$}{set}{$e};
+        exists $self->{-set}{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$$}{set}{$e};
+        ++$self->{-set}{$e};
     }
 
     1;
@@ -134,12 +134,12 @@ BUILD can be used for validating the relation between attributes
     sub BUILD {
         my (undef, $self) = @_;
 
-        $self->{$$}{team1} != $self->{$$}{team2}
+        $self->{-team1} != $self->{-team2}
           or confess "Teams must be different";
 
-        $self->{$$}{team1}->number_of_players 
+        $self->{-team1}->number_of_players 
           == 
-        $self->{$$}{team2}->number_of_players
+        $self->{-team2}->number_of_players
           or confess "Teams must have the same number of players";
     }
 
@@ -162,7 +162,7 @@ is preferable due being more concise).
     sub BUILD {
         my (undef, $self, $arg) = @_;
 
-        $self->{$$}{count} = $arg->{start};
+        $self->{-count} = $arg->{start};
     }
 
     ...
@@ -221,7 +221,7 @@ We'll rewrite the counter example above and also show the more manual way of usi
         my $utility_class = Minions::utility_class($class);
         $utility_class->assert('start' => $start);
         my $obj = $utility_class->new_object;
-        $obj->{$$}{count} = $start;
+        $obj->{-count} = $start;
         return $obj;
     }
 
@@ -249,7 +249,7 @@ This can be simplified using the 'class_methods' declaration
                 $utility_class->assert('start' => $start);
                 my $obj = $utility_class->new_object;
 
-                $obj->{$$}{count} = $start;
+                $obj->{-count} = $start;
                 return $obj;
             },
         },

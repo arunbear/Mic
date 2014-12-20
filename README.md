@@ -44,7 +44,7 @@ Minions - What is _your_ API?
     sub next {
         my ($self) = @_;
     
-        $self->{$$}{count}++;
+        $self->{-count}++;
     }
     
     1;    
@@ -117,7 +117,7 @@ The class defined in the SYNOPSIS could also be defined like this
                 next => sub {
                     my ($self) = @_;
 
-                    $self->{$$}{count}++;
+                    $self->{-count}++;
                 }
             },
             has  => {
@@ -188,7 +188,7 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object like this:
 
-    $self->{$$}{foo}
+    $self->{-foo}
 
 Objects created by Minions are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)

@@ -11,7 +11,7 @@ our %__Meta = (
 sub next {
     my ($self) = @_;
 
-    $self->{$$}{count}++;
+    $self->{-count}++;
 }
 
 1;

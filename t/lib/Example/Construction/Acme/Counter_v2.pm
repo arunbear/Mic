@@ -11,13 +11,13 @@ our %__Meta = (
 sub BUILD {
     my (undef, $self, $arg) = @_;
 
-    $self->{$$}{count} = $arg->{start};
+    $self->{-count} = $arg->{start};
 }
 
 sub next {
     my ($self) = @_;
 
-    $self->{$$}{count}++;
+    $self->{-count}++;
 }
 
 1;

@@ -14,12 +14,12 @@ use Minions ();
     sub BUILD {
         my (undef, $self, $arg) = @_;
 
-        $self->{$$}{set} = { map { $_ => 1 } @{ $arg->{elements} } };
+        $self->{-set} = { map { $_ => 1 } @{ $arg->{elements} } };
     }
     
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$$}{set}{$e};
+        exists $self->{-set}{$e};
     }
 }
 

@@ -22,7 +22,7 @@ sub new {
     my $utility_class = Minions::utility_class($class);
     $utility_class->assert('start' => $start);
     my $obj = $utility_class->new_object;
-    $obj->{$$}{count} = $start;
+    $obj->{-count} = $start;
     return $obj;
 }
 

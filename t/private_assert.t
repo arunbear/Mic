@@ -28,13 +28,13 @@ my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0
 
         $self->{'!'}->ASSERT('count', $arg->{start});
         $self->{'!'}->ASSERT('step',  $arg->{'-step'}) if $arg->{'-step'};
-        $self->{$$}{count} = $arg->{start};
+        $self->{-count} = $arg->{start};
     }
     
     sub next {
         my ($self) = @_;
 
-        $self->{$$}{count}++;
+        $self->{-count}++;
     }
 }
 

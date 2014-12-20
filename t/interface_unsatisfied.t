@@ -11,7 +11,7 @@ use Minions ();
 
     sub greet {
         my ($self) = @_;
-        return "Hello $self->{$$}{name}";
+        return "Hello $self->{-name}";
     }
 }
 

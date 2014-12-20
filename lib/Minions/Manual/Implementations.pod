@@ -9,7 +9,7 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object like this:
 
-    $self->{$$}{foo}
+    $self->{-foo}
 
 Objects created by Minions are hashes,
 and are locked down to allow only keys declared in the "has" (implementation or role level)

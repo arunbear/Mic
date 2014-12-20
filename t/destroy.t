@@ -16,7 +16,7 @@ use Minions ();
     sub BUILD {
         my (undef, $self) = @_;
 
-        $self->{$$}{id} = ++$Count;
+        $self->{-id} = ++$Count;
     }
     
     sub DESTROY {

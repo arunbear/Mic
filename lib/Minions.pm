@@ -298,17 +298,15 @@ sub _get_object_maker {
         my $stash = Package::Stash->new($class);
         my %obj = ( 
             '!' => ${ $stash->get_symbol('$__Private_pkg') },
-            $$  => {}, 
         );
 
         my $spec = $stash->get_symbol('%__Meta');
         
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            $obj{$$}{$attr} = ref $meta->{default} eq 'CODE'
+            $obj{-$attr} = ref $meta->{default} eq 'CODE'
               ? $meta->{default}->()
               : $meta->{default};
         }
-        lock_keys(%{ $obj{$$} });
         
         bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };            
         lock_keys(%obj);
@@ -413,7 +411,7 @@ sub _add_default_constructor {
                 if ( $attr ) {
                     _copy_assertions($spec, $name, $attr);
                     my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
-                    $obj->{$$}{$attr} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
+                    $obj->{-$attr} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
             }
             
@@ -484,7 +482,7 @@ sub _add_methods {
              && $in_interface->{$name} ) {
 
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
-            $spec->{implementation}{methods}{$name} = sub { $_[0]->{$$}{$name} };
+            $spec->{implementation}{methods}{$name} = sub { $_[0]->{-$name} };
         }
 
         if ( !  $spec->{implementation}{methods}{$name}
@@ -496,7 +494,7 @@ sub _add_methods {
                 my ($self, $new_val) = @_;
 
                 $self->{'!'}->ASSERT($name, $new_val);
-                $self->{$$}{$name} = $new_val;
+                $self->{-$name} = $new_val;
                 return $self;
             };
         }
@@ -537,8 +535,8 @@ sub _add_delegates {
                 my $target = $target_method->{$meth} || $meth;
                 $spec->{implementation}{methods}{$meth} =
                   $in_interface->{$meth}
-                    ? sub { shift->{$$}{$name}->$target(@_) }
-                    : sub { shift; shift->{$$}{$name}->$target(@_) };
+                    ? sub { shift->{-$name}->$target(@_) }
+                    : sub { shift; shift->{-$name}->$target(@_) };
             }
         }
     }
@@ -606,7 +604,7 @@ Minions - What is I<your> API?
     sub next {
         my ($self) = @_;
     
-        $self->{$$}{count}++;
+        $self->{-count}++;
     }
     
     1;    
@@ -688,7 +686,7 @@ The class defined in the SYNOPSIS could also be defined like this
                 next => sub {
                     my ($self) = @_;
 
-                    $self->{$$}{count}++;
+                    $self->{-count}++;
                 }
             },
             has  => {

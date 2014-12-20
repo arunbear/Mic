@@ -10,7 +10,7 @@ my %Class = (
 
             my $utility_class = Minions::utility_class($class);
             my $obj = $utility_class->new_object;
-            $obj->{$$}{count} = $start;
+            $obj->{-count} = $start;
             return $obj;
         },
     },
@@ -22,7 +22,7 @@ my %Class = (
             next => sub {
                 my ($self) = @_;
 
-                $self->{$$}{count}++;
+                $self->{-count}++;
             }
         },
     },

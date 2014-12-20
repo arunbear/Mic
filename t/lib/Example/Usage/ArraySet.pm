@@ -8,14 +8,14 @@ our %__Meta = (
 
 sub has {
     my ($self, $e) = @_;
-    scalar grep { $_ == $e } @{ $self->{$$}{set} };
+    scalar grep { $_ == $e } @{ $self->{-set} };
 }
 
 sub add {
     my ($self, $e) = @_;
 
     if ( ! $self->has($e) ) {
-        push @{ $self->{$$}{set} }, $e;
+        push @{ $self->{-set} }, $e;
     }
 }
 

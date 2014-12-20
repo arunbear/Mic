@@ -13,12 +13,12 @@ use Minions ();
 
     sub greet {
         my ($self) = @_;
-        return "Hello $self->{$$}{name}";
+        return "Hello $self->{-name}";
     }
 
     sub gday {
         my ($self) = @_;
-        return "G'day $self->{$$}{name}";
+        return "G'day $self->{-name}";
     }
 }
 
