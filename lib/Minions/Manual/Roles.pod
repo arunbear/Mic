@@ -1,0 +1,30 @@
+=head2 Configuring a role package
+
+A role package must be configured with a package variable C<%__Meta> with the following keys (of which only "role"
+is mandatory):
+ 
+=head3 role => 1 (Mandatory)
+
+This indicates that the package is a Role.
+
+=head3 has => HASHREF
+
+This works the same way as in an implementation package.
+
+=head3 semiprivate => ARRAYREF
+
+This works the same way as in an implementation package.
+
+=head3 requires => HASHREF
+
+A hash with keys:
+
+=head4 methods => ARRAYREF
+
+Any methods listed here must be provided by an implementation package or a role.
+
+=head4 attributes => ARRAYREF
+
+Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
+definition in the class.
+
