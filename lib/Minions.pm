@@ -635,7 +635,37 @@ expense of Encapsulation (the hiding of implementation details from end users).
 E.g. idiomatic Moose code exposes all of an object's attributes via methods. If we wrote the counter example above
 using this approach, we would expose the count attribute via a method even though end users shouldn't need to know about it. 
 
-Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require encapsulation to be sacrificed.
+Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
+
+=head2 The Tale of Minions
+
+There once was a farmer who had a flock of sheep. His typical workday looked like:
+
+    $farmer->move_flock($pasture)  
+    $farmer->monitor_flock()  
+    $farmer->move_flock($home)  
+
+    $farmer->other_important_work()  
+
+In order to devote more time to C<other_important_work()>, the farmer decided to hire a minion, so the work was now split like this:     
+
+    $shepherd_boy->move_flock($pasture)  
+    $shepherd_boy->monitor_flock()  
+    $shepherd_boy->move_flock($home)  
+
+    $farmer->other_important_work()  
+
+This did give the farmer more time for C<other_important_work()>, but unfornately C<$shepherd_boy> had a tendency to L<cry wolf|http://en.wikipedia.org/wiki/The_Boy_Who_Cried_Wolf> so the farmer had to replace him:
+
+    $sheep_dog->move_flock($pasture)  
+    $sheep_dog->monitor_flock()  
+    $sheep_dog->move_flock($home)  
+
+    $farmer->other_important_work()  
+
+C<$sheep_dog> was more reliable and demanded less pay than C<$shepherd_boy>, so this was a win for the farmer.
+
+Object Oriented design is essentially the act of minionization, i.e. deciding which minions ($objects) will do what work, and how to communicate with them (using an interface).
 
 =head1 USAGE
 
@@ -751,36 +781,6 @@ These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 Alternatively an implementation can be hashref as shown in the synopsis above.
 
 L<Minions::Manual::Implementations> describes how implementations are configured.
-
-=head2 Configuring a role package
-
-A role package must be configured with a package variable C<%__Meta> with the following keys (of which only "role"
-is mandatory):
- 
-=head3 role => 1 (Mandatory)
-
-This indicates that the package is a Role.
-
-=head3 has => HASHREF
-
-This works the same way as in an implementation package.
-
-=head3 semiprivate => ARRAYREF
-
-This works the same way as in an implementation package.
-
-=head3 requires => HASHREF
-
-A hash with keys:
-
-=head4 methods => ARRAYREF
-
-Any methods listed here must be provided by an implementation package or a role.
-
-=head4 attributes => ARRAYREF
-
-Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
-definition in the class.
 
 =head1 BUGS
 
