@@ -1,9 +1,6 @@
 package FixedSizeQueueRole;
 
-use strict;
-
-our %__Meta = (
-    role => 1,
+use Minions::Role
     has  => {
         q => { default => sub { [ ] } },
         max_size => { 
@@ -11,7 +8,7 @@ our %__Meta = (
             reader => 1,
         },
     }, 
-);
+;
 
 sub size {
     my ($self) = @_;

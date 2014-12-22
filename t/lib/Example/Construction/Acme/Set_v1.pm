@@ -1,8 +1,6 @@
 package Example::Construction::Acme::Set_v1;
 
-use strict;
-
-our %__Meta = (
+use Minions::Implementation
     has => { 
         set => { 
             default => sub { {} },
@@ -10,7 +8,7 @@ our %__Meta = (
             map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
         } 
     },
-);
+;
 
 sub has {
     my ($self, $e) = @_;

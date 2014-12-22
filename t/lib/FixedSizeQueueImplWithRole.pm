@@ -1,8 +1,6 @@
 package FixedSizeQueueImplWithRole;
 
-use strict;
-
-our %__Meta = (
+use Minions::Implementation
     roles => ['FixedSizeQueueRole'],
     has  => {
         max_size => { 
@@ -10,6 +8,6 @@ our %__Meta = (
             reader => 1,
         },
     }, 
-);
+;
 
 1;

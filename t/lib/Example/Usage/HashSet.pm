@@ -1,10 +1,8 @@
 package Example::Usage::HashSet;
 
-use strict;
-
-our %__Meta = (
+use Minions::Implementation
     has => { set => { default => sub { {} } } },
-);
+;
 
 sub has {
     my ($self, $e) = @_;

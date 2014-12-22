@@ -1,10 +1,6 @@
 package AlphabetRole;
 
-use strict;
-
-our %__Meta = (
-    role => 1,
-);
+use Minions::Role;
 
 sub alpha   { 'alpha' }
 sub bravo   { 'bravo' }

@@ -1,12 +1,10 @@
 package Example::Synopsis::Acme::Counter;
 
-use strict;
-
-our %__Meta = (
-    has  => {
+use Minions::Implementation
+    has => {
         count => { default => 0 },
-    }, 
-);
+    } 
+;
 
 sub next {
     my ($self) = @_;

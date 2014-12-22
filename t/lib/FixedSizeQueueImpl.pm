@@ -1,8 +1,6 @@
 package FixedSizeQueueImpl;
 
-use strict;
-
-our %__Meta = (
+use Minions::Implementation
     has  => {
         q => { default => sub { [ ] } },
         max_size => { 
@@ -10,7 +8,7 @@ our %__Meta = (
             reader => 1,
         },
     }, 
-);
+;
 
 sub size {
     my ($self) = @_;
