@@ -1,4 +1,9 @@
-=head2 Configuring an implementation package
+=head2 Introduction
+
+An implementation is a package containing attribute definitions as well as subroutines implementing the
+behaviours described by the class interface.
+
+=head2 Configuration
 
 An implementation package can also be configured with a package variable C<%__Meta> with the following keys:
 
@@ -10,10 +15,6 @@ the following sub sections.
 An attribute called "foo" can be accessed via it's object like this:
 
     $self->{-foo}
-
-Objects created by Minions are hashes,
-and are locked down to allow only keys declared in the "has" (implementation or role level)
-declarations. This is done to prevent accidents like mis-spelling an attribute name.
 
 =head4 default => SCALAR | CODEREF
 
@@ -58,11 +59,13 @@ Readers should only be created if they are logically part of the class API.
 Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
 can be called using the syntax:
 
-    $obj->{'!'}->do_something(...)
+    $self->{'!'}->do_something(...)
 
 =head3 roles => ARRAYREF
 
 A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
+
+L<Minions::Manual::Roles> describes how roles are configured.
 
 The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
 These won't be callable using the C<$minion-E<gt>command(...)> syntax.
