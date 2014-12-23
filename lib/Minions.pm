@@ -67,8 +67,10 @@ sub minionize {
         class_methods  => { type => HASHREF, optional => 1 },
         build_args     => { type => CODEREF, optional => 1 },
         name => { type => SCALAR, optional => 1 },
+        no_attribute_sym => { type => BOOLEAN, optional => 1 },
     });
     $cls_stash    ||= Package::Stash->new($spec->{name});
+    $spec->{attribute_sym} = $spec->{no_attribute_sym}  ? '' : $Minions::_Guts::attribute_sym;
     
     my $obj_stash;
 
@@ -301,9 +303,10 @@ sub _get_object_maker {
         );
 
         my $spec = $stash->get_symbol('%__Meta');
+        my $obfu = $spec->{attribute_sym};
         
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            $obj{-$attr} = ref $meta->{default} eq 'CODE'
+            $obj{$obfu.-$attr} = ref $meta->{default} eq 'CODE'
               ? $meta->{default}->()
               : $meta->{default};
         }
@@ -394,6 +397,7 @@ sub _add_default_constructor {
 
             my $utility_class = utility_class($class);
             my $obj = $utility_class->new_object;
+            my $obfu = $spec->{attribute_sym};
             for my $name ( keys %{ $spec->{construct_with} } ) {
 
                 if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
@@ -411,7 +415,7 @@ sub _add_default_constructor {
                 if ( $attr ) {
                     _copy_assertions($spec, $name, $attr);
                     my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
-                    $obj->{-$attr} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
+                    $obj->{$obfu.-$attr} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
             }
             
@@ -475,6 +479,8 @@ sub _add_methods {
                || $self->isa($r);
     };
     
+    my $obfu = $spec->{attribute_sym};
+
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
         if ( !  $spec->{implementation}{methods}{$name}
@@ -482,7 +488,7 @@ sub _add_methods {
              && $in_interface->{$name} ) {
 
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
-            $spec->{implementation}{methods}{$name} = sub { $_[0]->{-$name} };
+            $spec->{implementation}{methods}{$name} = sub { $_[0]->{$obfu.-$name} };
         }
 
         if ( !  $spec->{implementation}{methods}{$name}
@@ -494,7 +500,7 @@ sub _add_methods {
                 my ($self, $new_val) = @_;
 
                 $self->{'!'}->ASSERT($name, $new_val);
-                $self->{-$name} = $new_val;
+                $self->{$obfu.-$name} = $new_val;
                 return $self;
             };
         }
@@ -526,6 +532,7 @@ sub _add_delegates {
             (undef, $method) = _load_role($meta->{handles});
         }
         my $in_interface = _interface($spec);
+        my $obfu = $spec->{attribute_sym};
         
         foreach my $meth ( keys %{ $method } ) {
             if ( defined $spec->{implementation}{methods}{$meth} ) {
@@ -535,8 +542,8 @@ sub _add_delegates {
                 my $target = $target_method->{$meth} || $meth;
                 $spec->{implementation}{methods}{$meth} =
                   $in_interface->{$meth}
-                    ? sub { shift->{-$name}->$target(@_) }
-                    : sub { shift; shift->{-$name}->$target(@_) };
+                    ? sub { shift->{$obfu.-$name}->$target(@_) }
+                    : sub { shift; shift->{$obfu.-$name}->$target(@_) };
             }
         }
     }
@@ -604,7 +611,7 @@ Minions - What is I<your> API?
     sub next {
         my ($self) = @_;
     
-        $self->{-count}++;
+        $self->{$A.count}++;
     }
     
     1;    
@@ -716,7 +723,7 @@ The class defined in the SYNOPSIS could also be defined like this
                 next => sub {
                     my ($self) = @_;
 
-                    $self->{-count}++;
+                    $self->{$A.count}++;
                 }
             },
             has  => {
