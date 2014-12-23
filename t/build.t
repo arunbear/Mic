@@ -29,6 +29,7 @@ use Minions ();
     our %__Meta = (
         interface => [qw( has )],
         implementation => 'SetImpl',
+        no_attribute_sym => 1,
     );
     Minions->minionize;
 }

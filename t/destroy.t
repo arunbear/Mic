@@ -31,6 +31,7 @@ use Minions ();
     our %__Meta = (
         interface => [qw( id )],
         implementation => 'ProcessImpl',
+        no_attribute_sym => 1,
     );
     Minions->minionize;
 }
