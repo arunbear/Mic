@@ -6,14 +6,13 @@ use Minions ();
 {
     package Greeter;
 
-    our %__Meta = (
-        role => 1,
+    use Minions::Role
         requires => { attributes => ['name'] }
-    );
+    ;
 
     sub greet {
         my ($self) = @_;
-        return "Hello $self->{-name}";
+        return "Hello $self->{$__Name}";
     }
 }
 

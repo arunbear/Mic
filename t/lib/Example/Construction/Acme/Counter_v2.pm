@@ -9,13 +9,13 @@ use Minions::Implementation
 sub BUILD {
     my (undef, $self, $arg) = @_;
 
-    $self->{-count} = $arg->{start};
+    $self->{$__Count} = $arg->{start};
 }
 
 sub next {
     my ($self) = @_;
 
-    $self->{-count}++;
+    $self->{$__Count}++;
 }
 
 1;

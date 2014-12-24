@@ -1,4 +1,4 @@
-use strict;
+# use strict;
 use Test::Lib;
 use Test::Most;
 use Minions ();
@@ -6,23 +6,22 @@ use Minions ();
 {
     package Greeter;
 
-    our %__Meta = (
-        role => 1,
+    use Minions::Role
         requires => { attributes => ['name'] }
-    );
+    ;
 
     sub greet {
         my ($self) = @_;
-        return "Hello, I am $self->{-name}";
+        return "Hello, I am $self->{$__Name}";
     }
 }
 
 {
     package PersonImpl;
-    our %__Meta = (
+    use Minions::Implementation
         roles => [qw( Greeter )],
         has => { name => { init_arg => 'name' } }
-    );
+    ;
 }
 
 {
