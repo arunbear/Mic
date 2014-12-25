@@ -15,10 +15,9 @@ use Minions
         new => sub {
             my ($class, $start) = @_;
 
-            my $utility_class = Minions::utility_class($class);
-            $utility_class->assert('start' => $start);
-            my $obj = $utility_class->new_object;
-            $obj->{-count} = $start;
+            my $util = Minions::utility_class($class);
+            $util->assert(start => $start);
+            my $obj = $util->new_object({count => $start});
             return $obj;
         },
     },

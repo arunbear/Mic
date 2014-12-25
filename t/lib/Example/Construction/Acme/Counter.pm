@@ -9,7 +9,7 @@ use Minions::Implementation
 sub next {
     my ($self) = @_;
 
-    $self->{-count}++;
+    $self->{$__Count}++;
 }
 
 1;

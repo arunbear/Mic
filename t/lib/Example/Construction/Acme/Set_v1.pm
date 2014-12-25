@@ -12,12 +12,12 @@ use Minions::Implementation
 
 sub has {
     my ($self, $e) = @_;
-    exists $self->{-set}{$e};
+    exists $self->{$__Set}{$e};
 }
 
 sub add {
     my ($self, $e) = @_;
-    ++$self->{-set}{$e};
+    ++$self->{$__Set}{$e};
 }
 
 1;

@@ -16,7 +16,6 @@ my %Class = (
             }
         },
     },
-    no_attribute_sym => 1
 );
 
 my $counter = Minions->minionize(\%Class)->new;
@@ -44,7 +43,6 @@ my %Named_class = (
             }
         },
     }, 
-    no_attribute_sym => 1
 );
 Minions->minionize(\%Named_class);
 my $counter2 = Counter->new;

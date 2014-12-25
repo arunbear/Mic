@@ -3,23 +3,25 @@ use Test::Lib;
 use Test::Most;
 use Minions ();
 
-my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0] == int $_[0] });
+BEGIN {
+our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0] == int $_[0] });
+}
 
 {
     package CounterImpl;
     use Scalar::Util;
 
-    our %__Meta = (
+    use Minions::Implementation
         has  => {
             count => {
                 default => 0,
-                assert  => { %Assert },
+                assert  => { %main::Assert },
             },
             step => {
                 init_arg => 'step',
             }
         }, 
-    );
+    ;
     
     our $Count = 0;
 
@@ -27,14 +29,15 @@ my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0
         my (undef, $self, $arg) = @_;
 
         $self->{'!'}->ASSERT('count', $arg->{start});
-        $self->{'!'}->ASSERT('step',  $arg->{'-step'}) if $arg->{'-step'};
-        $self->{-count} = $arg->{start};
+        $self->{'!'}->ASSERT('step',  $arg->{-step}) if $arg->{-step};
+        # use Data::Dump 'pp'; die pp($self);
+        $self->{$__Count} = $arg->{start};
     }
     
     sub next {
         my ($self) = @_;
 
-        $self->{-count}++;
+        $self->{$__Count}++;
     }
 }
 
@@ -44,9 +47,10 @@ my %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0
     our %__Meta = (
         interface => [qw( next )],
         construct_with => {
+            #TODO: fix to allow just these keys
             step => {
                 optional => 1,
-                assert  => { %Assert },
+                assert  => { %main::Assert },
             }
         },
         implementation => 'CounterImpl',
