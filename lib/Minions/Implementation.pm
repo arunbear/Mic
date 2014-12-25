@@ -30,14 +30,24 @@ sub add_attribute_syms {
     my ($class, $arg, $stash) = @_;
 
     foreach my $slot (keys %{ $arg->{has} }) {
-        Readonly my $sym_val => "$Minions::_Guts::attribute_sym-$slot"; 
-        $Minions::_Guts::obfu_name{$slot} = $sym_val;
-
-        $stash->add_symbol(
-            sprintf('$%s%s', $arg->{attribute_sym_prefix} || '__', ucfirst $slot),
-            \ $sym_val
-        );
+        $class->add_obfu_name($arg, $stash, $slot);
     }
+
+    foreach my $slot (@{ $arg->{requires}{attributes} || [] }) {
+        $class->add_obfu_name($arg, $stash, $slot);
+    }
+}
+
+sub add_obfu_name {
+    my ($class, $arg, $stash, $slot) = @_;
+
+    Readonly my $sym_val => "$Minions::_Guts::attribute_sym-$slot"; 
+    $Minions::_Guts::obfu_name{$slot} = $sym_val;
+
+    $stash->add_symbol(
+        sprintf('$%s%s', $arg->{attribute_sym_prefix} || '__', ucfirst $slot),
+        \ $sym_val
+    );
 }
 
 sub update_args {}
