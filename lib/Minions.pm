@@ -68,10 +68,9 @@ sub minionize {
         class_methods  => { type => HASHREF, optional => 1 },
         build_args     => { type => CODEREF, optional => 1 },
         name => { type => SCALAR, optional => 1 },
-        no_attribute_sym => { type => BOOLEAN, optional => 1 },
+        no_attribute_vars => { type => BOOLEAN, optional => 1 },
     });
     $cls_stash    ||= Package::Stash->new($spec->{name});
-    $spec->{attribute_sym} = $spec->{no_attribute_sym}  ? '' : $Minions::_Guts::attribute_sym;
     
     my $obj_stash;
 
@@ -294,7 +293,7 @@ sub _raise_role_conflict {
 sub _get_object_maker {
 
     sub {
-        my $utility_class = shift;
+        my ($utility_class, $init) = @_;
 
         my $class = $utility_class->main_class;
         
@@ -306,10 +305,12 @@ sub _get_object_maker {
         my $spec = $stash->get_symbol('%__Meta');
         
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            my $obfu_name = $Minions::_Guts::obfu_name{$attr};
-            $obj{$obfu_name} = ref $meta->{default} eq 'CODE'
-              ? $meta->{default}->()
-              : $meta->{default};
+            my $obfu_name = Minions::_Guts::obfu_name($attr, $spec);
+            $obj{$obfu_name} = $init->{$attr} 
+              ? $init->{$attr} 
+              : (ref $meta->{default} eq 'CODE'
+                ? $meta->{default}->()
+                : $meta->{default});
         }
         
         bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };            
@@ -415,7 +416,7 @@ sub _add_default_constructor {
                 if ( $attr ) {
                     _copy_assertions($spec, $name, $attr);
                     my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
-                    my $obfu_name = $Minions::_Guts::obfu_name{$attr};
+                    my $obfu_name = Minions::_Guts::obfu_name($attr, $spec) ;
                     $obj->{$obfu_name} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
             }
@@ -487,7 +488,7 @@ sub _add_methods {
              && $in_interface->{$name} ) {
 
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
-            my $obfu_name = $Minions::_Guts::obfu_name{$name};
+            my $obfu_name = Minions::_Guts::obfu_name($name, $spec);
             $spec->{implementation}{methods}{$name} = sub { $_[0]->{$obfu_name} };
         }
 
@@ -500,7 +501,7 @@ sub _add_methods {
                 my ($self, $new_val) = @_;
 
                 $self->{'!'}->ASSERT($name, $new_val);
-                $self->{ $Minions::_Guts::obfu_name{$name} } = $new_val;
+                $self->{ Minions::_Guts::obfu_name($name, $spec) } = $new_val;
                 return $self;
             };
         }
@@ -532,7 +533,7 @@ sub _add_delegates {
             (undef, $method) = _load_role($meta->{handles});
         }
         my $in_interface = _interface($spec);
-        my $obfu_name = $Minions::_Guts::obfu_name{$name};
+        my $obfu_name = Minions::_Guts::obfu_name($name, $spec);
         
         foreach my $meth ( keys %{ $method } ) {
             if ( defined $spec->{implementation}{methods}{$meth} ) {
