@@ -474,14 +474,26 @@ sub _add_methods {
         my ($self, $r) = @_;
         
         if ( ! $r ) {
-            return (( $spec->{interface_name} ? $spec->{interface_name} : () ), 
-                    $spec->{name}, sort keys %{ $spec->{composed_role} });
+            my @items = (( $spec->{interface_name} ? $spec->{interface_name} : () ), 
+                          $spec->{name}, sort keys %{ $spec->{composed_role} });
+            return unless defined wantarray;
+            return wantarray ? @items : \@items;
         }
         
         return    $r eq $spec->{interface_name}
                || $spec->{name} eq $r 
                || $spec->{composed_role}{$r} 
                || $self->isa($r);
+    };
+    $spec->{implementation}{methods}{can} = sub {
+        my ($self, $f) = @_;
+
+        if ( ! $f ) {
+            my @items = sort @{ $spec->{interface} };
+            return unless defined wantarray;
+            return wantarray ? @items : \@items;
+        }
+        return UNIVERSAL::can($self, $f);
     };
     
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
