@@ -30,7 +30,6 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
 
         $self->{'!'}->ASSERT('count', $arg->{start});
         $self->{'!'}->ASSERT('step',  $arg->{-step}) if $arg->{-step};
-        # use Data::Dump 'pp'; die pp($self);
         $self->{$__count} = $arg->{start};
     }
     
@@ -48,10 +47,17 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
         interface => [qw( next )],
         construct_with => {
             #TODO: fix to allow just these keys
+            start => {
+                optional => 1,
+            },
             step => {
                 optional => 1,
                 assert  => { %main::Assert },
-            }
+            },
+            -step => {
+                optional => 1,
+                assert  => { %main::Assert },
+            },
         },
         implementation => 'CounterImpl',
     );

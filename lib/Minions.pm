@@ -396,6 +396,9 @@ sub _add_default_constructor {
             elsif ( scalar @_ > 1 ) {
                 $arg = { @_ };
             }
+            if (my @unknown = grep { ! exists $spec->{construct_with}{$_} } keys %$arg) {
+                confess "Unknown args: [@unknown]";                
+            }
 
             my $utility_class = utility_class($class);
             my $obj = $utility_class->new_object;

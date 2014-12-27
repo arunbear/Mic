@@ -28,6 +28,9 @@ use Minions ();
 
     our %__meta__ = (
         interface => [qw( has )],
+        construct_with => {
+            elements => {},
+        },
         implementation => 'SetImpl',
     );
     Minions->minionize;
