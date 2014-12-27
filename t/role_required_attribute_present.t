@@ -27,7 +27,7 @@ use Minions ();
 {
     package Person;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( greet )],
         construct_with => {
             name => { },

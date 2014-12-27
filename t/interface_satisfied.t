@@ -6,7 +6,7 @@ use Minions ();
 {
     package PersonImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         has => { 
             name => { 
                 init_arg => 'name',
@@ -24,7 +24,7 @@ use Minions ();
 {
     package Person;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( greet name )],
         construct_with => {
             name => { },

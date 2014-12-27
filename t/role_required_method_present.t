@@ -6,7 +6,7 @@ use Minions ();
 {
     package SorterRole;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         requires => { methods => ['cmp'] }
     );
@@ -22,7 +22,7 @@ use Minions ();
 {
     package SorterImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         semiprivate => ['cmp'],
         roles => [qw( SorterRole )],
     );
@@ -36,7 +36,7 @@ use Minions ();
 {
     package Sorter;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( sort )],
         implementation => 'SorterImpl',
     );

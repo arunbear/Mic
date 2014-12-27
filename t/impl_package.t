@@ -4,7 +4,7 @@ use Minions ();
 
 package Counter::Impl;
 
-our %__Meta = (
+our %__meta__ = (
     has  => {
         count => { default => 0 },
     }, 
@@ -18,7 +18,7 @@ sub next {
 
 package Counter;
 
-our %__Meta = (
+our %__meta__ = (
     interface => [qw(next)],
     implementation => 'Counter::Impl',
 );

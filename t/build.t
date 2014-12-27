@@ -6,7 +6,7 @@ use Minions ();
 {
     package SetImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         has => { set => { default => sub { {} } } }
     );
@@ -26,7 +26,7 @@ use Minions ();
 {
     package Set;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( has )],
         implementation => 'SetImpl',
     );

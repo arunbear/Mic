@@ -6,7 +6,7 @@ use Minions ();
 {
     package FixedSizeQueueImpl;
     
-    our %__Meta = (
+    our %__meta__ = (
         has  => {
             q => { default => sub { [ ] } },
             max_size => {},
@@ -33,7 +33,7 @@ use Minions ();
 
 package FixedSizeQueue;
 
-our %__Meta = (
+our %__meta__ = (
     interface => [qw( push size )],
     implementation => 'FixedSizeQueueImpl',
     construct_with => {

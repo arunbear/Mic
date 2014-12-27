@@ -6,7 +6,7 @@ use Minions ();
 {
     package PersonImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
     );
 
     sub greet {
@@ -18,7 +18,7 @@ use Minions ();
 {
     package Person;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( greet name )],
         implementation => 'PersonImpl',
     );

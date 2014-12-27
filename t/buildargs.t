@@ -5,7 +5,7 @@ use Minions ();
 
 package FixedSizeQueue;
 
-our %__Meta = (
+our %__meta__ = (
     interface => [qw(push size max_size)],
     construct_with => {
         max_size => { 

@@ -6,7 +6,7 @@ use Minions ();
 {
     package SorterRole;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         requires => { methods => ['cmp'] }
     );
@@ -21,7 +21,7 @@ use Minions ();
 {
     package SorterImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         roles => [qw( SorterRole )],
     );
 }
@@ -29,7 +29,7 @@ use Minions ();
 {
     package Sorter;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( sort )],
         implementation => 'SorterImpl',
     );
@@ -38,7 +38,7 @@ use Minions ();
 package main;
 
 throws_ok {
-    Minions->minionize(\ %Sorter::__Meta);
+    Minions->minionize(\ %Sorter::__meta__);
 } qr/Method 'cmp', required by role SorterRole, is not implemented./;
 
 done_testing();

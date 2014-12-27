@@ -6,7 +6,7 @@ use Minions ();
 {
     package Alpha;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         roles => [qw( Bravo Charlie )]
     );
@@ -17,7 +17,7 @@ use Minions ();
 {
     package Bravo;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         roles => [qw( Delta )]
     );
@@ -28,7 +28,7 @@ use Minions ();
 {
     package Charlie;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
     );
 
@@ -38,7 +38,7 @@ use Minions ();
 {
     package Delta;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
     );
 
@@ -48,7 +48,7 @@ use Minions ();
 {
     package AlphabetImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         roles => [qw( Alpha )],
     );
 }
@@ -56,7 +56,7 @@ use Minions ();
 {
     package Alphabet;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
     );

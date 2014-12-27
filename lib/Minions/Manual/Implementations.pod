@@ -5,7 +5,7 @@ behaviours described by the class interface.
 
 =head2 Configuration
 
-An implementation package can also be configured with a package variable C<%__Meta> with the following keys:
+An implementation package can also be configured with a package variable C<%__meta__> with the following keys:
 
 =head3 has => HASHREF
 

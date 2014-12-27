@@ -6,7 +6,7 @@ use Minions ();
 {
     package Camper;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
     );
 
@@ -18,7 +18,7 @@ use Minions ();
 {
     package BaseballPro;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
     );
 
@@ -30,7 +30,7 @@ use Minions ();
 {
     package BusyDudeImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         roles => [qw( Camper BaseballPro )],
     );
 }
@@ -38,7 +38,7 @@ use Minions ();
 {
     package BusyDude;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( pitch )],
         implementation => 'BusyDudeImpl'
     );
@@ -46,7 +46,7 @@ use Minions ();
 package main;
 
 throws_ok {
-    Minions->minionize(\ %BusyDude::__Meta);
+    Minions->minionize(\ %BusyDude::__meta__);
 } qr/Cannot have 'pitch' in both BaseballPro and Camper/;
 
 done_testing();

@@ -6,7 +6,7 @@ use Minions ();
 {
     package Lawyer;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         has  => { clients => { default => sub { [] } } } 
     );
@@ -15,7 +15,7 @@ use Minions ();
 {
     package Server;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         has  => { clients => { default => sub { [] } } } 
     );
@@ -28,7 +28,7 @@ use Minions ();
 {
     package BusyDudeImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         roles => [qw( Lawyer Server )],
     );
 }
@@ -36,7 +36,7 @@ use Minions ();
 {
     package BusyDude;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( serve )],
         implementation => 'BusyDudeImpl'
     );
@@ -44,7 +44,7 @@ use Minions ();
 package main;
 
 throws_ok {
-    Minions->minionize(\ %BusyDude::__Meta);
+    Minions->minionize(\ %BusyDude::__meta__);
 } qr/Cannot have 'clients' in both Server and Lawyer/;
 
 done_testing();

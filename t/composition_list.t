@@ -7,7 +7,7 @@ use Minions ();
 {
     package AlphabetImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         roles => [qw( AlphabetRole )],
     );
 }
@@ -15,7 +15,7 @@ use Minions ();
 {
     package Alphabet;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
     );
@@ -24,7 +24,7 @@ use Minions ();
 
 {
     package KeyboardImpl;
-    our %__Meta = (
+    our %__meta__ = (
         has => { 
             alphabet => {
                 handles => [qw( alpha bravo charlie delta )],
@@ -37,7 +37,7 @@ use Minions ();
 {
     package Keyboard;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( alpha bravo charlie delta )],
         construct_with => {
             alphabet => {

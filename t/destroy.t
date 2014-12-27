@@ -6,7 +6,7 @@ use Minions ();
 {
     package ProcessImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         role => 1,
         has => { id => { reader => 1 } }
     );
@@ -28,7 +28,7 @@ use Minions ();
 {
     package Process;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( id )],
         implementation => 'ProcessImpl',
     );

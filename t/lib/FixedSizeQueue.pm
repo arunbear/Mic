@@ -3,7 +3,7 @@ package FixedSizeQueue;
 use strict;
 use Minions ();
 
-our %__Meta = (
+our %__meta__ = (
     interface => [qw(push size max_size)],
     implementation => 'FixedSizeQueueImpl',
     construct_with  => {

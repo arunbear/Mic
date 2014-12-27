@@ -1,6 +1,6 @@
 =head2 Configuring a role package
 
-A role package must be configured with a package variable C<%__Meta> with the following keys (of which only "role"
+A role package must be configured with a package variable C<%__meta__> with the following keys (of which only "role"
 is mandatory):
  
 =head3 role => 1 (Mandatory)

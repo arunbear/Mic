@@ -23,7 +23,7 @@ sub define {
     $class->update_args(\%arg);
     $class->add_attribute_syms(\%arg, $stash);
     
-    $stash->add_symbol('%__Meta', \%arg);
+    $stash->add_symbol('%__meta__', \%arg);
 }
 
 sub add_attribute_syms {

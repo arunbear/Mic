@@ -55,7 +55,7 @@ sub minionize {
             $caller_pkg = (caller 1)[0];
         }
         $cls_stash = Package::Stash->new($caller_pkg);
-        $spec = { %$spec, %{ $cls_stash->get_symbol('%__Meta') || {} } };
+        $spec = { %$spec, %{ $cls_stash->get_symbol('%__meta__') || {} } };
         $spec->{name} = $caller_pkg;
     }
     $spec->{name} ||= "Minions::Class_${\ ++$Class_count }";
@@ -80,7 +80,7 @@ sub minionize {
           or confess "$spec->{name} cannot be its own implementation.";
         my $stash = _get_stash($pkg);
 
-        my $meta = $stash->get_symbol('%__Meta');
+        my $meta = $stash->get_symbol('%__meta__');
         $spec->{implementation} = { 
             package => $pkg, 
             methods => $stash->get_all_symbols('CODE'),
@@ -105,7 +105,7 @@ sub minionize {
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
     $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
-    $cls_stash->add_symbol('%__Meta', $spec) if @_ > 0;
+    $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
     
     _make_util_class($spec);
     _add_class_methods($spec, $cls_stash);
@@ -174,7 +174,7 @@ sub _load_role {
     my ($role) = @_;
     
     my $stash  = _get_stash($role);
-    my $meta   = $stash->get_symbol('%__Meta');
+    my $meta   = $stash->get_symbol('%__meta__');
     $meta->{role}
       or confess "$role is not a role";
     
@@ -220,12 +220,12 @@ sub _get_stash {
 
     my $stash = Package::Stash->new($pkg); # allow for inlined pkg
 
-    if ( ! $stash->has_symbol('%__Meta') ) {
+    if ( ! $stash->has_symbol('%__meta__') ) {
         require_module($pkg);
         $stash = Package::Stash->new($pkg);
     }
-    if ( ! $stash->has_symbol('%__Meta') ) {
-        confess "Package $pkg has no %__Meta";
+    if ( ! $stash->has_symbol('%__meta__') ) {
+        confess "Package $pkg has no %__meta__";
     }
     return $stash;
 }
@@ -302,7 +302,7 @@ sub _get_object_maker {
             '!' => ${ $stash->get_symbol('$__Private_pkg') },
         );
 
-        my $spec = $stash->get_symbol('%__Meta');
+        my $spec = $stash->get_symbol('%__meta__');
         
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
             my $obfu_name = Minions::_Guts::obfu_name($attr, $spec);
@@ -603,7 +603,7 @@ Minions - What is I<your> API?
     
     use strict;
     
-    our %__Meta = (
+    our %__meta__ = (
         has  => {
             count => { default => 0 },
         }, 
@@ -708,7 +708,7 @@ A class can be defined when importing Minions e.g.
 A class can also be defined by calling the C<minionize()> class method, with an optional hashref that 
 specifies the class.
 
-If the hashref is not given, the specification is read from a package variable named C<%__Meta> in the package
+If the hashref is not given, the specification is read from a package variable named C<%__meta__> in the package
 from which C<minionize()> was called.
 
 The class defined in the SYNOPSIS could also be defined like this

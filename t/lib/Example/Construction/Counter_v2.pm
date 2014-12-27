@@ -3,7 +3,7 @@ package Example::Construction::Counter_v2;
 use strict;
 use Minions ();
 
-our %__Meta = (
+our %__meta__ = (
     interface => [ qw( next ) ],
 
     construct_with => {

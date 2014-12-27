@@ -5,13 +5,13 @@ use Minions ();
 
 package FixedSizeQueueImpl;
 
-our %__Meta = (
+our %__meta__ = (
     roles => ['FixedSizeQueueRole'],
 );
 
 package FixedSizeQueue;
 
-our %__Meta = (
+our %__meta__ = (
     interface => [qw(push size max_size)],
     implementation => 'FixedSizeQueueImpl',
     construct_with => {

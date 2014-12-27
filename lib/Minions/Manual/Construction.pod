@@ -41,7 +41,7 @@ and we change the implementation to make use of this starting value.
 
     use strict;
 
-    our %__Meta = (
+    our %__meta__ = (
         has  => {
             count => { init_arg => 'start' },
         }, 
@@ -98,7 +98,7 @@ In the implementation, we convert the argument array to a hash
 
     use strict;
 
-    our %__Meta = (
+    our %__meta__ = (
         has => { 
             set => { 
                 default => sub { {} },
@@ -153,7 +153,7 @@ is preferable due being more concise).
 
     use strict;
 
-    our %__Meta = (
+    our %__meta__ = (
         has  => {
             count => { },
         }, 
@@ -202,7 +202,7 @@ We'll rewrite the counter example above and also show the more manual way of usi
     use strict;
     use Minions ();
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [ qw( next ) ],
 
         construct_with => {

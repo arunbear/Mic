@@ -19,7 +19,7 @@ use Minions ();
 {
     package PersonImpl;
 
-    our %__Meta = (
+    our %__meta__ = (
         roles => [qw( Greeter )],
     );
 }
@@ -27,7 +27,7 @@ use Minions ();
 {
     package Person;
 
-    our %__Meta = (
+    our %__meta__ = (
         interface => [qw( greet )],
         implementation => 'PersonImpl',
     );
@@ -36,7 +36,7 @@ use Minions ();
 package main;
 
 throws_ok {
-    Minions->minionize(\ %Person::__Meta);
+    Minions->minionize(\ %Person::__meta__);
 } qr/Attribute 'name', required by role Greeter, is not defined./;
 
 done_testing();
