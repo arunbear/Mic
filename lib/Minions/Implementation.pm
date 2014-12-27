@@ -45,7 +45,7 @@ sub add_obfu_name {
     $Minions::_Guts::obfu_name{$slot} = $sym_val;
 
     $stash->add_symbol(
-        sprintf('$%s%s', $arg->{attribute_sym_prefix} || '__', ucfirst $slot),
+        sprintf('$%s%s', $arg->{attribute_var_prefix} || '__', $slot),
         \ $sym_val
     );
 }

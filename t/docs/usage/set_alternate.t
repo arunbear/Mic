@@ -9,7 +9,7 @@ use Example::Usage::Set;
 
 my $set = Example::Usage::Set->new;
 
-is reftype $set->{$Example::Usage::HashSet::__Set} => 'HASH';
+is reftype $set->{$Example::Usage::HashSet::__set} => 'HASH';
 
 ok ! $set->has(1);
 $set->add(1);

@@ -31,13 +31,13 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
         $self->{'!'}->ASSERT('count', $arg->{start});
         $self->{'!'}->ASSERT('step',  $arg->{-step}) if $arg->{-step};
         # use Data::Dump 'pp'; die pp($self);
-        $self->{$__Count} = $arg->{start};
+        $self->{$__count} = $arg->{start};
     }
     
     sub next {
         my ($self) = @_;
 
-        $self->{$__Count}++;
+        $self->{$__count}++;
     }
 }
 

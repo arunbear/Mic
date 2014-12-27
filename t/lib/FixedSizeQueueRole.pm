@@ -12,13 +12,13 @@ use Minions::Role
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{$__Q} };
+    scalar @{ $self->{$__q} };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{$__Q} }, $val;
+    push @{ $self->{$__q} }, $val;
 }
 
 1;

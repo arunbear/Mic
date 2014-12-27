@@ -6,14 +6,14 @@ use Minions::Implementation
 
 sub has {
     my ($self, $e) = @_;
-    scalar grep { $_ == $e } @{ $self->{$__Set} };
+    scalar grep { $_ == $e } @{ $self->{$__set} };
 }
 
 sub add {
     my ($self, $e) = @_;
 
     if ( ! $self->has($e) ) {
-        push @{ $self->{$__Set} }, $e;
+        push @{ $self->{$__set} }, $e;
     }
 }
 
