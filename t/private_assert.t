@@ -46,7 +46,6 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
     our %__meta__ = (
         interface => [qw( next )],
         construct_with => {
-            #TODO: fix to allow just these keys
             start => {
                 optional => 1,
             },
