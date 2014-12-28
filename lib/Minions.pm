@@ -71,7 +71,7 @@ sub minionize {
         no_attribute_vars => { type => BOOLEAN, optional => 1 },
     });
     $cls_stash    ||= Package::Stash->new($spec->{name});
-    
+
     my $obj_stash;
 
     if ( ! ref $spec->{implementation} ) {
@@ -81,8 +81,8 @@ sub minionize {
         my $stash = _get_stash($pkg);
 
         my $meta = $stash->get_symbol('%__meta__');
-        $spec->{implementation} = { 
-            package => $pkg, 
+        $spec->{implementation} = {
+            package => $pkg,
             methods => $stash->get_all_symbols('CODE'),
             has     => {
                 %{ $meta->{has} || { } },
@@ -98,7 +98,7 @@ sub minionize {
         }
     }
     $obj_stash = Package::Stash->new("$spec->{name}::__Minions");
-    
+
     _prep_interface($spec);
     _compose_roles($spec);
 
@@ -106,7 +106,7 @@ sub minionize {
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
     $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
-    
+
     _make_util_class($spec);
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
@@ -117,7 +117,7 @@ sub minionize {
 
 sub utility_class {
     my ($class) = @_;
-    
+
     return $Util_class{ $class }
       or confess "Unknown class: $class";
 }
@@ -130,11 +130,11 @@ sub _prep_interface {
     {
 
         if (my $methods = $Interface_for{ $spec->{interface} }) {
-            $spec->{interface_name} = $spec->{interface};        
-            $spec->{interface} = $methods;        
+            $spec->{interface_name} = $spec->{interface};
+            $spec->{interface} = $methods;
         }
         else {
-            $count > 0 
+            $count > 0
               and confess "Invalid interface: $spec->{interface}";
             require_module($spec->{interface});
             $count++;
@@ -145,26 +145,26 @@ sub _prep_interface {
 
 sub _compose_roles {
     my ($spec, $roles, $from_role) = @_;
-    
+
     if ( ! $roles ) {
         $roles = $spec->{roles};
     }
-    
+
     $from_role ||= {};
-    
+
     for my $role ( @{ $roles } ) {
-        
+
         if ( $spec->{composed_role}{$role} ) {
             confess "Cannot compose role '$role' twice";
         }
         else {
             $spec->{composed_role}{$role}++;
         }
-        
+
         my ($meta, $method) = _load_role($role);
         $spec->{required}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || [], $from_role);
-        
+
         _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
         _add_role_methods($spec, $from_role, $role, $meta, $method);
     }
@@ -172,12 +172,12 @@ sub _compose_roles {
 
 sub _load_role {
     my ($role) = @_;
-    
+
     my $stash  = _get_stash($role);
     my $meta   = $stash->get_symbol('%__meta__');
     $meta->{role}
       or confess "$role is not a role";
-    
+
     my $method = $stash->get_all_symbols('CODE');
     return ($meta, $method);
 }
@@ -242,7 +242,7 @@ sub _add_role_items {
                 $spec->{implementation}{$type}{$name} = $item->{$name};
                 $from_role->{$name} = $role;
             }
-        }            
+        }
     }
 }
 
@@ -296,24 +296,24 @@ sub _get_object_maker {
         my ($utility_class, $init) = @_;
 
         my $class = $utility_class->main_class;
-        
+
         my $stash = Package::Stash->new($class);
-        my %obj = ( 
+        my %obj = (
             '!' => ${ $stash->get_symbol('$__Private_pkg') },
         );
 
         my $spec = $stash->get_symbol('%__meta__');
-        
+
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
             my $obfu_name = Minions::_Guts::obfu_name($attr, $spec);
-            $obj{$obfu_name} = $init->{$attr} 
-              ? $init->{$attr} 
+            $obj{$obfu_name} = $init->{$attr}
+              ? $init->{$attr}
               : (ref $meta->{default} eq 'CODE'
                 ? $meta->{default}->()
                 : $meta->{default});
         }
-        
-        bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };            
+
+        bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };
         lock_keys(%obj);
         return \ %obj;
     };
@@ -333,7 +333,7 @@ sub _add_class_methods {
 
 sub _make_util_class {
     my ($spec) = @_;
-    
+
     my $stash = Package::Stash->new("$spec->{name}::__Util");
     $Util_class{ $spec->{name} } = $stash->name;
 
@@ -342,21 +342,21 @@ sub _make_util_class {
     );
 
     $method{main_class} = sub { $spec->{name} };
-    
+
     $method{build} = sub {
         my (undef, $obj, $arg) = @_;
         if ( my $builder = $obj->{'!'}->can('BUILD') ) {
             $builder->($obj->{'!'}, $obj, $arg);
         }
     };
-    
+
     $method{assert} = sub {
         my (undef, $slot, $val) = @_;
-        
+
         return unless exists $spec->{construct_with}{$slot};
-        
+
         my $meta = $spec->{construct_with}{$slot};
-        
+
         for my $desc ( keys %{ $meta->{assert} || {} } ) {
             my $code = $meta->{assert}{$desc};
             $code->($val)
@@ -365,7 +365,7 @@ sub _make_util_class {
     };
 
     my $class_var_stash = Package::Stash->new("$spec->{name}::__ClassVar");
-    
+
     $method{get_var} = sub {
         my ($class, $name) = @_;
         $class_var_stash->get_symbol($name);
@@ -384,7 +384,7 @@ sub _make_util_class {
 
 sub _add_default_constructor {
     my ($spec) = @_;
-    
+
     if ( ! exists $spec->{class_methods}{new} ) {
         $spec->{class_methods}{new} = sub {
             my $class = shift;
@@ -397,7 +397,7 @@ sub _add_default_constructor {
                 $arg = { @_ };
             }
             if (my @unknown = grep { ! exists $spec->{construct_with}{$_} } keys %$arg) {
-                confess "Unknown args: [@unknown]";                
+                confess "Unknown args: [@unknown]";
             }
 
             my $utility_class = utility_class($class);
@@ -411,7 +411,7 @@ sub _add_default_constructor {
                     $utility_class->assert($name, $arg->{$name});
                 }
 
-                my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name } 
+                my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name }
                                         keys %{ $spec->{implementation}{has} };
                 if ( $dup ) {
                     confess "Cannot have same init_arg '$name' for attributes '$attr' and '$dup'";
@@ -423,15 +423,15 @@ sub _add_default_constructor {
                     $obj->{$obfu_name} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
             }
-            
+
             $utility_class->build($obj, $arg);
             return $obj;
         };
-        
+
         my $build_args = $spec->{build_args} || $spec->{class_methods}{BUILDARGS};
         if ( $build_args ) {
             my $prev_new = $spec->{class_methods}{new};
-            
+
             $spec->{class_methods}{new} = sub {
                 my $class = shift;
                 $prev_new->($class, $build_args->($class, @_));
@@ -444,7 +444,7 @@ sub _copy_assertions {
     my ($spec, $name, $attr) = @_;
 
     my $meta = $spec->{construct_with}{$name};
-    
+
     for my $desc ( keys %{ $meta->{assert} || {} } ) {
         next if exists $spec->{implementation}{has}{$attr}{assert}{$desc};
 
@@ -459,11 +459,11 @@ sub _add_methods {
 
     $spec->{implementation}{semiprivate}{ASSERT} = sub {
         my (undef, $slot, $val) = @_;
-        
+
         return unless exists $spec->{implementation}{has}{$slot};
-        
+
         my $meta = $spec->{implementation}{has}{$slot};
-        
+
         for my $desc ( keys %{ $meta->{assert} || {} } ) {
             my $code = $meta->{assert}{$desc};
             $code->($val)
@@ -472,17 +472,17 @@ sub _add_methods {
     };
     $spec->{implementation}{methods}{DOES} = sub {
         my ($self, $r) = @_;
-        
+
         if ( ! $r ) {
-            my @items = (( $spec->{interface_name} ? $spec->{interface_name} : () ), 
+            my @items = (( $spec->{interface_name} ? $spec->{interface_name} : () ),
                           $spec->{name}, sort keys %{ $spec->{composed_role} });
             return unless defined wantarray;
             return wantarray ? @items : \@items;
         }
-        
+
         return    $r eq $spec->{interface_name}
-               || $spec->{name} eq $r 
-               || $spec->{composed_role}{$r} 
+               || $spec->{name} eq $r
+               || $spec->{composed_role}{$r}
                || $self->isa($r);
     };
     $spec->{implementation}{methods}{can} = sub {
@@ -495,11 +495,11 @@ sub _add_methods {
         }
         return UNIVERSAL::can($self, $f);
     };
-    
+
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
         if ( !  $spec->{implementation}{methods}{$name}
-             && $meta->{reader} 
+             && $meta->{reader}
              && $in_interface->{$name} ) {
 
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
@@ -549,7 +549,7 @@ sub _add_delegates {
         }
         my $in_interface = _interface($spec);
         my $obfu_name = Minions::_Guts::obfu_name($name, $spec);
-        
+
         foreach my $meth ( keys %{ $method } ) {
             if ( defined $spec->{implementation}{methods}{$meth} ) {
                 confess "Cannot override implemented method '$meth' with a delegated method";
@@ -587,16 +587,8 @@ Minions - What is I<your> API?
 
 =head1 SYNOPSIS
 
-    package Example::Synopsis::Counter;
+    # Imagine a counter used like this:
 
-    use Minions
-        interface => [ qw( next ) ],
-        implementation => 'Example::Synopsis::Acme::Counter';
-
-    1;
-    
-    # In a script near by ...
-    
     use Test::Most tests => 5;
     use Example::Synopsis::Counter;
 
@@ -607,45 +599,57 @@ Minions - What is I<your> API?
     is $counter->next => 2;
 
     throws_ok { $counter->new } qr/Can't locate object method "new"/;
-    
-    throws_ok { Example::Synopsis::Counter->next } 
+
+    throws_ok { Example::Synopsis::Counter->next }
               qr/Can't locate object method "next" via package "Example::Synopsis::Counter"/;
 
-    
+
+    # The counter class:
+
+    package Example::Synopsis::Counter;
+
+    use Minions
+        interface => [ qw( next ) ],
+
+        implementation => 'Example::Synopsis::Acme::Counter';
+
+    1;
+
+
     # And the implementation for this class:
-    
+
     package Example::Synopsis::Acme::Counter;
-    
-    use strict;
-    
-    our %__meta__ = (
-        has  => {
+
+    use Minions::Implementation
+        has => {
             count => { default => 0 },
-        }, 
-    );
-    
+        }
+    ;
+
     sub next {
         my ($self) = @_;
-    
-        $self->{$A.count}++;
+
+        $self->{$__count}++;
     }
-    
-    1;    
-    
+
+    1;
+
 =head1 STATUS
 
 This is an early release available for testing and feedback and as such is subject to change.
 
 =head1 DESCRIPTION
 
-Minions is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>.
+Minions is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
+there is a clear separation between what end users need to know (the interface for using the class) and implementation details that users
+don't need to know about.
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
 
 This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
 
-It is not a coincidence that the Object Oriented way as it was originally envisioned was mainly concerned with messaging,
+It is not a coincidence that the Object Oriented way as originally envisioned was mainly concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/>).
@@ -653,10 +657,8 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 =head1 RATIONALE
 
 Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
-perhaps the most popular being the L<Moose> family. Moose is very effective at class building but acheives this at the
-expense of Encapsulation (the hiding of implementation details from end users). 
-E.g. idiomatic Moose code exposes all of an object's attributes via methods. If we wrote the counter example above
-using this approach, we would expose the count attribute via a method even though end users shouldn't need to know about it. 
+perhaps the most popular being the L<Moose> family. Moo(se) is very effective at class building but acheives this at the
+expense of Encapsulation (the hiding of implementation details from end users).
 
 Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
 
@@ -664,27 +666,27 @@ Minions takes inspriation from Moose's declaratve approach to simplifying OO aut
 
 There once was a farmer who had a flock of sheep. His typical workday looked like:
 
-    $farmer->move_flock($pasture)  
-    $farmer->monitor_flock()  
-    $farmer->move_flock($home)  
+    $farmer->move_flock($pasture)
+    $farmer->monitor_flock()
+    $farmer->move_flock($home)
 
-    $farmer->other_important_work()  
+    $farmer->other_important_work()
 
-In order to devote more time to C<other_important_work()>, the farmer decided to hire a minion, so the work was now split like this:     
+In order to devote more time to C<other_important_work()>, the farmer decided to hire a minion, so the work was now split like this:
 
-    $shepherd_boy->move_flock($pasture)  
-    $shepherd_boy->monitor_flock()  
-    $shepherd_boy->move_flock($home)  
+    $shepherd_boy->move_flock($pasture)
+    $shepherd_boy->monitor_flock()
+    $shepherd_boy->move_flock($home)
 
-    $farmer->other_important_work()  
+    $farmer->other_important_work()
 
 This did give the farmer more time for C<other_important_work()>, but unfornately C<$shepherd_boy> had a tendency to L<cry wolf|http://en.wikipedia.org/wiki/The_Boy_Who_Cried_Wolf> so the farmer had to replace him:
 
-    $sheep_dog->move_flock($pasture)  
-    $sheep_dog->monitor_flock()  
-    $sheep_dog->move_flock($home)  
+    $sheep_dog->move_flock($pasture)
+    $sheep_dog->monitor_flock()
+    $sheep_dog->move_flock($home)
 
-    $farmer->other_important_work()  
+    $farmer->other_important_work()
 
 C<$sheep_dog> was more reliable and demanded less pay than C<$shepherd_boy>, so this was a win for the farmer.
 
@@ -720,7 +722,7 @@ A class can be defined when importing Minions e.g.
 
 =head2 Minions->minionize([HASHREF])
 
-A class can also be defined by calling the C<minionize()> class method, with an optional hashref that 
+A class can also be defined by calling the C<minionize()> class method, with an optional hashref that
 specifies the class.
 
 If the hashref is not given, the specification is read from a package variable named C<%__meta__> in the package
@@ -739,12 +741,12 @@ The class defined in the SYNOPSIS could also be defined like this
                 next => sub {
                     my ($self) = @_;
 
-                    $self->{$A.count}++;
+                    $self->{-count}++;
                 }
             },
             has  => {
                 count => { default => 0 },
-            }, 
+            },
         },
     );
 
@@ -798,16 +800,13 @@ The default constructor will call these predicates to validate the parameters pa
 
 The name of a package that defines the subroutines declared in the interface.
 
-The package may also contain other subroutines not declared in the interface that are for internal use in the package.
-These won't be callable using the C<$minion-E<gt>command(...)> syntax.
-
 Alternatively an implementation can be hashref as shown in the synopsis above.
 
 L<Minions::Manual::Implementations> describes how implementations are configured.
 
 =head1 BUGS
 
-Please report any bugs or feature requests via the GitHub web interface at 
+Please report any bugs or feature requests via the GitHub web interface at
 L<https://github.com/arunbear/perl5-minion/issues>.
 
 =head1 AUTHOR
