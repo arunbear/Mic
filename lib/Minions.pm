@@ -524,6 +524,7 @@ sub _add_methods {
     }
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
+        next unless $in_interface->{$name};
         $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub);
     }
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
@@ -570,7 +571,7 @@ sub _interface {
 
     $type ||= 'interface';
     my %must_allow = (
-        interface   => [qw( DOES DESTROY )],
+        interface   => [qw( can DOES DESTROY )],
         semiprivate => [qw( BUILD )],
     );
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
@@ -730,7 +731,7 @@ from which C<minionize()> was called.
 
 The class defined in the SYNOPSIS could also be defined like this
 
-    use Test::Most tests => 4;
+    use Test::More tests => 2;
     use Minions ();
 
     my %Class = (
@@ -755,9 +756,6 @@ The class defined in the SYNOPSIS could also be defined like this
 
     is $counter->next => 0;
     is $counter->next => 1;
-
-    throws_ok { $counter->new } qr/Can't locate object method "new"/;
-    throws_ok { Counter->next } qr/Can't locate object method "next" via package "Counter"/;
 
 =head2 Examples
 
@@ -802,7 +800,7 @@ The name of a package that defines the subroutines declared in the interface.
 
 Alternatively an implementation can be hashref as shown in the synopsis above.
 
-L<Minions::Manual::Implementations> describes how implementations are configured.
+L<Minions::Implementation> describes how implementations are configured.
 
 =head1 BUGS
 
