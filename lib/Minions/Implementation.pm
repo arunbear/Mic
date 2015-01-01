@@ -137,9 +137,17 @@ All methods in the given array will be forwarded.
 Method forwarding will be set up such that a method whose name is a key in the given hash will be
 forwarded to a method whose name is the corresponding value in the hash.
 
+=for comment
 =head3 handles => SCALAR
-
 The scalar is assumed to be a role, and methods provided directly (i.e. not including methods in sub-roles) by the role will be forwarded.
+
+=head3 init_arg => SCALAR
+
+This causes the attribute to be populated with the value of a similarly named constructor parameter.
+
+=head3 map_init_arg => CODEREF
+
+If the attribute has an C<init_arg>, it will be populated with the result of applying the given code ref to the value of a similarly named constructor parameter.
 
 =head3 reader => SCALAR
 
@@ -147,14 +155,20 @@ This can be a string which if present will be the name of a generated reader met
 
 This can also be the numerical value 1 in which case the generated reader method will have the same name as the key.
 
-Readers should only be created if they are logically part of the class API.
+Readers should only be created if they are needed by end users of the class.
+
+=head3 writer => SCALAR
+
+This can be a string which if present will be the name of a generated writer method.
+
+This can also be the numerical value 1 in which case the generated writer method will have a name of the form C<change_foo> where "foo" is the given key.
+
+Writers should only be created if they are needed by end users of the class.
 
 =for comment
 =head2 semiprivate => ARRAYREF
-
 Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
 can be called using the syntax:
-
     $self->{'!'}->do_something(...)
 
 =head2 roles => ARRAYREF
