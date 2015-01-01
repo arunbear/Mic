@@ -12,12 +12,22 @@ use Minions::Implementation
 
 sub has {
     my ($self, $e) = @_;
+
+    log_info($self);
     exists $self->{$__set}{$e};
 }
 
 sub add {
     my ($self, $e) = @_;
+
+    log_info($self);
     ++$self->{$__set}{$e};
+}
+
+sub log_info {
+    my ($self) = @_;
+
+    warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$__set} });
 }
 
 1;
