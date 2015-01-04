@@ -29,11 +29,12 @@ sub define {
 sub add_attribute_syms {
     my ($class, $arg, $stash) = @_;
 
-    foreach my $slot (keys %{ $arg->{has} }) {
-        $class->add_obfu_name($arg, $stash, $slot);
-    }
-
-    foreach my $slot (@{ $arg->{requires}{attributes} || [] }) {
+    my @slots = (
+        keys %{ $arg->{has} },
+        @{ $arg->{requires}{attributes} || [] },
+        '', # semiprivate pkg
+    );
+    foreach my $slot ( @slots ) {
         $class->add_obfu_name($arg, $stash, $slot);
     }
 }
@@ -175,7 +176,7 @@ can be called using the syntax:
 
 A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
 
-L<Minions::Manual::Roles> describes how roles are configured.
+L<Minions::Role> describes how roles are configured.
 
 =head1 PRIVATE ROUTINES
 
