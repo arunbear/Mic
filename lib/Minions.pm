@@ -298,11 +298,12 @@ sub _get_object_maker {
         my $class = $utility_class->main_class;
 
         my $stash = Package::Stash->new($class);
-        my %obj = (
-            '!' => ${ $stash->get_symbol('$__Private_pkg') },
-        );
 
         my $spec = $stash->get_symbol('%__meta__');
+        my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
+        my %obj = (
+            $obfu_pkg => ${ $stash->get_symbol('$__Private_pkg') },
+        );
 
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
             my $obfu_name = Minions::_Guts::obfu_name($attr, $spec);
@@ -343,10 +344,11 @@ sub _make_util_class {
 
     $method{main_class} = sub { $spec->{name} };
 
+    my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
     $method{build} = sub {
         my (undef, $obj, $arg) = @_;
-        if ( my $builder = $obj->{'!'}->can('BUILD') ) {
-            $builder->($obj->{'!'}, $obj, $arg);
+        if ( my $builder = $obj->{$obfu_pkg}->can('BUILD') ) {
+            $builder->($obj->{$obfu_pkg}, $obj, $arg);
         }
     };
 
@@ -512,10 +514,11 @@ sub _add_methods {
              && $in_interface->{$name} ) {
 
             my $name = $meta->{writer} == 1 ? "change_$name" : $meta->{writer};
+            my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{$name} = sub {
                 my ($self, $new_val) = @_;
 
-                $self->{'!'}->ASSERT($name, $new_val);
+                $self->{$obfu_pkg}->ASSERT($name, $new_val);
                 $self->{ Minions::_Guts::obfu_name($name, $spec) } = $new_val;
                 return $self;
             };
