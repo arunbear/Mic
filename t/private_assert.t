@@ -28,8 +28,8 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
     sub BUILD {
         my (undef, $self, $arg) = @_;
 
-        $self->{'!'}->ASSERT('count', $arg->{start});
-        $self->{'!'}->ASSERT('step',  $arg->{-step}) if $arg->{-step};
+        $self->{$__}->ASSERT('count', $arg->{start});
+        $self->{$__}->ASSERT('step',  $arg->{-step}) if $arg->{-step};
         $self->{$__count} = $arg->{start};
     }
     

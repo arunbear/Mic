@@ -6,15 +6,14 @@ use Minions ();
 {
     package SorterRole;
 
-    our %__meta__ = (
-        role => 1,
+    use Minions::Role
         requires => { methods => ['cmp'] }
-    );
+    ;
 
     sub sort {
         my ($self, $items) = @_;
         
-        my $cmp = $self->{'!'}->can('cmp');
+        my $cmp = $self->{$__}->can('cmp');
         return [ sort $cmp @$items ];
     }
 }
