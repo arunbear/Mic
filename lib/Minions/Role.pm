@@ -223,6 +223,8 @@ We can use a role to factor out the commonality of the two implementations:
 
     1;
 
+The role provides the  "q" attribute, the "size", "pop" and "push" methods, as well as a do nothing semiprivate "after_push" method.
+
 Now using this role, the Queue implementation can be simplified to this:
 
     package Example::Roles::Acme::Queue_v2;
@@ -256,6 +258,8 @@ And the FixedSizeQueue implementation can be simplified to this:
     }
 
     1;
+
+This implementation provides its own "after_push" method, so it does not get the one provided by the role.
 
 To test these new implementations, we don't even need to update the main classes because we can re-bind them to new implementations quite easily:
 
