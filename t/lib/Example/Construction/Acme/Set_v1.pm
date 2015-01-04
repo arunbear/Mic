@@ -27,7 +27,12 @@ sub add {
 sub log_info {
     my ($self) = @_;
 
-    warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$__set} });
+    warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), $self->size;
+}
+
+sub size {
+    my ($self) = @_;
+    scalar(keys %{ $self->{$__set} });
 }
 
 1;

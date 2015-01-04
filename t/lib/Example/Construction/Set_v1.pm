@@ -2,7 +2,7 @@ package Example::Construction::Set_v1;
 
 use Minions
 
-    interface => [qw( add has )],
+    interface => [qw( add has size )],
     construct_with => { items => {} },
 
     build_args => sub {
