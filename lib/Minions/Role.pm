@@ -20,6 +20,20 @@ Minions::Role
 
 =head1 SYNOPSIS
 
+    package Foo::Role;
+
+    use Minions::Role
+        has  => {
+            beans => { default => sub { [ ] } },
+        }, 
+        requires => {
+            methods => [qw/some required methods/],
+            attributes => [qw/some required attributes/],
+        },
+        roles => [qw/all these roles/],
+        semiprivate => [qw/some internal subs/],
+    ;
+
 =head1 DESCRIPTION
 
 Roles provide reusable implementation details, i.e. they solve the problem of what to do when the same implementation details are found in more than one implementation package.
@@ -27,17 +41,13 @@ Roles provide reusable implementation details, i.e. they solve the problem of wh
 =head1 CONFIGURATION
 
 A role package can be configured either using Minions::Role or with a package variable C<%__meta__>. Both methods make use of the following keys:
- 
-=head2 role => 1 (Mandatory)
-
-Only needed if Minions::Role is not used. This indicates that the package is a Role.
 
 =head2 has => HASHREF
 
 This works the same way as in an implementation package.
 
-=for comment
 =head2 semiprivate => ARRAYREF
+
 This works the same way as in an implementation package.
 
 =head2 requires => HASHREF
@@ -52,9 +62,26 @@ Any methods listed here must be provided by an implementation package or a role.
 
 Any attributes listed here must be provided by an implementation package or a role.
 
+Variables with names corresponding to these attributes will be created in the role package to allow accessing the attributes e.g.
+
+    use Minions::Role
+        requires => {
+            attributes => [qw/length width/]
+
+        };
+
+    sub area {
+        my ($self) = @_;
+        $self->{$__length} * $self->{$__width};
+    }
+
 =head2 roles => ARRAYREF
 
 A list of roles which the current role is composed out of.
+ 
+=head2 role => 1
+
+Only needed if Minions::Role is not used. This indicates that the package is a Role.
 
 =head1 EXAMPLES
 
@@ -282,3 +309,9 @@ To test these new implementations, we don't even need to update the main classes
     is $q->size => 3;
     is $q->pop => 4;
     done_testing();
+
+=head2 Using multiple roles
+
+An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Minions::Implementation/PRIVATE ROUTINES>. Such functionality does not logically belong in the queue role, but we could create a new role for it
+
+

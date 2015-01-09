@@ -170,8 +170,7 @@ Writers should only be created if they are needed by end users of the class.
 =head2 semiprivate => ARRAYREF
 Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
 can be called using the syntax:
-    $self->{'!'}->do_something(...)
-
+    $self->{'!'}->do_something(...) 
 =head2 roles => ARRAYREF
 
 A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
@@ -180,7 +179,7 @@ L<Minions::Role> describes how roles are configured.
 
 =head1 PRIVATE ROUTINES
 
-An implementation package will typically contain subroutines not declared in the interface that are for internal use in the package.
+An implementation package will typically contain subroutines that are for internal use in the package and therefore ought not to be declared in the interface.
 These won't be callable using the C<$minion-E<gt>command(...)> syntax.
 
 As an example, suppose we want to print an informational message whenever the Set's C<has> or C<add> methods are called. A first cut may look like:
@@ -215,10 +214,15 @@ But this duplication of code is not good, so we factor it out:
         ++$self->{$__set}{$e};
     }
 
+    sub size {
+        my ($self) = @_;
+        scalar(keys %{ $self->{$__set} });
+    }
+
     sub log_info {
         my ($self) = @_;
 
-        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$__set} });
+        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), $self->size;
     }
 
 Notice how the C<log_info> routine is called as a regular sub rather than as a method.
