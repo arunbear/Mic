@@ -7,7 +7,10 @@ use Minions::Implementation
         },
     }, 
     semiprivate => ['after_push'],
-    roles => ['Example::Roles::Role::Queue']
+    roles => [qw/
+        Example::Roles::Role::Queue
+        Example::Roles::Role::LogSize
+    /]
 ;
 
 sub after_push {
@@ -16,6 +19,7 @@ sub after_push {
     if ($self->size > $self->{$__max_size}) {
         $self->pop;        
     }
+    $self->{$__}->log_info($self);
 }
 
 1;
