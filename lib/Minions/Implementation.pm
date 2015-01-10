@@ -229,33 +229,29 @@ Notice how the C<log_info> routine is called as a regular sub rather than as a m
 
 Here is a transcript of using this object via L<reply|https://metacpan.org/pod/distribution/Reply/bin/reply>
 
-    1:54% reply -I t/lib
+    5:51% reply -I t/lib
     0> use Example::Construction::Set_v1
     1> my $set = Example::Construction::Set_v1->new
     $res[0] = bless( {
-                '!' => 'Example::Construction::Set_v1::__Private',
-                'be93cca1-set' => {}
-            }, 'Example::Construction::Set_v1::__Minions'  )
+            '1f5f6ad9-' => 'Example::Construction::Set_v1::__Private',
+            '1f5f6ad9-set' => {}
+        }, 'Example::Construction::Set_v1::__Minions' )
 
     2> $set->can
     $res[1] = [
-      'add',
-      'has'
+    'add',
+    'has',
+    'size'
     ]
 
     3> $set->add(1)
-    [Thu Jan  1 13:56:47 2015] I have 0 element(s)
+    [Sat Jan 10 17:52:35 2015] I have 0 element(s)
     $res[2] = 1
 
     4> $set->add(1)
-    [Thu Jan  1 13:56:51 2015] I have 1 element(s)
+    [Sat Jan 10 17:57:03 2015] I have 1 element(s)
     $res[3] = 2
 
-    5> $set->has(1)
-    [Thu Jan  1 13:56:59 2015] I have 1 element(s)
-    $res[4] = 1
-
-    6> $set->log_info()
+    5> $set->log_info()
     Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Minions" at reply input line 1.
-    7>
-
+    6> 

@@ -312,6 +312,67 @@ To test these new implementations, we don't even need to update the main classes
 
 =head2 Using multiple roles
 
-An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Minions::Implementation/PRIVATE ROUTINES>. Such functionality does not logically belong in the queue role, but we could create a new role for it
+An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Minions::Implementation/PRIVATE ROUTINES>.
 
+Such functionality does not logically belong in the queue role, but we could create a new role for it
 
+    package Example::Roles::Role::LogSize;
+
+    use Minions::Role
+        semiprivate => ['log_info'],
+        requires => {
+            methods => [qw/ size /],
+        },
+    ;
+
+    sub log_info {
+        my (undef, $self) = @_;
+
+        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), $self->size;
+    }
+
+    1;
+
+Now we can use this role too
+
+    package Example::Roles::Acme::FixedSizeQueue_v3;
+
+    use Minions::Implementation
+        has  => {
+            max_size => { 
+                init_arg => 'max_size',
+            },
+        }, 
+        semiprivate => ['after_push'],
+        roles => [qw/
+            Example::Roles::Role::Queue
+            Example::Roles::Role::LogSize
+        /]
+    ;
+
+    sub after_push {
+        my (undef, $self) = @_;
+
+        if ($self->size > $self->{$__max_size}) {
+            $self->pop;        
+        }
+        $self->{$__}->log_info($self);
+    }
+
+    1;
+
+And use the queue like this
+
+    7:12% reply -I t/lib
+    0> use Minions bind => { 'Example::Roles::FixedSizeQueue' => 'Example::Roles::Acme::FixedSizeQueue_v3' }
+    1> use Example::Roles::FixedSizeQueue
+    2> my $q = Example::Roles::FixedSizeQueue->new(max_size => 2)
+    $res[0] = bless( {
+            '749b3dec-' => 'Example::Roles::FixedSizeQueue::__Private',
+            '749b3dec-max_size' => 2,
+            '749b3dec-q' => []
+        }, 'Example::Roles::FixedSizeQueue::__Minions' )
+
+    3> $q->push(1)
+    [Sat Jan 10 19:13:42 2015] I have 1 element(s)
+    $res[1] = 1
