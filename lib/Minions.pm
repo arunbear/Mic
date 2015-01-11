@@ -653,7 +653,7 @@ as well as a package that provide the implementation of these commands.
 
 This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
 
-It is not a coincidence that the Object Oriented way as originally envisioned was mainly concerned with messaging,
+It is not a coincidence that the Object Oriented concept as originally envisioned was mainly concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/>).
@@ -661,7 +661,7 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 =head1 RATIONALE
 
 Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
-perhaps the most popular being the L<Moose> family. Moo(se) is very effective at class building but acheives this at the
+perhaps the most popular being the L<Moose> family. Moo(se) is very effective at simplifying class building but this is typically achieved at the
 expense of Encapsulation (the hiding of implementation details from end users).
 
 Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
