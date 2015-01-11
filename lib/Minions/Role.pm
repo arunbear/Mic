@@ -46,10 +46,6 @@ A role package can be configured either using Minions::Role or with a package va
 
 This works the same way as in an implementation package.
 
-=head2 semiprivate => ARRAYREF
-
-This works the same way as in an implementation package.
-
 =head2 requires => HASHREF
 
 A hash with keys:
@@ -77,7 +73,20 @@ Variables with names corresponding to these attributes will be created in the ro
 
 =head2 roles => ARRAYREF
 
-A list of roles which the current role is composed out of.
+A list of roles which the current role is composed out of (roles can be built from other roles).
+
+=head2 semiprivate => ARRAYREF
+
+A list of semiprivate methods. These are methods provided by the role that are not indended
+to be used by end users of the class that the role was used in.
+
+Such methods can't be called with the C<$minion-E<gt>do_something()> syntax. Instead they are called this way
+
+    $self->{$__}->some_work($self, ...);
+
+Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Minions::Role (and also by Minions::Implementation).
+
+Since a semiprivate method is called with a package name as its first argument, the C<$self> variable must be explicitly passed to it, if it needs access to the object that called it.
  
 =head2 role => 1
 

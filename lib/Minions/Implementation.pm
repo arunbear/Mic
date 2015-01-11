@@ -166,16 +166,29 @@ This can also be the numerical value 1 in which case the generated writer method
 
 Writers should only be created if they are needed by end users of the class.
 
-=for comment
-=head2 semiprivate => ARRAYREF
-Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
-can be called using the syntax:
-    $self->{'!'}->do_something(...) 
 =head2 roles => ARRAYREF
 
-A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
+A reference to an array containing the names of one or more Role packages. 
+
+Any attributes and/or routines defined in the specified roles will be added to the implementation subject to the following rules 
+
+=over 
+
+=item Implementation trumps Roles
+
+An attribute/routine defined in a role won't get added to the implementation if the implementation already has an attribute/routine with the same name.
+
+=item Conflicts not allowed
+
+An exception will be raised if the same attribute/routine would be provided by two roles.
+
+=back
 
 L<Minions::Role> describes how roles are configured.
+
+=head2 semiprivate => ARRAYREF
+
+These are perhaps only useful when used in conjunction with Roles. They work the same way as in L<Minions::Role>.
 
 =head1 PRIVATE ROUTINES
 
