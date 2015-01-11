@@ -808,7 +808,7 @@ L<Minions::Implementation> describes how implementations are configured.
 =head1 BUGS
 
 Please report any bugs or feature requests via the GitHub web interface at
-L<https://github.com/arunbear/perl5-minion/issues>.
+L<https://github.com/arunbear/minions/issues>.
 
 =head1 AUTHOR
 
