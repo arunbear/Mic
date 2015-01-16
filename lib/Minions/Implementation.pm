@@ -123,9 +123,9 @@ to prevent all objects from sharing the same reference).
 This is like the C<assert> declared in a class package, except that these assertions are not run at
 construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
 
-=head3 handles => ARRAYREF | HASHREF | SCALAR
+=head3 handles => ARRAYREF | HASHREF
 
-This declares that methods can be forwarded from the object to this attribute in one of three ways
+This declares that methods can be forwarded from the object to this attribute in one of two ways
 described below. These forwarding methods are generated as public methods if they are declared in
 the interface, and as semiprivate routines otherwise.
 
@@ -268,3 +268,9 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     5> $set->log_info()
     Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Minions" at reply input line 1.
     6> 
+
+=head1 OBJECT COMPOSITION
+
+Composition allows us to create new objects incorporating the functionality of existing ones.
+
+In  the section L<Minions::Role/EXAMPLES>.
