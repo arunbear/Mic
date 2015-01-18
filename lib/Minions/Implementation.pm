@@ -273,4 +273,90 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
 
 Composition allows us to create new objects incorporating the functionality of existing ones.
 
-In  the section L<Minions::Role/EXAMPLES>.
+As an example, consider a queue which we would use like this:
+
+    use strict;
+    use Test::More;
+    use Example::Delegates::Queue;
+
+    my $q = Example::Delegates::Queue->new;
+
+    is $q->size => 0;
+
+    $q->push(1);
+    is $q->size => 1;
+
+    $q->push(2);
+    is $q->size => 2;
+
+    $q->pop;
+    is $q->size => 1;
+    done_testing();
+
+Now suppose we need a queue which maintains a fixed size by evicting the oldest items:
+
+    use strict;
+    use Test::More;
+    use Example::Delegates::FixedSizeQueue;
+
+    my $q = Example::Delegates::FixedSizeQueue->new(max_size => 3);
+
+    $q->push($_) for 1 .. 3;
+    is $q->size => 3;
+
+    $q->push($_) for 4 .. 6;
+    is $q->size => 3;
+    is $q->pop => 4;
+    done_testing();
+
+Here is the interface for this fixed size queue
+
+    package Example::Delegates::FixedSizeQueue;
+
+    use Minions
+        interface => [qw( push pop size )],
+
+        construct_with  => {
+            max_size => { 
+                assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
+            },
+        }, 
+
+        implementation => 'Example::Delegates::Acme::FixedSizeQueue_v1',
+    ;
+
+    1;
+
+And it is implemented like this
+
+    package Example::Delegates::Acme::FixedSizeQueue_v1;
+
+    use Example::Delegates::Queue;
+
+    use Minions::Implementation
+        has  => {
+            q => {
+                default => sub { Example::Delegates::Queue->new },
+
+                handles => [qw( size pop )],
+            },
+
+            max_size => {
+                init_arg => 'max_size',
+            },
+        },
+    ;
+
+    sub push {
+        my ($self, $val) = @_;
+
+        $self->{$__q}->push($val);
+
+        if ($self->size > $self->{$__max_size}) {
+            $self->pop;
+        }
+    }
+
+    1;
+
+The fixed size queue is composed out of the regular queue, which handles the C<size> and C<pop> methods.
