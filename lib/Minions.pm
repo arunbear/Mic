@@ -805,6 +805,26 @@ Alternatively an implementation can be hashref as shown in the synopsis above.
 
 L<Minions::Implementation> describes how implementations are configured.
 
+=head2 Bindings
+
+The implementation of a class can be quite easily changed from user code e.g. after
+
+    use Minions
+        bind => { 
+            'Foo' => 'Foo::Fake', 
+            'Bar' => 'Bar::Fake', 
+        };
+    use Foo;
+    use Bar;
+
+Foo and bar will be bound to fake implementations (e.g. to aid with testing), instead of the implementations defined in
+their respective modules.
+
+=head2 Introspection
+
+Behavioural and Role introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list of methods or roles respectiively supported by the object.
+
+
 =head1 BUGS
 
 Please report any bugs or feature requests via the GitHub web interface at
