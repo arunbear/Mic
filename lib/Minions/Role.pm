@@ -372,16 +372,34 @@ Now we can use this role too
 
 And use the queue like this
 
-    7:12% reply -I t/lib
+    % reply -I t/lib
     0> use Minions bind => { 'Example::Roles::FixedSizeQueue' => 'Example::Roles::Acme::FixedSizeQueue_v3' }
     1> use Example::Roles::FixedSizeQueue
     2> my $q = Example::Roles::FixedSizeQueue->new(max_size => 2)
     $res[0] = bless( {
-            '749b3dec-' => 'Example::Roles::FixedSizeQueue::__Private',
-            '749b3dec-max_size' => 2,
-            '749b3dec-q' => []
-        }, 'Example::Roles::FixedSizeQueue::__Minions' )
+             '2d395d65-' => 'Example::Roles::FixedSizeQueue::__Private',
+             '2d395d65-max_size' => 2,
+             '2d395d65-q' => []
+           }, 'Example::Roles::FixedSizeQueue::__Minions' )
 
     3> $q->push(1)
-    [Sat Jan 10 19:13:42 2015] I have 1 element(s)
+    [Tue Jan 20 11:52:28 2015] I have 1 element(s)
     $res[1] = 1
+
+    4> $q->can
+    $res[2] = [
+      'pop',
+      'push',
+      'size'
+    ]
+
+    5> $q->DOES
+    $res[3] = [
+      'Example::Roles::FixedSizeQueue',
+      'Example::Roles::Role::LogSize',
+      'Example::Roles::Role::Queue'
+    ]
+
+    6>
+
+The last two commands show L<Minions>' support for introspection.

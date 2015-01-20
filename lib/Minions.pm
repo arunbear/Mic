@@ -822,8 +822,13 @@ their respective modules.
 
 =head2 Introspection
 
-Behavioural and Role introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list of methods or roles respectiively supported by the object.
+Behavioural and Role introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list (or array ref depending on context) of methods or roles respectiively supported by the object.
 
+See the section "Using multiple roles" from L<Minions::Role/EXAMPLES> for an example.
+
+Also note that for any class C<Foo> created using Minions, and for any object created with C<Foo>'s constructor, the following will always return a true value
+
+    $object->DOES('Foo')
 
 =head1 BUGS
 
