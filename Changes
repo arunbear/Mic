@@ -1,6 +1,8 @@
 Revision history for Minions
 
 {{$NEXT}}
+        - More automation for implementations.
+        - More documentation added.
 
 0.000004  2014-12-12 21:09:49 GMT
         - Test CPAN indexing. No changes.
