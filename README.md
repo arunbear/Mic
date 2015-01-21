@@ -4,16 +4,8 @@ Minions - What is _your_ API?
 
 # SYNOPSIS
 
-    package Example::Synopsis::Counter;
+    # Imagine a counter used like this:
 
-    use Minions
-        interface => [ qw( next ) ],
-        implementation => 'Example::Synopsis::Acme::Counter';
-
-    1;
-    
-    # In a script near by ...
-    
     use Test::Most tests => 5;
     use Example::Synopsis::Counter;
 
@@ -24,31 +16,40 @@ Minions - What is _your_ API?
     is $counter->next => 2;
 
     throws_ok { $counter->new } qr/Can't locate object method "new"/;
-    
-    throws_ok { Example::Synopsis::Counter->next } 
+
+    throws_ok { Example::Synopsis::Counter->next }
               qr/Can't locate object method "next" via package "Example::Synopsis::Counter"/;
 
-    
+
+    # The counter class:
+
+    package Example::Synopsis::Counter;
+
+    use Minions
+        interface => [ qw( next ) ],
+
+        implementation => 'Example::Synopsis::Acme::Counter';
+
+    1;
+
+
     # And the implementation for this class:
-    
+
     package Example::Synopsis::Acme::Counter;
-    
-    use strict;
-    
-    our %__Meta = (
-        has  => {
+
+    use Minions::Implementation
+        has => {
             count => { default => 0 },
-        }, 
-    );
-    
+        }
+    ;
+
     sub next {
         my ($self) = @_;
-    
-        $self->{-count}++;
+
+        $self->{$__count}++;
     }
-    
-    1;    
-    
+
+    1;
 
 # STATUS
 
@@ -56,17 +57,57 @@ This is an early release available for testing and feedback and as such is subje
 
 # DESCRIPTION
 
-Minions is a class builder that makes it easy to create classes that are [modular](http://en.wikipedia.org/wiki/Modular_programming).
+Minions is a class builder that makes it easy to create classes that are [modular](http://en.wikipedia.org/wiki/Modular_programming), which means
+there is a clear separation between what end users need to know (the interface for using the class) and implementation details that users
+don't need to know about.
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
 as well as a package that provide the implementation of these commands.
 
 This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
 
-It is not a coincidence that the Object Oriented way as it was originally envisioned was mainly concerned with messaging,
+It is not a coincidence that the Object Oriented concept as originally envisioned was mainly concerned with messaging,
 where in the words of Alan Kay (who coined the term "Object Oriented Programming") objects are "like biological cells and/or individual computers on a network, only able to communicate with messages"
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/)).
+
+# RATIONALE
+
+Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
+perhaps the most popular being the [Moose](https://metacpan.org/pod/Moose) family. Moo(se) is very effective at simplifying class building but this is typically achieved at the
+expense of Encapsulation (the hiding of implementation details from end users).
+
+Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
+
+## The Tale of Minions
+
+There once was a farmer who had a flock of sheep. His typical workday looked like:
+
+    $farmer->move_flock($pasture)
+    $farmer->monitor_flock()
+    $farmer->move_flock($home)
+
+    $farmer->other_important_work()
+
+In order to devote more time to `other_important_work()`, the farmer decided to hire a minion, so the work was now split like this:
+
+    $shepherd_boy->move_flock($pasture)
+    $shepherd_boy->monitor_flock()
+    $shepherd_boy->move_flock($home)
+
+    $farmer->other_important_work()
+
+This did give the farmer more time for `other_important_work()`, but unfornately `$shepherd_boy` had a tendency to [cry wolf](http://en.wikipedia.org/wiki/The_Boy_Who_Cried_Wolf) so the farmer had to replace him:
+
+    $sheep_dog->move_flock($pasture)
+    $sheep_dog->monitor_flock()
+    $sheep_dog->move_flock($home)
+
+    $farmer->other_important_work()
+
+`$sheep_dog` was more reliable and demanded less pay than `$shepherd_boy`, so this was a win for the farmer.
+
+Object Oriented design is essentially the act of minionization, i.e. deciding which minions ($objects) will do what work, and how to communicate with them (using an interface).
 
 # USAGE
 
@@ -98,15 +139,15 @@ A class can be defined when importing Minions e.g.
 
 ## Minions->minionize(\[HASHREF\])
 
-A class can also be defined by calling the `minionize()` class method, with an optional hashref that 
+A class can also be defined by calling the `minionize()` class method, with an optional hashref that
 specifies the class.
 
-If the hashref is not given, the specification is read from a package variable named `%__Meta` in the package
+If the hashref is not given, the specification is read from a package variable named `%__meta__` in the package
 from which `minionize()` was called.
 
 The class defined in the SYNOPSIS could also be defined like this
 
-    use Test::Most tests => 4;
+    use Test::More tests => 2;
     use Minions ();
 
     my %Class = (
@@ -122,7 +163,7 @@ The class defined in the SYNOPSIS could also be defined like this
             },
             has  => {
                 count => { default => 0 },
-            }, 
+            },
         },
     );
 
@@ -132,14 +173,11 @@ The class defined in the SYNOPSIS could also be defined like this
     is $counter->next => 0;
     is $counter->next => 1;
 
-    throws_ok { $counter->new } qr/Can't locate object method "new"/;
-    throws_ok { Counter->next } qr/Can't locate object method "next" via package "Counter"/;
-
 ## Examples
 
 Further examples of usage can be found in the following documents
 
-- [Minions::Construction](https://metacpan.org/pod/Minions::Construction)
+- [Minions::Manual::Construction](https://metacpan.org/pod/Minions::Manual::Construction)
 
 ## Specification
 
@@ -172,114 +210,39 @@ The default constructor will call these predicates to validate the parameters pa
 
 The name of a package that defines the subroutines declared in the interface.
 
-The package may also contain other subroutines not declared in the interface that are for internal use in the package.
-These won't be callable using the `$minion->command(...)` syntax.
-
 Alternatively an implementation can be hashref as shown in the synopsis above.
 
-## Configuring an implementation package
+[Minions::Implementation](https://metacpan.org/pod/Minions::Implementation) describes how implementations are configured.
 
-An implementation package can also be configured with a package variable `%__Meta` with the following keys:
+## Bindings
 
-### has => HASHREF
+The implementation of a class can be quite easily changed from user code e.g. after
 
-This declares attributes of the implementation, mapping the name of an attribute to a hash with keys described in
-the following sub sections.
+    use Minions
+        bind => { 
+            'Foo' => 'Foo::Fake', 
+            'Bar' => 'Bar::Fake', 
+        };
+    use Foo;
+    use Bar;
 
-An attribute called "foo" can be accessed via it's object like this:
+Foo and bar will be bound to fake implementations (e.g. to aid with testing), instead of the implementations defined in
+their respective modules.
 
-    $self->{-foo}
+## Introspection
 
-Objects created by Minions are hashes,
-and are locked down to allow only keys declared in the "has" (implementation or role level)
-declarations. This is done to prevent accidents like mis-spelling an attribute name.
+Behavioural and Role introspection are possible using `$object->can` and `$object->DOES` which if called with no argument will return a list (or array ref depending on context) of methods or roles respectiively supported by the object.
 
-#### default => SCALAR | CODEREF
+See the section "Using multiple roles" from ["EXAMPLES" in Minions::Role](https://metacpan.org/pod/Minions::Role#EXAMPLES) for an example.
 
-The default value assigned to the attribute when the object is created. This can be an anonymous sub,
-which will be excecuted to build the the default value (this would be needed if the default value is a reference,
-to prevent all objects from sharing the same reference).
+Also note that for any class `Foo` created using Minions, and for any object created with `Foo`'s constructor, the following will always return a true value
 
-#### assert => HASHREF
-
-This is like the `assert` declared in a class package, except that these assertions are not run at
-construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
-
-#### handles => ARRAYREF | HASHREF | SCALAR
-
-This declares that methods can be forwarded from the object to this attribute in one of three ways
-described below. These forwarding methods are generated as public methods if they are declared in
-the interface, and as semiprivate routines otherwise.
-
-#### handles => ARRAYREF
-
-All methods in the given array will be forwarded.
-
-#### handles => HASHREF
-
-Method forwarding will be set up such that a method whose name is a key in the given hash will be
-forwarded to a method whose name is the corresponding value in the hash.
-
-#### handles => SCALAR
-
-The scalar is assumed to be a role, and methods provided directly (i.e. not including methods in sub-roles) by the role will be forwarded.
-
-#### reader => SCALAR
-
-This can be a string which if present will be the name of a generated reader method.
-
-This can also be the numerical value 1 in which case the generated reader method will have the same name as the key.
-
-Readers should only be created if they are logically part of the class API.
-
-### semiprivate => ARRAYREF
-
-Any subroutines in this list will be semiprivate, i.e. they will not be callable as regular object methods but
-can be called using the syntax:
-
-    $obj->{'!'}->do_something(...)
-
-### roles => ARRAYREF
-
-A reference to an array containing the names of one or more Role packages that define the subroutines declared in the interface.
-
-The packages may also contain other subroutines not declared in the interface that are for internal use in the package.
-These won't be callable using the `$minion->command(...)` syntax.
-
-## Configuring a role package
-
-A role package must be configured with a package variable `%__Meta` with the following keys (of which only "role"
-is mandatory):
-
-### role => 1 (Mandatory)
-
-This indicates that the package is a Role.
-
-### has => HASHREF
-
-This works the same way as in an implementation package.
-
-### semiprivate => ARRAYREF
-
-This works the same way as in an implementation package.
-
-### requires => HASHREF
-
-A hash with keys:
-
-#### methods => ARRAYREF
-
-Any methods listed here must be provided by an implementation package or a role.
-
-#### attributes => ARRAYREF
-
-Any attributes listed here must be provided by an implementation package or a role, or by the "requires"
-definition in the class.
+    $object->DOES('Foo')
 
 # BUGS
 
-Please report any bugs or feature requests via the GitHub web interface at 
-[https://github.com/arunbear/perl5-minion/issues](https://github.com/arunbear/perl5-minion/issues).
+Please report any bugs or feature requests via the GitHub web interface at
+[https://github.com/arunbear/minions/issues](https://github.com/arunbear/minions/issues).
 
 # AUTHOR
 
