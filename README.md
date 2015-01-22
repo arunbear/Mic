@@ -75,7 +75,9 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
 perhaps the most popular being the [Moose](https://metacpan.org/pod/Moose) family. Moo(se) is very effective at simplifying class building but this is typically achieved at the
-expense of Encapsulation (the hiding of implementation details from end users).
+expense of [Encapsulation](https://en.wikipedia.org/wiki/Information_hiding) (the hiding of implementation details from end users).
+
+To see this first hand, try writing the fixed size queue from ["OBJECT COMPOSITION" in Minions::Implementation](https://metacpan.org/pod/Minions::Implementation#OBJECT-COMPOSITION) using [Moo](https://metacpan.org/pod/Moo), bearing in mind that the only operations the queue should allow are `push`, `pop` and `size`. It is also a revealing exercise to consider how this queue would be written in Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
 
 Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
 
@@ -173,12 +175,6 @@ The class defined in the SYNOPSIS could also be defined like this
     is $counter->next => 0;
     is $counter->next => 1;
 
-## Examples
-
-Further examples of usage can be found in the following documents
-
-- [Minions::Manual::Construction](https://metacpan.org/pod/Minions::Manual::Construction)
-
 ## Specification
 
 The meaning of the keys in the specification hash are described next.
@@ -196,6 +192,8 @@ otherwise an exception is raised.
 An optional reference to a hash whose keys are the names of keyword parameters that are passed to the default constructor.
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
+
+See [Minions::Manual::Construction](https://metacpan.org/pod/Minions::Manual::Construction) for more about construction.
 
 #### optional => BOOLEAN (Default: false)
 
