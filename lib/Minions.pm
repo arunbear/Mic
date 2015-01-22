@@ -760,16 +760,6 @@ The class defined in the SYNOPSIS could also be defined like this
     is $counter->next => 0;
     is $counter->next => 1;
 
-=head2 Examples
-
-Further examples of usage can be found in the following documents
-
-=over 4
-
-=item L<Minions::Manual::Construction>
-
-=back
-
 =head2 Specification
 
 The meaning of the keys in the specification hash are described next.
@@ -787,6 +777,8 @@ otherwise an exception is raised.
 An optional reference to a hash whose keys are the names of keyword parameters that are passed to the default constructor.
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
+
+See L<Minions::Manual::Construction> for more about construction.
 
 =head4 optional => BOOLEAN (Default: false)
 
