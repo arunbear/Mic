@@ -662,7 +662,9 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
 perhaps the most popular being the L<Moose> family. Moo(se) is very effective at simplifying class building but this is typically achieved at the
-expense of Encapsulation (the hiding of implementation details from end users).
+expense of L<Encapsulation|https://en.wikipedia.org/wiki/Information_hiding> (the hiding of implementation details from end users).
+
+To see this first hand, try writing the fixed size queue from L<Minions::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing excercise to consider how this queue would be written in Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
 
 Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
 
