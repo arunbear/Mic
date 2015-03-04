@@ -94,11 +94,10 @@ Only needed if Minions::Role is not used. This indicates that the package is a R
 
 =head1 EXAMPLES
 
-=head2 Queueing Up
+=head2 Queueing and Stacking
 
 First consider a queue which we would use like this:
 
-    use strict;
     use Test::More;
     use Example::Roles::Queue_v1;
 
@@ -112,7 +111,8 @@ First consider a queue which we would use like this:
     $q->push(2);
     is $q->size => 2;
 
-    $q->pop;
+    my $n = $q->pop;
+    is $n => 1;
     is $q->size => 1;
     done_testing();
 
@@ -134,196 +134,185 @@ And its implementation:
 
     use Minions::Implementation
         has  => {
-            q => { default => sub { [ ] } },
+            items => { default => sub { [ ] } },
         }, 
     ;
 
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{$__q} };
+        scalar @{ $self->{$__items} };
     }
 
     sub push {
         my ($self, $val) = @_;
 
-        push @{ $self->{$__q} }, $val;
+        push @{ $self->{$__items} }, $val;
     }
 
     sub pop {
         my ($self) = @_;
-        shift @{ $self->{$__q} };
+
+        shift @{ $self->{$__items} };
     }
 
     1;
 
-Now consider a queue which maintains a fixed size by evicting the oldest items:
+Now consider a stack with this usage:
 
-    use strict;
     use Test::More;
-    use FixedSizeQueue_v1;
+    use Example::Roles::Stack;
 
-    my $q = FixedSizeQueue_v1->new(max_size => 3);
+    my $s = Example::Roles::Stack->new;
 
-    $q->push($_) for 1 .. 3;
-    is $q->size => 3;
+    is $s->size => 0;
 
-    $q->push($_) for 4 .. 6;
-    is $q->size => 3;
-    is $q->pop => 4;
+    $s->push(1);
+    is $s->size => 1;
+
+    $s->push(2);
+    is $s->size => 2;
+
+    my $n = $s->pop;
+    is $n => 2;
+    is $s->size => 1;
     done_testing();
 
 Its class and implementation:
 
-    package Example::Roles::FixedSizeQueue_v1;
+    package Example::Roles::Stack;
 
     use Minions
         interface => [qw( push pop size )],
 
-        construct_with  => {
-            max_size => { 
-                assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
-            },
-        }, 
-
-        implementation => 'Example::Roles::Acme::FixedSizeQueue_v1',
+        implementation => 'Example::Roles::Acme::Stack_v1',
     ;
 
     1;
 
-    package Example::Roles::Acme::FixedSizeQueue_v1;
+    package Example::Roles::Acme::Stack_v1;
 
     use Minions::Implementation
         has  => {
-            q => { default => sub { [ ] } },
-
-            max_size => { 
-                init_arg => 'max_size',
-            },
+            items => { default => sub { [ ] } },
         }, 
     ;
 
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{$__q} };
+        scalar @{ $self->{$__items} };
     }
 
     sub push {
         my ($self, $val) = @_;
 
-        push @{ $self->{$__q} }, $val;
-
-        if ($self->size > $self->{$__max_size}) {
-            $self->pop;        
-        }
+        push @{ $self->{$__items} }, $val;
     }
 
     sub pop {
         my ($self) = @_;
-        shift @{ $self->{$__q} };
+
+        pop @{ $self->{$__items} };
     }
 
     1;
 
-The two queue implementations are very similar, both containing a "q" attribute, the "size" and "pop" methods. The "push" methods are almost the same, the fixed size version just containing some extra logic after adding the item.
+The two implementations are very similar, both containing an "items" attribute, the "size" and "push" methods. The "pop" methods are almost the same, the only difference being whether an item is removed from the front or the back of the array.
 
-We can use a role to factor out the commonality of the two implementations:
+Suppose we wanted to factor out the commonality of the two implementations. We can use a role to do this:
 
-    package Example::Roles::Role::Queue;
+    package Example::Roles::Role::Pushable;
 
     use Minions::Role
         has  => {
-            q => { default => sub { [ ] } },
+            items => { default => sub { [ ] } },
         }, 
-        semiprivate => ['after_push'],
     ;
 
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{$__q} };
+        scalar @{ $self->{$__items} };
     }
 
     sub push {
         my ($self, $val) = @_;
 
-        push @{ $self->{$__q} }, $val;
-
-        $self->{$__}->after_push($self);
+        push @{ $self->{$__items} }, $val;
     }
-
-    sub pop {
-        my ($self) = @_;
-        shift @{ $self->{$__q} };
-    }
-
-    sub after_push { }
 
     1;
 
-The role provides the  "q" attribute, the "size", "pop" and "push" methods, as well as a do nothing semiprivate "after_push" method.
+The role provides the "items" attribute, the "size" and "push" methods.
 
 Now using this role, the Queue implementation can be simplified to this:
 
     package Example::Roles::Acme::Queue_v2;
 
     use Minions::Implementation
-        roles => ['Example::Roles::Role::Queue']
+        roles => ['Example::Roles::Role::Pushable'],
+
+        requires => {
+            attributes => [qw/items/]
+        };
     ;
 
-    1;
+    sub pop {
+        my ($self) = @_;
 
-And the FixedSizeQueue implementation can be simplified to this:
-
-    package Example::Roles::Acme::FixedSizeQueue_v2;
-
-    use Minions::Implementation
-        has  => {
-            max_size => { 
-                init_arg => 'max_size',
-            },
-        }, 
-        semiprivate => ['after_push'],
-        roles => ['Example::Roles::Role::Queue']
-    ;
-
-    sub after_push {
-        my (undef, $self) = @_;
-
-        if ($self->size > $self->{$__max_size}) {
-            $self->pop;        
-        }
+        shift @{ $self->{$__items} };
     }
 
     1;
 
-This implementation provides its own "after_push" method, so it does not get the one provided by the role.
+And the Stack implementation can be simplified to this:
+
+    package Example::Roles::Acme::Stack_v2;
+
+    use Minions::Implementation
+        roles => ['Example::Roles::Role::Pushable'],
+
+        requires => {
+            attributes => [qw/items/]
+        };
+    ;
+
+    sub pop {
+        my ($self) = @_;
+
+        pop @{ $self->{$__items} };
+    }
+
+    1;
 
 To test these new implementations, we don't even need to update the main classes because we can re-bind them to new implementations quite easily:
 
-    use strict;
     use Test::More;
 
     use Minions
-        bind => { 
-            'Example::Roles::FixedSizeQueue' 
-              => 'Example::Roles::Acme::FixedSizeQueue_v2' 
+        bind => {
+            'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v2',
         };
-    use Example::Roles::FixedSizeQueue;
+    use Example::Roles::Queue;
 
-    my $q = Example::Roles::FixedSizeQueue->new(max_size => 3);
+    my $q = Example::Roles::Queue->new;
 
-    $q->push($_) for 1 .. 3;
-    is $q->size => 3;
+    is $q->size => 0;
 
-    $q->push($_) for 4 .. 6;
-    is $q->size => 3;
-    is $q->pop => 4;
+    $q->push(1);
+    is $q->size => 1;
+
+    $q->push(2);
+    is $q->size => 2;
+
+    my $n = $q->pop;
+    is $n => 1;
+    is $q->size => 1;
     done_testing();
 
 =head2 Using multiple roles
 
 An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Minions::Implementation/PRIVATE ROUTINES>.
 
-Such functionality does not logically belong in the queue role, but we could create a new role for it
+Such functionality does not logically belong in the Pushable role, but we could create a new role for it
 
     package Example::Roles::Role::LogSize;
 
@@ -344,28 +333,24 @@ Such functionality does not logically belong in the queue role, but we could cre
 
 Now we can use this role too
 
-    package Example::Roles::Acme::FixedSizeQueue_v3;
+    package Example::Roles::Acme::Queue_v3;
 
     use Minions::Implementation
-        has  => {
-            max_size => { 
-                init_arg => 'max_size',
-            },
-        }, 
-        semiprivate => ['after_push'],
         roles => [qw/
-            Example::Roles::Role::Queue
+            Example::Roles::Role::Pushable
             Example::Roles::Role::LogSize
-        /]
+        /],
+
+        requires => {
+            attributes => [qw/items/]
+        };
     ;
 
-    sub after_push {
-        my (undef, $self) = @_;
+    sub pop {
+        my ($self) = @_;
 
-        if ($self->size > $self->{$__max_size}) {
-            $self->pop;        
-        }
         $self->{$__}->log_info($self);
+        shift @{ $self->{$__items} };
     }
 
     1;
@@ -373,33 +358,35 @@ Now we can use this role too
 And use the queue like this
 
     % reply -I t/lib
-    0> use Minions bind => { 'Example::Roles::FixedSizeQueue' => 'Example::Roles::Acme::FixedSizeQueue_v3' }
-    1> use Example::Roles::FixedSizeQueue
-    2> my $q = Example::Roles::FixedSizeQueue->new(max_size => 2)
+    0> use Minions bind => { 'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3' }
+    1> use Example::Roles::Queue
+    2> my $q = Example::Roles::Queue->new
     $res[0] = bless( {
-             '2d395d65-' => 'Example::Roles::FixedSizeQueue::__Private',
-             '2d395d65-max_size' => 2,
-             '2d395d65-q' => []
-           }, 'Example::Roles::FixedSizeQueue::__Minions' )
+        '83cb834b-' => 'Example::Roles::Queue::__Private',
+        '83cb834b-items' => []
+    }, 'Example::Roles::Queue::__Minions' )
 
     3> $q->push(1)
-    [Tue Jan 20 11:52:28 2015] I have 1 element(s)
     $res[1] = 1
 
-    4> $q->can
-    $res[2] = [
-      'pop',
-      'push',
-      'size'
-    ]
+    4> $q->pop
+    [Tue Mar  3 18:24:08 2015] I have 1 element(s)
+    $res[2] = 1
 
-    5> $q->DOES
+    5> $q->can
     $res[3] = [
-      'Example::Roles::FixedSizeQueue',
-      'Example::Roles::Role::LogSize',
-      'Example::Roles::Role::Queue'
+    'pop',
+    'push',
+    'size'
     ]
 
-    6>
+    6> $q->DOES
+    $res[4] = [
+        'Example::Roles::Queue',
+        'Example::Roles::Role::LogSize',
+        'Example::Roles::Role::Pushable'
+    ]
+
+    7>
 
 The last two commands show L<Minions>' support for introspection.
