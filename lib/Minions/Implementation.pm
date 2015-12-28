@@ -154,15 +154,11 @@ If the attribute has an C<init_arg>, it will be populated with the result of app
 
 This can be a string which if present will be the name of a generated reader method.
 
-This can also be the numerical value 1 in which case the generated reader method will have the same name as the key.
-
 Readers should only be created if they are needed by end users of the class.
 
 =head3 writer => SCALAR
 
 This can be a string which if present will be the name of a generated writer method.
-
-This can also be the numerical value 1 in which case the generated writer method will have a name of the form C<change_foo> where "foo" is the given key.
 
 Writers should only be created if they are needed by end users of the class.
 

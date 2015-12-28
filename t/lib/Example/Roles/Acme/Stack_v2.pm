@@ -1,4 +1,4 @@
-package Example::Roles::Acme::Queue_v2;
+package Example::Roles::Acme::Stack_v2;
 
 use Minions::Implementation
     roles => ['Example::Roles::Role::Pushable'],
@@ -11,7 +11,7 @@ use Minions::Implementation
 sub pop {
     my ($self) = @_;
 
-    shift @{ $self->{$__items} };
+    pop @{ $self->{$__items} };
 }
 
 1;

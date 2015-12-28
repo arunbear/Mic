@@ -1,6 +1,6 @@
-package Example::Roles::Acme::Queue_v1;
+package Example::Roles::Role::Pushable;
 
-use Minions::Implementation
+use Minions::Role
     has  => {
         items => { default => sub { [ ] } },
     }, 
@@ -15,12 +15,6 @@ sub push {
     my ($self, $val) = @_;
 
     push @{ $self->{$__items} }, $val;
-}
-
-sub pop {
-    my ($self) = @_;
-
-    shift @{ $self->{$__items} };
 }
 
 1;

@@ -1,4 +1,4 @@
-package Example::Roles::Acme::Queue_v1;
+package Example::Roles::Acme::Stack_v1;
 
 use Minions::Implementation
     has  => {
@@ -20,7 +20,7 @@ sub push {
 sub pop {
     my ($self) = @_;
 
-    shift @{ $self->{$__items} };
+    pop @{ $self->{$__items} };
 }
 
 1;

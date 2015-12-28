@@ -13,6 +13,7 @@ is $q->size => 1;
 $q->push(2);
 is $q->size => 2;
 
-$q->pop;
+my $n = $q->pop;
+is $n => 1;
 is $q->size => 1;
 done_testing();
