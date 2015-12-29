@@ -42,7 +42,11 @@ sub add_attribute_syms {
 sub add_obfu_name {
     my ($class, $arg, $stash, $slot) = @_;
 
-    Readonly my $sym_val => "$Minions::_Guts::attribute_sym-$slot";
+    my $data_version = $stash->get_symbol('$DATA_VERSION');
+    Readonly my $sym_val => sprintf(
+        "%s-$slot",
+       Minions::_Guts::attribute_sym($data_version),
+    );
     $Minions::_Guts::obfu_name{$slot} = $sym_val;
 
     $stash->add_symbol(

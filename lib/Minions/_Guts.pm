@@ -2,8 +2,6 @@ package Minions::_Guts;
 
 use Digest::MD5 qw( md5_hex );
 
-*attribute_sym = \ substr(md5_hex($$), 0 ,8);
-
 our %obfu_name;
 
 sub obfu_name {
@@ -15,6 +13,12 @@ sub obfu_name {
     else {
         return $obfu_name{$name};
     }
+}
+
+sub attribute_sym {
+    my $datum = shift || $$;
+
+    return substr(md5_hex($datum), 0 ,8);
 }
 
 1;
