@@ -175,6 +175,9 @@ The class defined in the SYNOPSIS could also be defined like this
     is $counter->next => 0;
     is $counter->next => 1;
 
+_This example was included for completeness. Creating a class this way is not recommended for real world
+projects as it doesn't scale up as well as the mainstream usage (i.e. using separate packages)._
+
 ## Specification
 
 The meaning of the keys in the specification hash are described next.
