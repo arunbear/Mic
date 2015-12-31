@@ -645,10 +645,10 @@ This is an early release available for testing and feedback and as such is subje
 =head1 DESCRIPTION
 
 Minions is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
-there is a clear separation between what end users need to know (the interface for using the class) and implementation details that users
+there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
 don't need to know about.
 
-Classes are built from a specification that declares the interface of the class (i.e. what commands minions of the classs respond to),
+Classes are built from a specification that declares the interface of the class (i.e. what commands instances of the classs respond to),
 as well as a package that provide the implementation of these commands.
 
 This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
@@ -664,11 +664,13 @@ Due to Perl's "assembly required" approach to OOP, there are many CPAN modules t
 perhaps the most popular being the L<Moose> family. Moo(se) is very effective at simplifying class building but this is typically achieved at the
 expense of L<Encapsulation|https://en.wikipedia.org/wiki/Information_hiding> (the hiding of implementation details from end users).
 
-To see this first hand, try writing the fixed size queue from L<Minions::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
+To see this first hand, try writing the fixed size queue from L<Minions::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
 
 Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
 
 =head2 The Tale of Minions
+
+The following fable illustrates the main ideas of OOP.
 
 There once was a farmer who had a flock of sheep. His typical workday looked like:
 
@@ -696,7 +698,34 @@ This did give the farmer more time for C<other_important_work()>, but unfornatel
 
 C<$sheep_dog> was more reliable and demanded less pay than C<$shepherd_boy>, so this was a win for the farmer.
 
-Object Oriented design is essentially the act of minionization, i.e. deciding which minions ($objects) will do what work, and how to communicate with them (using an interface).
+=head3 Ideas
+
+Object Oriented design is essentially the act of minionization, i.e. deciding which minions (objects) will do what work, and how to communicate with them (using an interface).
+
+The most important ideas are
+
+=head4 Delegation
+
+To handle complexity, delegate to a suitable entity e.g. the farmer delegates some of his work to C<$shepherd_boy> (and later on to C<$sheep_dog>).
+
+=head4 Encapsulation
+
+We tell objects what to do, rather than micro-manage e.g.
+
+    $sheep_dog->monitor_flock();
+
+rather than
+
+    $sheep_dog->{brain}{task}{monitor_flock} = 1;
+
+At a high level, we do not particularly care what the internals of the object are. We only care what the object can do.
+
+But, an object becomes harder to change the more its internals are exposed.
+
+=head4 Polymorphism
+
+C<$sheep_dog> and C<$shepherd_boy> both understood the same commands, so replacing the latter with the former was easier than it would have been otherwise.
+
 
 =head1 USAGE
 
