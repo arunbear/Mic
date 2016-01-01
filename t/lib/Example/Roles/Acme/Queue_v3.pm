@@ -10,11 +10,12 @@ use Minions::Implementation
         attributes => [qw/items/]
     };
 ;
+use Minions::Util 'call_sp';
 
 sub pop {
     my ($self) = @_;
 
-    $self->{$__}->log_info($self);
+    call_sp($self => 'log_info');
     shift @{ $self->{$__items} };
 }
 
