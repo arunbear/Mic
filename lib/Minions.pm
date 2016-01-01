@@ -513,7 +513,7 @@ sub _add_methods {
              && $meta->{writer}
              && $in_interface->{$name} ) {
 
-            my $name = $meta->{writer} == 1 ? "change_$name" : $meta->{writer};
+            my $name = $meta->{writer};
             my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{$name} = sub {
                 my ($self, $new_val) = @_;
