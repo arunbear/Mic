@@ -10,4 +10,5 @@ requires 'Sub::Name',      '0.09';
 on test => sub {
     requires 'Test::Lib',  '0.002';
     requires 'Test::Most', '0.34';
+    requires 'Test::Output', '1.03';
 };
