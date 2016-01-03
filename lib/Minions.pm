@@ -497,6 +497,7 @@ sub _add_methods {
         }
         return UNIVERSAL::can($self, $f);
     };
+    _add_autoload($spec, $stash);
 
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
@@ -533,6 +534,33 @@ sub _add_methods {
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
         $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
     }
+}
+
+sub _add_autoload {
+    my ($spec, $stash) = @_;
+
+    $spec->{implementation}{methods}{AUTOLOAD} = sub {
+        my $self = shift;
+
+        my $caller_sub = (caller 1)[3];
+        my $caller_pkg = $caller_sub;
+        $caller_pkg =~ s/::[^:]+$//;
+
+        my $called = ${ $stash->get_symbol('$AUTOLOAD') };
+        $called =~ s/.+:://;
+
+        if(    exists $spec->{implementation}{semiprivate}{$called}
+            && $caller_pkg eq ref $self
+        ) {
+            my $stash = _get_stash($spec->{implementation}{package});
+            my $sp_var = ${ $stash->get_symbol('$__') };
+            return $self->{$sp_var}->$called($self, @_);
+        }
+        else {
+            croak sprintf(q{Can't locate object method "%s" via package "%s"},
+                          $called, ref $self);
+        }
+    };
 }
 
 sub _add_delegates {
@@ -574,7 +602,7 @@ sub _interface {
 
     $type ||= 'interface';
     my %must_allow = (
-        interface   => [qw( can DOES DESTROY )],
+        interface   => [qw( AUTOLOAD can DOES DESTROY )],
         semiprivate => [qw( BUILD )],
     );
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
