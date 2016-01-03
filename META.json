@@ -54,7 +54,8 @@
       "test" : {
          "requires" : {
             "Test::Lib" : "0.002",
-            "Test::Most" : "0.34"
+            "Test::Most" : "0.34",
+            "Test::Output" : "1.03"
          }
       }
    },
