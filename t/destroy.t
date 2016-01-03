@@ -41,6 +41,6 @@ for ( 1 .. 3 ) {
     my $proc = Process->new();
     is($proc->id, 1);
 }
-is($ProcessImpl::Count, 0);
+is($ProcessImpl::Count, 0, 'All objects destroyed');
 
 done_testing();
