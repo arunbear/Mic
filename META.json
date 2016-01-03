@@ -1,5 +1,5 @@
 {
-   "abstract" : "What is I<your> API?",
+   "abstract" : "Simplifies the creation of loosely coupled object oriented code.",
    "author" : [
       "Arun Prasaad <arunbear@cpan.org>"
    ],

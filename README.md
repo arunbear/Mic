@@ -1,6 +1,6 @@
 # NAME
 
-Minions - What is _your_ API?
+Minions - Simplifies the creation of loosely coupled object oriented code.
 
 # SYNOPSIS
 
@@ -272,6 +272,10 @@ Also note that for any class `Foo` created using Minions, and for any object cre
 
 Please report any bugs or feature requests via the GitHub web interface at
 [https://github.com/arunbear/minions/issues](https://github.com/arunbear/minions/issues).
+
+# ACKNOWLEDGEMENTS
+
+Stevan Little (for creating Moose), Tye McQueen (for numerous insights on class building and modular programming).
 
 # AUTHOR
 
