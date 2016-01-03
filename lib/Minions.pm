@@ -587,7 +587,7 @@ __END__
 
 =head1 NAME
 
-Minions - What is I<your> API?
+Minions - Simplifies the creation of loosely coupled object oriented code.
 
 =head1 SYNOPSIS
 
@@ -860,6 +860,10 @@ Also note that for any class C<Foo> created using Minions, and for any object cr
 
 Please report any bugs or feature requests via the GitHub web interface at
 L<https://github.com/arunbear/minions/issues>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Stevan Little (for creating Moose), Tye McQueen (for numerous insights on class building and modular programming).
 
 =head1 AUTHOR
 
