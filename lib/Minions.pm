@@ -300,9 +300,9 @@ sub _get_object_maker {
         my $stash = Package::Stash->new($class);
 
         my $spec = $stash->get_symbol('%__meta__');
-        my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
+        my $pkg_key = Minions::_Guts::obfu_name('', $spec);
         my %obj = (
-            $obfu_pkg => ${ $stash->get_symbol('$__Private_pkg') },
+            $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
         );
 
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
