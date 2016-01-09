@@ -8,14 +8,15 @@ use Minions::Implementation
 
     requires => {
         attributes => [qw/items/]
-    };
+    },
+    attr_style => 'uc'
 ;
 
 sub pop {
     my ($self) = @_;
 
     $self->log_info;
-    shift @{ $self->{$__items} };
+    shift @{ $self->{$ITEMS} };
 }
 
 1;
