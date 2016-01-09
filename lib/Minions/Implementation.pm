@@ -49,8 +49,15 @@ sub add_obfu_name {
     );
     $Minions::_Guts::obfu_name{$slot} = $sym_val;
 
+    my $prefix = '';
+    if($slot eq '' || ! $arg->{attr_style}) {
+        $prefix = '__';
+    }
+    elsif($arg->{attr_style} eq 'uc') {
+        $slot = uc $slot;
+    }
     $stash->add_symbol(
-        sprintf('$%s%s', $arg->{attribute_var_prefix} || '__', $slot),
+        sprintf('$%s%s', $prefix, $slot),
         \ $sym_val
     );
 }
@@ -189,6 +196,13 @@ L<Minions::Role> describes how roles are configured.
 =head2 semiprivate => ARRAYREF
 
 These are perhaps only useful when used in conjunction with Roles. They work the same way as in L<Minions::Role>.
+
+=head2 attr_style => SCALAR
+
+If this is set to the string C<'uc'>, then an attribute named 'foo' can be accessed via its object using the symbol C<$FOO> e.g.
+
+    # implementation defined using Minions::Implementation
+    $self->{$FOO}
 
 =head1 PRIVATE ROUTINES
 
