@@ -12,6 +12,9 @@ use Example::Roles::Queue;
 my $q = Example::Roles::Queue->new;
 
 $q->push(1);
-stderr_like(sub { $q->pop }, qr'I have 1 element');
+
+my $item;
+stderr_like(sub { $item = $q->pop }, qr'I have 1 element');
+is($item, 1, 'pop');
 
 done_testing();
