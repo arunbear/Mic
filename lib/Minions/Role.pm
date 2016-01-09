@@ -80,14 +80,20 @@ A list of roles which the current role is composed out of (roles can be built fr
 A list of semiprivate methods. These are methods provided by the role that are not indended
 to be used by end users of the class that the role was used in.
 
-Such methods can't be called with the C<$minion-E<gt>do_something()> syntax. Instead they are called this way
+Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Minions::Role (and also by Minions::Implementation).
+
+A semiprivate method can then be called like this
 
     $self->{$__}->some_work($self, ...);
 
-Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Minions::Role (and also by Minions::Implementation).
+Since a semiprivate method is receives a package name as its first argument, the C<$self> variable must be explicitly passed to it, if it needs access to the object that called it.
 
-Since a semiprivate method is called with a package name as its first argument, the C<$self> variable must be explicitly passed to it, if it needs access to the object that called it.
+As this syntax is somewhat cumbersome, it is also possible to call a semiprivate method via the usual method call syntax i.e.
  
+    $self->some_work(...);
+
+but this is only valid if called within the object's implementation package, or a role that the implementation is composed out of.
+
 =head2 role => 1
 
 Only needed if Minions::Role is not used. This indicates that the package is a Role.
@@ -350,6 +356,9 @@ Now we can use this role too
         my ($self) = @_;
 
         $self->{$__}->log_info($self);
+        # or just
+        # $self->log_info;
+
         shift @{ $self->{$__items} };
     }
 
