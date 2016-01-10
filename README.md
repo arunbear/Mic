@@ -74,12 +74,13 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 # RATIONALE
 
 Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
-perhaps the most popular being the [Moose](https://metacpan.org/pod/Moose) family. Moo(se) is very effective at simplifying class building but this is typically achieved at the
-expense of [Encapsulation](https://en.wikipedia.org/wiki/Information_hiding) (the hiding of implementation details from end users).
+perhaps the most popular being the [Moose](https://metacpan.org/pod/Moose) family. Although Moo(se) is very effective at simplifying class building, this is typically achieved at the
+expense of [Encapsulation](https://en.wikipedia.org/wiki/Information_hiding) (because Moose encourages the exposure of all an object's attributes via methods), and this in turn encourages
+designs that are tightly [coupled](https://en.wikipedia.org/wiki/Coupling_\(computer_programming\)).
 
 To see this first hand, try writing the fixed size queue from ["OBJECT COMPOSITION" in Minions::Implementation](https://metacpan.org/pod/Minions::Implementation#OBJECT-COMPOSITION) using [Moo](https://metacpan.org/pod/Moo), bearing in mind that the only operations the queue should allow are `push`, `pop` and `size`. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
 
-Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but does not require or encourage encapsulation to be sacrificed.
+Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
 
 ## The Tale of Minions
 
