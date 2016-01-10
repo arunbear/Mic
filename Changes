@@ -2,6 +2,13 @@ Revision history for Minions
 
 {{$NEXT}}
 
+0.000007 2016-01-10T19:20:19Z
+        - Documentation updates.
+        - reader => 1 and writer => 1 are no longer supported (their meaning was not obvious)
+        - Simpler syntax for calling semiprivate methods.
+        - Added option to allow $self->{$ATTR} syntax.
+        - Migrated to Minilla.
+
 0.000006  2015-01-22 21:54:21 GMT
         - Documentation updates.
 
