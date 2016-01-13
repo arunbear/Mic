@@ -556,6 +556,9 @@ sub _add_autoload {
             my $sp_var = ${ $stash->get_symbol('$__') };
             return $self->{$sp_var}->$called($self, @_);
         }
+        elsif( $called eq 'DESTROY' ) {
+            return;
+        }
         else {
             croak sprintf(q{Can't locate object method "%s" via package "%s"},
                           $called, ref $self);
