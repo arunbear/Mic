@@ -123,6 +123,9 @@ An attribute called "foo" can be accessed via it's object in one of two ways:
 The advantage of the first form is that the symbol C<$__foo> is not (easily) available to users of the object, so
 there is greater incentive for using the provided interface when using the object.
 
+B<WARNING> The C<$__foo> syntax is deprecated in favour of C<$FOO> which will
+be the default sytle starting from the next version of Minions. See also the I<attr_style> section below.
+
 =head3 default => SCALAR | CODEREF
 
 The default value assigned to the attribute when the object is created. This can be an anonymous sub,
@@ -203,6 +206,8 @@ If this is set to the string C<'uc'>, then an attribute named 'foo' can be acces
 
     # implementation defined using Minions::Implementation
     $self->{$FOO}
+
+B<WARNING> This will be the default starting from the next version of Minions, in which the current C<$__foo> syntax can be enabled by setting I<attr_style> to C<'_2'>
 
 =head1 PRIVATE ROUTINES
 
