@@ -7,7 +7,8 @@ use Minions ();
     package Greeter;
 
     use Minions::Role
-        requires => { attributes => ['name'] }
+        requires => { attributes => ['name'] },
+        attr_style => '_2',
     ;
 
     sub greet {

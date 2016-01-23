@@ -9,20 +9,20 @@ use Minions::Role
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{$__q} };
+    scalar @{ $self->{$Q} };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{$__q} }, $val;
+    push @{ $self->{$Q} }, $val;
 
     $self->{$__}->after_push($self);
 }
 
 sub pop {
     my ($self) = @_;
-    shift @{ $self->{$__q} };
+    shift @{ $self->{$Q} };
 }
 
 sub after_push { }

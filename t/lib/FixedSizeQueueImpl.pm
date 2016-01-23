@@ -12,13 +12,13 @@ use Minions::Implementation
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{$__q} };
+    scalar @{ $self->{$Q} };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{$__q} }, $val;
+    push @{ $self->{$Q} }, $val;
 }
 
 1;

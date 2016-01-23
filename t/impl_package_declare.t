@@ -21,7 +21,7 @@ use Minions::Implementation
 sub next {
     my ($self) = @_;
 
-    $self->{$__count}++;
+    $self->{$COUNT}++;
 }
 
 package main;

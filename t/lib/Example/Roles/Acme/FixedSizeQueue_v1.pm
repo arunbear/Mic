@@ -12,22 +12,22 @@ use Minions::Implementation
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{$__q} };
+    scalar @{ $self->{$Q} };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{$__q} }, $val;
+    push @{ $self->{$Q} }, $val;
 
-    if ($self->size > $self->{$__max_size}) {
+    if ($self->size > $self->{$MAX_SIZE}) {
         $self->pop;        
     }
 }
 
 sub pop {
     my ($self) = @_;
-    shift @{ $self->{$__q} };
+    shift @{ $self->{$Q} };
 }
 
 1;

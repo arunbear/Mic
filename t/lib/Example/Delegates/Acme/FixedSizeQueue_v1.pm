@@ -19,9 +19,9 @@ use Minions::Implementation
 sub push {
     my ($self, $val) = @_;
 
-    $self->{$__q}->push($val);
+    $self->{$Q}->push($val);
 
-    if ($self->size > $self->{$__max_size}) {
+    if ($self->size > $self->{$MAX_SIZE}) {
         $self->pop;        
     }
 }

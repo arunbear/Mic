@@ -11,7 +11,7 @@ use Minions::Implementation
 sub pop {
     my ($self) = @_;
 
-    shift @{ $self->{$__items} };
+    shift @{ $self->{$ITEMS} };
 }
 
 1;

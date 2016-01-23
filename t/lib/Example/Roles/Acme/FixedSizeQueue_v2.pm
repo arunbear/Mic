@@ -13,7 +13,7 @@ use Minions::Implementation
 sub after_push {
     my (undef, $self) = @_;
 
-    if ($self->size > $self->{$__max_size}) {
+    if ($self->size > $self->{$MAX_SIZE}) {
         $self->pop;        
     }
 }

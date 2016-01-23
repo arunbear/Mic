@@ -14,14 +14,14 @@ sub has {
     my ($self, $e) = @_;
 
     log_info($self);
-    exists $self->{$__set}{$e};
+    exists $self->{$SET}{$e};
 }
 
 sub add {
     my ($self, $e) = @_;
 
     log_info($self);
-    ++$self->{$__set}{$e};
+    ++$self->{$SET}{$e};
 }
 
 sub log_info {
@@ -32,7 +32,7 @@ sub log_info {
 
 sub size {
     my ($self) = @_;
-    scalar(keys %{ $self->{$__set} });
+    scalar(keys %{ $self->{$SET} });
 }
 
 1;
