@@ -50,10 +50,10 @@ sub add_obfu_name {
     $Minions::_Guts::obfu_name{$slot} = $sym_val;
 
     my $prefix = '';
-    if($slot eq '' || ! $arg->{attr_style}) {
+    if($slot eq '' || $arg->{attr_style} eq '_2') {
         $prefix = '__';
     }
-    elsif($arg->{attr_style} eq 'uc') {
+    elsif($arg->{attr_style} eq 'uc' || ! $arg->{attr_style}) {
         $slot = uc $slot;
     }
     $stash->add_symbol(
