@@ -28,7 +28,7 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
     sub BUILD {
         my (undef, $self, $arg) = @_;
 
-        $self->{$__}->ASSERT('count', $arg->{start});
+        $self->{$__}->ASSERT('count', $arg->{start}) if $arg->{start};
         $self->{$__}->ASSERT('step',  $arg->{-step}) if $arg->{-step};
         $self->{$COUNT} = $arg->{start};
     }
@@ -65,8 +65,9 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
 
 package main;
 
-throws_ok { my $counter = Counter->new() } 'Minions::Error::AssertionFailure';
+lives_ok { my $counter = Counter->new() } 'Minions::Error::AssertionFailure';
 throws_ok { my $counter = Counter->new(start => 'asd') } 'Minions::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(starr => 'asd') } qr/Unknown args: \[starr\]/;
 throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } 'Minions::Error::AssertionFailure';
 throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } 'Minions::Error::AssertionFailure';
 lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
