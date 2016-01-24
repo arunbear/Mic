@@ -9,5 +9,5 @@ is $counter->next => 10;
 is $counter->next => 11;
 is $counter->next => 12;
 
-throws_ok { Example::Construction::Counter_v3->new(start => 'abc') } 
+throws_ok { Example::Construction::Counter_v3->new('abc') } 
           qr/Parameter 'start' failed check 'is_integer'/;
