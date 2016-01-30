@@ -68,7 +68,7 @@ Variables with names corresponding to these attributes will be created in the ro
 
     sub area {
         my ($self) = @_;
-        $self->{$__length} * $self->{$__width};
+        $self->{$LENGTH} * $self->{$WIDTH};
     }
 
 =head2 roles => ARRAYREF
@@ -146,19 +146,19 @@ And its implementation:
 
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{$__items} };
+        scalar @{ $self->{$ITEMS} };
     }
 
     sub push {
         my ($self, $val) = @_;
 
-        push @{ $self->{$__items} }, $val;
+        push @{ $self->{$ITEMS} }, $val;
     }
 
     sub pop {
         my ($self) = @_;
 
-        shift @{ $self->{$__items} };
+        shift @{ $self->{$ITEMS} };
     }
 
     1;
@@ -205,19 +205,19 @@ Its class and implementation:
 
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{$__items} };
+        scalar @{ $self->{$ITEMS} };
     }
 
     sub push {
         my ($self, $val) = @_;
 
-        push @{ $self->{$__items} }, $val;
+        push @{ $self->{$ITEMS} }, $val;
     }
 
     sub pop {
         my ($self) = @_;
 
-        pop @{ $self->{$__items} };
+        pop @{ $self->{$ITEMS} };
     }
 
     1;
@@ -236,13 +236,13 @@ Suppose we wanted to factor out the commonality of the two implementations. We c
 
     sub size {
         my ($self) = @_;
-        scalar @{ $self->{$__items} };
+        scalar @{ $self->{$ITEMS} };
     }
 
     sub push {
         my ($self, $val) = @_;
 
-        push @{ $self->{$__items} }, $val;
+        push @{ $self->{$ITEMS} }, $val;
     }
 
     1;
@@ -264,7 +264,7 @@ Now using this role, the Queue implementation can be simplified to this:
     sub pop {
         my ($self) = @_;
 
-        shift @{ $self->{$__items} };
+        shift @{ $self->{$ITEMS} };
     }
 
     1;
@@ -284,7 +284,7 @@ And the Stack implementation can be simplified to this:
     sub pop {
         my ($self) = @_;
 
-        pop @{ $self->{$__items} };
+        pop @{ $self->{$ITEMS} };
     }
 
     1;
@@ -359,7 +359,7 @@ Now we can use this role too
         # or just
         # $self->log_info;
 
-        shift @{ $self->{$__items} };
+        shift @{ $self->{$ITEMS} };
     }
 
     1;

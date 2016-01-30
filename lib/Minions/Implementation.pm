@@ -88,12 +88,12 @@ Minions::Implementation
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$__set}{$e};
+        exists $self->{$SET}{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$__set}{$e};
+        ++$self->{$SET}{$e};
     }
 
     1;
@@ -115,16 +115,13 @@ the following sub sections.
 An attribute called "foo" can be accessed via it's object in one of two ways:
 
     # implementation defined using Minions::Implementation
-    $self->{$__foo}
+    $self->{$FOO}
 
     # implementation defined using %__meta__
     $self->{-foo}
 
-The advantage of the first form is that the symbol C<$__foo> is not (easily) available to users of the object, so
+The advantage of the first form is that the symbol C<$FOO> is not (easily) available to users of the object, so
 there is greater incentive for using the provided interface when using the object.
-
-B<WARNING> The C<$__foo> syntax is deprecated in favour of C<$FOO> which will
-be the default sytle starting from the next version of Minions. See also the I<attr_style> section below.
 
 =head3 default => SCALAR | CODEREF
 
@@ -202,12 +199,12 @@ These are perhaps only useful when used in conjunction with Roles. They work the
 
 =head2 attr_style => SCALAR
 
-If this is set to the string C<'uc'>, then an attribute named 'foo' can be accessed via its object using the symbol C<$FOO> e.g.
+If this is set to the string C<'_2'>, then an attribute named 'foo' can be accessed via its object using the symbol C<$__foo> e.g.
 
     # implementation defined using Minions::Implementation
-    $self->{$FOO}
+    $self->{$__foo}
 
-B<WARNING> This will be the default starting from the next version of Minions, in which the current C<$__foo> syntax can be enabled by setting I<attr_style> to C<'_2'>
+This was the default behaviour in Minions 0.000008 and earlier.
 
 =head1 PRIVATE ROUTINES
 
@@ -219,15 +216,15 @@ As an example, suppose we want to print an informational message whenever the Se
     sub has {
         my ($self, $e) = @_;
 
-        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$__set} });
-        exists $self->{$__set}{$e};
+        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$SET} });
+        exists $self->{$SET}{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
 
-        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$__set} });
-        ++$self->{$__set}{$e};
+        warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->{$SET} });
+        ++$self->{$SET}{$e};
     }
 
 But this duplication of code is not good, so we factor it out:
@@ -236,19 +233,19 @@ But this duplication of code is not good, so we factor it out:
         my ($self, $e) = @_;
 
         log_info($self);
-        exists $self->{$__set}{$e};
+        exists $self->{$SET}{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
 
         log_info($self);
-        ++$self->{$__set}{$e};
+        ++$self->{$SET}{$e};
     }
 
     sub size {
         my ($self) = @_;
-        scalar(keys %{ $self->{$__set} });
+        scalar(keys %{ $self->{$SET} });
     }
 
     sub log_info {
@@ -369,9 +366,9 @@ And it is implemented like this
     sub push {
         my ($self, $val) = @_;
 
-        $self->{$__q}->push($val);
+        $self->{$Q}->push($val);
 
-        if ($self->size > $self->{$__max_size}) {
+        if ($self->size > $self->{$MAX_SIZE}) {
             $self->pop;
         }
     }
