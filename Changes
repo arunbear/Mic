@@ -2,6 +2,10 @@ Revision history for Minions
 
 {{$NEXT}}
 
+1.000000 2016-02-04T21:46:53Z
+        - The $self->{$__foo} syntax is now supported via an option,
+          the default now being $self->{$FOO}
+
 0.000008 2016-01-16T14:37:46Z
         - Corrects test failures in Perl 5.12.x and earlier.
         - The $__foo syntax is deprecated in favour of $FOO

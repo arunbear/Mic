@@ -46,7 +46,7 @@ Minions - Simplifies the creation of loosely coupled object oriented code.
     sub next {
         my ($self) = @_;
 
-        $self->{$__count}++;
+        $self->{$COUNT}++;
     }
 
     1;

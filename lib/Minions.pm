@@ -18,7 +18,7 @@ use Exception::Class (
 );
 use Minions::_Guts;
 
-our $VERSION = '0.000008';
+our $VERSION = '1.000000';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
