@@ -89,6 +89,7 @@ sub minionize {
             },
         };
         $spec->{roles} = $meta->{roles};
+        $spec->{traitlibs} = $meta->{traitlibs};
         my $is_semiprivate = _interface($meta, 'semiprivate');
 
         foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
@@ -101,6 +102,7 @@ sub minionize {
 
     _prep_interface($spec);
     _compose_roles($spec);
+    _compose_traitlibs($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
@@ -111,6 +113,7 @@ sub minionize {
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     _check_role_requirements($spec);
+    _check_traitlib_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
 }
@@ -162,11 +165,38 @@ sub _compose_roles {
         }
 
         my ($meta, $method) = _load_role($role);
-        $spec->{required}{$role} = $meta->{requires};
+        $spec->{required_by_role}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || [], $from_role);
 
         _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
         _add_role_methods($spec, $from_role, $role, $meta, $method);
+    }
+}
+
+sub _compose_traitlibs {
+    my ($spec, $traitlibs, $from_traitlib) = @_;
+
+    if ( ! $traitlibs ) {
+        $traitlibs = $spec->{traitlibs};
+    }
+
+    $from_traitlib ||= {};
+
+    for my $traitlib ( @{ $traitlibs } ) {
+
+        if ( $spec->{composed_traitlib}{$traitlib} ) {
+            confess "Cannot compose traitlib '$traitlib' twice";
+        }
+        else {
+            $spec->{composed_traitlib}{$traitlib}++;
+        }
+
+        my ($meta, $method) = _load_traitlib($traitlib);
+        $spec->{required_by_traitlib}{$traitlib} = $meta->{requires};
+        _compose_traitlibs($spec, $meta->{traitlibs} || [], $from_traitlib);
+
+        _add_traitlib_items($spec, $from_traitlib, $traitlib, $meta->{has}, 'has');
+        _add_traitlib_methods($spec, $from_traitlib, $traitlib, $meta, $method);
     }
 }
 
@@ -182,24 +212,45 @@ sub _load_role {
     return ($meta, $method);
 }
 
+sub _load_traitlib {
+    my ($traitlib) = @_;
+
+    my $stash  = _get_stash($traitlib);
+    my $meta   = $stash->get_symbol('%__meta__');
+    $meta->{traitlib}
+      or confess "$traitlib is not a traitlib";
+
+    my $method = $stash->get_all_symbols('CODE');
+    return ($meta, $method);
+}
+
 sub _check_role_requirements {
     my ($spec) = @_;
 
-    foreach my $role ( keys %{ $spec->{required} } ) {
+    _check_traitlib_requirements($spec, 'required_by_role');
+}
 
-        my $required = $spec->{required}{$role};
+sub _check_traitlib_requirements {
+    my ($spec, $type) = @_;
+
+    $type ||= 'required_by_traitlib';
+    my $required_by = do { my $tmp = $type; $tmp =~ s/_/ /g; $tmp };
+
+    foreach my $traitlib ( keys %{ $spec->{$type} } ) {
+
+        my $required = $spec->{$type}{$traitlib};
 
         foreach my $name ( @{ $required->{methods} } ) {
 
             unless (   defined $spec->{implementation}{methods}{$name}
                     || defined $spec->{implementation}{semiprivate}{$name}
                    ) {
-                confess "Method '$name', required by role $role, is not implemented.";
+                confess "Method '$name', $required_by $traitlib, is not implemented.";
             }
         }
         foreach my $name ( @{ $required->{attributes} } ) {
             defined $spec->{implementation}{has}{$name}
-              or confess "Attribute '$name', required by role $role, is not defined.";
+              or confess "Attribute '$name', $required_by $traitlib, is not defined.";
         }
     }
 }
