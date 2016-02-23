@@ -297,6 +297,27 @@ sub _add_role_items {
     }
 }
 
+sub _add_traitlib_items {
+    my ($spec, $from_traitlib, $traitlib, $item, $type) = @_;
+
+    my $wanted = $spec->{implementation}{traitlibs}{$traitlib}{attributes};
+    for my $name ( @{$wanted} ) {
+
+        if (my $other_traitlib = $from_traitlib->{$name}) {
+            _raise_role_conflict($name, $traitlib, $other_traitlib);
+        }
+        if (exists $item->{$name}) {
+            if ( ! $spec->{implementation}{$type}{$name} ) {
+                $spec->{implementation}{$type}{$name} = $item->{$name};
+                $from_traitlib->{$name} = $traitlib;
+            }
+        }
+        else {
+            confess "Attribute $name not available via traitlib $traitlib";
+        }
+    }
+}
+
 sub _add_role_methods {
     my ($spec, $from_role, $role, $role_meta, $code_for) = @_;
 
