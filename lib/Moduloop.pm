@@ -694,52 +694,98 @@ Moduloop - Simplifies the creation of loosely coupled object oriented code.
 
 =head1 SYNOPSIS
 
-    # Imagine a counter used like this:
+    # A simple Set class:
 
-    use Test::Most tests => 5;
-    use Example::Synopsis::Counter;
-
-    my $counter = Example::Synopsis::Counter->new;
-
-    is $counter->next => 0;
-    is $counter->next => 1;
-    is $counter->next => 2;
-
-    throws_ok { $counter->new } qr/Can't locate object method "new"/;
-
-    throws_ok { Example::Synopsis::Counter->next }
-              qr/Can't locate object method "next" via package "Example::Synopsis::Counter"/;
-
-
-    # The counter class:
-
-    package Example::Synopsis::Counter;
+    package Example::Synopsis::Set;
 
     use Moduloop
-        interface => [ qw( next ) ],
+        interface => [ qw( has add ) ], # what the class does
 
-        implementation => 'Example::Synopsis::Acme::Counter';
+        implementation => 'Example::Synopsis::ArraySet'; # how it does it
 
     1;
 
 
     # And the implementation for this class:
 
-    package Example::Synopsis::Acme::Counter;
+    package Example::Synopsis::ArraySet;
 
     use Moduloop::Implementation
-        has => {
-            count => { default => 0 },
-        }
+	has => { set => { default => sub { [] } } },
     ;
 
-    sub next {
-        my ($self) = @_;
+    sub has {
+	my ($self, $e) = @_;
+	scalar grep { $_ == $e } @{ $self->{$SET} };
+    }
 
-        $self->{$COUNT}++;
+    sub add {
+	my ($self, $e) = @_;
+
+	if ( ! $self->has($e) ) {
+	    push @{ $self->{$SET} }, $e;
+	}
     }
 
     1;
+
+
+    # Now we can use it
+
+    use Test::More tests => 2;
+    use Example::Synopsis::Set;
+
+    my $set = Example::Synopsis::Set->new;
+
+    ok ! $set->has(1);
+    $set->add(1);
+    ok $set->has(1);
+
+
+    # But this has O(n) lookup and we can do better, so:
+
+    package Example::Synopsis::HashSet;
+
+    use Moduloop::Implementation
+	has => { set => { default => sub { {} } } },
+    ;
+
+    sub has {
+	my ($self, $e) = @_;
+	exists $self->{$SET}{$e};
+    }
+
+    sub add {
+	my ($self, $e) = @_;
+	++$self->{$SET}{$e};
+    }
+
+    1;
+
+
+    # Now to make use of this we can either:
+
+    package Example::Synopsis::Set;
+
+    use Moduloop
+        interface => [ qw( has add ) ],
+
+        implementation => 'Example::Synopsis::HashSet'; # updated
+
+    1;
+
+    # Or just
+
+    use Test::More tests => 2;
+    use Moduloop
+	bind => { 'Example::Synopsis::Set' => 'Example::Synopsis::HashSet' };
+    use Example::Synopsis::Set;
+
+    my $set = Example::Synopsis::Set->new;
+
+    ok ! $set->has(1);
+    $set->add(1);
+    ok $set->has(1);
 
 =head1 STATUS
 
@@ -747,7 +793,7 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Moduloop is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
+Moduloop (Modular OOP [rocks!]) is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
 there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
 don't need to know about.
 
