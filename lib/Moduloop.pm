@@ -1,4 +1,4 @@
-package Minions;
+package Moduloop;
 
 use strict;
 use 5.008_005;
@@ -11,12 +11,12 @@ use Package::Stash;
 use Sub::Name;
 
 use Exception::Class (
-    'Minions::Error::AssertionFailure' => { alias => 'assert_failed' },
-    'Minions::Error::InterfaceMismatch',
-    'Minions::Error::MethodDeclaration',
-    'Minions::Error::RoleConflict',
+    'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
+    'Moduloop::Error::InterfaceMismatch',
+    'Moduloop::Error::MethodDeclaration',
+    'Moduloop::Error::RoleConflict',
 );
-use Minions::_Guts;
+use Moduloop::_Guts;
 
 our $VERSION = '1.000000';
 $VERSION = eval $VERSION;
@@ -58,7 +58,7 @@ sub minionize {
         $spec = { %$spec, %{ $cls_stash->get_symbol('%__meta__') || {} } };
         $spec->{name} = $caller_pkg;
     }
-    $spec->{name} ||= "Minions::Class_${\ ++$Class_count }";
+    $spec->{name} ||= "Moduloop::Class_${\ ++$Class_count }";
 
     my @args = %$spec;
     validate(@args, {
@@ -98,7 +98,7 @@ sub minionize {
             }
         }
     }
-    $obj_stash = Package::Stash->new("$spec->{name}::__Minions");
+    $obj_stash = Package::Stash->new("$spec->{name}::__Moduloop");
 
     _prep_interface($spec);
     _compose_roles($spec);
@@ -326,7 +326,7 @@ sub _add_role_methods {
     my $is_semiprivate     = _interface($role_meta, 'semiprivate');
 
     all { defined $in_class_interface->{$_} } keys %$in_role_interface
-      or Minions::Error::InterfaceMismatch->throw(
+      or Moduloop::Error::InterfaceMismatch->throw(
         error => "Interfaces do not match: Class => $spec->{name}, Role => $role"
       );
 
@@ -357,7 +357,7 @@ sub _add_role_methods {
 sub _raise_role_conflict {
     my ($name, $role, $other_role) = @_;
 
-    Minions::Error::RoleConflict->throw(
+    Moduloop::Error::RoleConflict->throw(
         error => "Cannot have '$name' in both $role and $other_role"
     );
 }
@@ -372,13 +372,13 @@ sub _get_object_maker {
         my $stash = Package::Stash->new($class);
 
         my $spec = $stash->get_symbol('%__meta__');
-        my $pkg_key = Minions::_Guts::obfu_name('', $spec);
+        my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
         my %obj = (
             $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
         );
 
         while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            my $obfu_name = Minions::_Guts::obfu_name($attr, $spec);
+            my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
             $obj{$obfu_name} = $init->{$attr}
               ? $init->{$attr}
               : (ref $meta->{default} eq 'CODE'
@@ -416,7 +416,7 @@ sub _make_util_class {
 
     $method{main_class} = sub { $spec->{name} };
 
-    my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
+    my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
     $method{build} = sub {
         my (undef, $obj, $arg) = @_;
         if ( my $builder = $obj->{$obfu_pkg}->can('BUILD') ) {
@@ -493,7 +493,7 @@ sub _add_default_constructor {
                 if ( $attr ) {
                     _copy_assertions($spec, $name, $attr);
                     my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
-                    my $obfu_name = Minions::_Guts::obfu_name($attr, $spec) ;
+                    my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec) ;
                     $obj->{$obfu_name} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
                 }
             }
@@ -578,7 +578,7 @@ sub _add_methods {
              && $in_interface->{$name} ) {
 
             my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
-            my $obfu_name = Minions::_Guts::obfu_name($name, $spec);
+            my $obfu_name = Moduloop::_Guts::obfu_name($name, $spec);
             $spec->{implementation}{methods}{$name} = sub { $_[0]->{$obfu_name} };
         }
 
@@ -587,12 +587,12 @@ sub _add_methods {
              && $in_interface->{$name} ) {
 
             my $name = $meta->{writer};
-            my $obfu_pkg = Minions::_Guts::obfu_name('', $spec);
+            my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{$name} = sub {
                 my ($self, $new_val) = @_;
 
                 $self->{$obfu_pkg}->ASSERT($name, $new_val);
-                $self->{ Minions::_Guts::obfu_name($name, $spec) } = $new_val;
+                $self->{ Moduloop::_Guts::obfu_name($name, $spec) } = $new_val;
                 return $self;
             };
         }
@@ -655,7 +655,7 @@ sub _add_delegates {
             (undef, $method) = _load_role($meta->{handles});
         }
         my $in_interface = _interface($spec);
-        my $obfu_name = Minions::_Guts::obfu_name($name, $spec);
+        my $obfu_name = Moduloop::_Guts::obfu_name($name, $spec);
 
         foreach my $meth ( keys %{ $method } ) {
             if ( defined $spec->{implementation}{methods}{$meth} ) {
@@ -690,7 +690,7 @@ __END__
 
 =head1 NAME
 
-Minions - Simplifies the creation of loosely coupled object oriented code.
+Moduloop - Simplifies the creation of loosely coupled object oriented code.
 
 =head1 SYNOPSIS
 
@@ -715,7 +715,7 @@ Minions - Simplifies the creation of loosely coupled object oriented code.
 
     package Example::Synopsis::Counter;
 
-    use Minions
+    use Moduloop
         interface => [ qw( next ) ],
 
         implementation => 'Example::Synopsis::Acme::Counter';
@@ -727,7 +727,7 @@ Minions - Simplifies the creation of loosely coupled object oriented code.
 
     package Example::Synopsis::Acme::Counter;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         has => {
             count => { default => 0 },
         }
@@ -747,7 +747,7 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Minions is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
+Moduloop is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
 there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
 don't need to know about.
 
@@ -768,11 +768,11 @@ perhaps the most popular being the L<Moose> family. Although Moo(se) is very eff
 expense of L<Encapsulation|https://en.wikipedia.org/wiki/Information_hiding> (because Moose encourages the exposure of all an object's attributes via methods), and this in turn encourages
 designs that are tightly L<coupled|https://en.wikipedia.org/wiki/Coupling_(computer_programming)>.
 
-To see this first hand, try writing the fixed size queue from L<Minions::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
+To see this first hand, try writing the fixed size queue from L<Moduloop::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
 
-Minions takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
+Moduloop takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
 
-=head2 The Tale of Minions
+=head2 The Tale of Moduloop
 
 The following fable illustrates the main ideas of OOP.
 
@@ -835,11 +835,11 @@ C<$sheep_dog> and C<$shepherd_boy> both understood the same commands, so replaci
 
 =head2 Via Import
 
-A class can be defined when importing Minions e.g.
+A class can be defined when importing Moduloop e.g.
 
     package Foo;
 
-    use Minions
+    use Moduloop
         interface => [ qw( list of methods ) ],
 
         construct_with => {
@@ -859,7 +859,7 @@ A class can be defined when importing Minions e.g.
         ;
     1;
 
-=head2 Minions->minionize([HASHREF])
+=head2 Moduloop->minionize([HASHREF])
 
 A class can also be defined by calling the C<minionize()> class method, with an optional hashref that
 specifies the class.
@@ -870,7 +870,7 @@ from which C<minionize()> was called.
 The class defined in the SYNOPSIS could also be defined like this
 
     use Test::More tests => 2;
-    use Minions ();
+    use Moduloop ();
 
     my %Class = (
         name => 'Counter',
@@ -889,7 +889,7 @@ The class defined in the SYNOPSIS could also be defined like this
         },
     );
 
-    Minions->minionize(\%Class);
+    Moduloop->minionize(\%Class);
     my $counter = Counter->new;
 
     is $counter->next => 0;
@@ -916,7 +916,7 @@ An optional reference to a hash whose keys are the names of keyword parameters t
 
 The values these keys are mapped to are themselves hash refs which can have the following keys.
 
-See L<Minions::Manual::Construction> for more about construction.
+See L<Moduloop::Manual::Construction> for more about construction.
 
 =head4 optional => BOOLEAN (Default: false)
 
@@ -933,13 +933,13 @@ The name of a package that defines the subroutines declared in the interface.
 
 Alternatively an implementation can be hashref as shown in the synopsis above.
 
-L<Minions::Implementation> describes how implementations are configured.
+L<Moduloop::Implementation> describes how implementations are configured.
 
 =head2 Bindings
 
 The implementation of a class can be quite easily changed from user code e.g. after
 
-    use Minions
+    use Moduloop
         bind => { 
             'Foo' => 'Foo::Fake', 
             'Bar' => 'Bar::Fake', 
@@ -954,9 +954,9 @@ their respective modules.
 
 Behavioural and Role introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list (or array ref depending on context) of methods or roles respectiively supported by the object.
 
-See the section "Using multiple roles" from L<Minions::Role/EXAMPLES> for an example.
+See the section "Using multiple roles" from L<Moduloop::Role/EXAMPLES> for an example.
 
-Also note that for any class C<Foo> created using Minions, and for any object created with C<Foo>'s constructor, the following will always return a true value
+Also note that for any class C<Foo> created using Moduloop, and for any object created with C<Foo>'s constructor, the following will always return a true value
 
     $object->DOES('Foo')
 

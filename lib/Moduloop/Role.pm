@@ -1,8 +1,8 @@
-package Minions::Role;
+package Moduloop::Role;
 
-require Minions::Implementation;
+require Moduloop::Implementation;
 
-our @ISA = qw( Minions::Implementation );
+our @ISA = qw( Moduloop::Implementation );
 
 sub update_args {
     my ($class, $arg) = @_;
@@ -16,13 +16,13 @@ __END__
 
 =head1 NAME
 
-Minions::Role
+Moduloop::Role
 
 =head1 SYNOPSIS
 
     package Foo::Role;
 
-    use Minions::Role
+    use Moduloop::Role
         has  => {
             beans => { default => sub { [ ] } },
         }, 
@@ -40,7 +40,7 @@ Roles provide reusable implementation details, i.e. they solve the problem of wh
 
 =head1 CONFIGURATION
 
-A role package can be configured either using Minions::Role or with a package variable C<%__meta__>. Both methods make use of the following keys:
+A role package can be configured either using Moduloop::Role or with a package variable C<%__meta__>. Both methods make use of the following keys:
 
 =head2 has => HASHREF
 
@@ -60,7 +60,7 @@ Any attributes listed here must be provided by an implementation package or a ro
 
 Variables with names corresponding to these attributes will be created in the role package to allow accessing the attributes e.g.
 
-    use Minions::Role
+    use Moduloop::Role
         requires => {
             attributes => [qw/length width/]
 
@@ -80,7 +80,7 @@ A list of roles which the current role is composed out of (roles can be built fr
 A list of semiprivate methods. These are methods provided by the role that are not indended
 to be used by end users of the class that the role was used in.
 
-Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Minions::Role (and also by Minions::Implementation).
+Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Moduloop::Role (and also by Moduloop::Implementation).
 
 A semiprivate method can then be called like this
 
@@ -96,7 +96,7 @@ but this is only valid if called within the object's implementation package, or 
 
 =head2 role => 1
 
-Only needed if Minions::Role is not used. This indicates that the package is a Role.
+Only needed if Moduloop::Role is not used. This indicates that the package is a Role.
 
 =head1 EXAMPLES
 
@@ -126,7 +126,7 @@ The Queue class:
 
     package Example::Roles::Queue_v1;
 
-    use Minions
+    use Moduloop
         interface => [qw( push pop size )],
 
         implementation => 'Example::Roles::Acme::Queue_v1',
@@ -138,7 +138,7 @@ And its implementation:
 
     package Example::Roles::Acme::Queue_v1;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -187,7 +187,7 @@ Its class and implementation:
 
     package Example::Roles::Stack;
 
-    use Minions
+    use Moduloop
         interface => [qw( push pop size )],
 
         implementation => 'Example::Roles::Acme::Stack_v1',
@@ -197,7 +197,7 @@ Its class and implementation:
 
     package Example::Roles::Acme::Stack_v1;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -228,7 +228,7 @@ Suppose we wanted to factor out the commonality of the two implementations. We c
 
     package Example::Roles::Role::Pushable;
 
-    use Minions::Role
+    use Moduloop::Role
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -253,7 +253,7 @@ Now using this role, the Queue implementation can be simplified to this:
 
     package Example::Roles::Acme::Queue_v2;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         roles => ['Example::Roles::Role::Pushable'],
 
         requires => {
@@ -273,7 +273,7 @@ And the Stack implementation can be simplified to this:
 
     package Example::Roles::Acme::Stack_v2;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         roles => ['Example::Roles::Role::Pushable'],
 
         requires => {
@@ -293,7 +293,7 @@ To test these new implementations, we don't even need to update the main classes
 
     use Test::More;
 
-    use Minions
+    use Moduloop
         bind => {
             'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v2',
         };
@@ -316,13 +316,13 @@ To test these new implementations, we don't even need to update the main classes
 
 =head2 Using multiple roles
 
-An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Minions::Implementation/PRIVATE ROUTINES>.
+An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Moduloop::Implementation/PRIVATE ROUTINES>.
 
 Such functionality does not logically belong in the Pushable role, but we could create a new role for it
 
     package Example::Roles::Role::LogSize;
 
-    use Minions::Role
+    use Moduloop::Role
         semiprivate => ['log_info'],
         requires => {
             methods => [qw/ size /],
@@ -341,7 +341,7 @@ Now we can use this role too
 
     package Example::Roles::Acme::Queue_v3;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         roles => [qw/
             Example::Roles::Role::Pushable
             Example::Roles::Role::LogSize
@@ -367,13 +367,13 @@ Now we can use this role too
 And use the queue like this
 
     % reply -I t/lib
-    0> use Minions bind => { 'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3' }
+    0> use Moduloop bind => { 'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3' }
     1> use Example::Roles::Queue
     2> my $q = Example::Roles::Queue->new
     $res[0] = bless( {
         '83cb834b-' => 'Example::Roles::Queue::__Private',
         '83cb834b-items' => []
-    }, 'Example::Roles::Queue::__Minions' )
+    }, 'Example::Roles::Queue::__Moduloop' )
 
     3> $q->push(1)
     $res[1] = 1
@@ -398,4 +398,4 @@ And use the queue like this
 
     7>
 
-The last two commands show L<Minions>' support for introspection.
+The last two commands show L<Moduloop>' support for introspection.

@@ -1,7 +1,7 @@
-package Minions::Implementation;
+package Moduloop::Implementation;
 
 use strict;
-use Minions::_Guts;
+use Moduloop::_Guts;
 use Package::Stash;
 use Readonly;
 
@@ -45,9 +45,9 @@ sub add_obfu_name {
     my $data_version = $stash->get_symbol('$DATA_VERSION');
     Readonly my $sym_val => sprintf(
         "%s-$slot",
-       Minions::_Guts::attribute_sym($data_version),
+       Moduloop::_Guts::attribute_sym($data_version),
     );
-    $Minions::_Guts::obfu_name{$slot} = $sym_val;
+    $Moduloop::_Guts::obfu_name{$slot} = $sym_val;
 
     my $prefix = '';
     if($slot eq '' || $arg->{attr_style} eq '_2') {
@@ -70,13 +70,13 @@ __END__
 
 =head1 NAME
 
-Minions::Implementation
+Moduloop::Implementation
 
 =head1 SYNOPSIS
 
     package Example::Construction::Acme::Set_v1;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         has => {
             set => {
                 default => sub { {} },
@@ -105,7 +105,7 @@ behaviours described by the class interface.
 
 =head1 CONFIGURATION
 
-An implementation package can be configured either using Minions::Implementation or with a package variable C<%__meta__>. Both methods make use of the following keys:
+An implementation package can be configured either using Moduloop::Implementation or with a package variable C<%__meta__>. Both methods make use of the following keys:
 
 =head2 has => HASHREF
 
@@ -114,7 +114,7 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object in one of two ways:
 
-    # implementation defined using Minions::Implementation
+    # implementation defined using Moduloop::Implementation
     $self->{$FOO}
 
     # implementation defined using %__meta__
@@ -191,20 +191,20 @@ An exception will be raised if the same attribute/routine would be provided by t
 
 =back
 
-L<Minions::Role> describes how roles are configured.
+L<Moduloop::Role> describes how roles are configured.
 
 =head2 semiprivate => ARRAYREF
 
-These are perhaps only useful when used in conjunction with Roles. They work the same way as in L<Minions::Role>.
+These are perhaps only useful when used in conjunction with Roles. They work the same way as in L<Moduloop::Role>.
 
 =head2 attr_style => SCALAR
 
 If this is set to the string C<'_2'>, then an attribute named 'foo' can be accessed via its object using the symbol C<$__foo> e.g.
 
-    # implementation defined using Minions::Implementation
+    # implementation defined using Moduloop::Implementation
     $self->{$__foo}
 
-This was the default behaviour in Minions 0.000008 and earlier.
+This was the default behaviour in Moduloop 0.000008 and earlier.
 
 =head1 PRIVATE ROUTINES
 
@@ -264,7 +264,7 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     $res[0] = bless( {
             '1f5f6ad9-' => 'Example::Construction::Set_v1::__Private',
             '1f5f6ad9-set' => {}
-        }, 'Example::Construction::Set_v1::__Minions' )
+        }, 'Example::Construction::Set_v1::__Moduloop' )
 
     2> $set->can
     $res[1] = [
@@ -282,7 +282,7 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     $res[3] = 2
 
     5> $set->log_info()
-    Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Minions" at reply input line 1.
+    Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Moduloop" at reply input line 1.
     6> 
 
 =head1 OBJECT COMPOSITION
@@ -329,7 +329,7 @@ Here is the interface for this fixed size queue
 
     package Example::Delegates::FixedSizeQueue;
 
-    use Minions
+    use Moduloop
         interface => [qw( push pop size )],
 
         construct_with  => {
@@ -349,7 +349,7 @@ And it is implemented like this
 
     use Example::Delegates::Queue;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         has  => {
             q => {
                 default => sub { Example::Delegates::Queue->new },

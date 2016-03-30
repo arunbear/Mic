@@ -1,4 +1,4 @@
-package Minions::_Guts;
+package Moduloop::_Guts;
 
 use Digest::MD5 qw( md5_hex );
 
