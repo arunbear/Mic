@@ -1,6 +1,6 @@
-package Example::Usage::HashSet;
+package Example::Synopsis::HashSet;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has => { set => { default => sub { {} } } },
 ;
 

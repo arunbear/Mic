@@ -1,6 +1,6 @@
-package Example::Usage::ArraySet;
+package Example::Synopsis::ArraySet;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has => { set => { default => sub { [] } } },
 ;
 

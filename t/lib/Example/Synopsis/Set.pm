@@ -1,8 +1,8 @@
-package Example::Usage::Set;
+package Example::Synopsis::Set;
 
-use Minions
+use Moduloop
     interface => [qw( add has )],
 
-    implementation => 'Example::Usage::ArraySet',
+    implementation => 'Example::Synopsis::ArraySet',
     ;
 1;
