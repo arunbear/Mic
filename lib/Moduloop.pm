@@ -818,65 +818,6 @@ To see this first hand, try writing the fixed size queue from L<Moduloop::Implem
 
 Moduloop takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
 
-=head2 The Tale of Moduloop
-
-The following fable illustrates the main ideas of OOP.
-
-There once was a farmer who had a flock of sheep. His typical workday looked like:
-
-    $farmer->move_flock($pasture)
-    $farmer->monitor_flock()
-    $farmer->move_flock($home)
-
-    $farmer->other_important_work()
-
-In order to devote more time to C<other_important_work()>, the farmer decided to hire a minion, so the work was now split like this:
-
-    $shepherd_boy->move_flock($pasture)
-    $shepherd_boy->monitor_flock()
-    $shepherd_boy->move_flock($home)
-
-    $farmer->other_important_work()
-
-This did give the farmer more time for C<other_important_work()>, but unfornately C<$shepherd_boy> had a tendency to L<cry wolf|http://en.wikipedia.org/wiki/The_Boy_Who_Cried_Wolf> so the farmer had to replace him:
-
-    $sheep_dog->move_flock($pasture)
-    $sheep_dog->monitor_flock()
-    $sheep_dog->move_flock($home)
-
-    $farmer->other_important_work()
-
-C<$sheep_dog> was more reliable and demanded less pay than C<$shepherd_boy>, so this was a win for the farmer.
-
-=head3 Ideas
-
-Object Oriented design is essentially the act of minionization, i.e. deciding which minions (objects) will do what work, and how to communicate with them (using an interface).
-
-The most important ideas are
-
-=head4 Delegation
-
-To handle complexity, delegate to a suitable entity e.g. the farmer delegates some of his work to C<$shepherd_boy> (and later on to C<$sheep_dog>).
-
-=head4 Encapsulation
-
-We tell objects what to do, rather than micro-manage e.g.
-
-    $sheep_dog->monitor_flock();
-
-rather than
-
-    $sheep_dog->{brain}{task}{monitor_flock} = 1;
-
-At a high level, we do not particularly care what the internals of the object are. We only care what the object can do.
-
-But, an object becomes harder to change the more its internals are exposed.
-
-=head4 Polymorphism
-
-C<$sheep_dog> and C<$shepherd_boy> both understood the same commands, so replacing the latter with the former was easier than it would have been otherwise.
-
-
 =head1 USAGE
 
 =head2 Via Import
