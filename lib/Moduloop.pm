@@ -40,11 +40,11 @@ sub import {
         $Interface_for{$caller_pkg} = $methods;
     }
     else {
-        $class->minionize(\%arg);
+        $class->assemble(\%arg);
     }
 }
 
-sub minionize {
+sub assemble {
     my (undef, $spec) = @_;
 
     my $cls_stash;
@@ -846,44 +846,45 @@ A class can be defined when importing Moduloop e.g.
         ;
     1;
 
-=head2 Moduloop->minionize([HASHREF])
+=head2 Moduloop->assemble([HASHREF])
 
-A class can also be defined by calling the C<minionize()> class method, with an optional hashref that
+A class can also be defined by calling the C<assemble()> class method, with an optional hashref that
 specifies the class.
 
 If the hashref is not given, the specification is read from a package variable named C<%__meta__> in the package
-from which C<minionize()> was called.
+from which C<assemble()> was called.
 
 The class defined in the SYNOPSIS could also be defined like this
 
-    use Test::More tests => 2;
+    package Example::Usage::Set;
+
     use Moduloop ();
 
-    my %Class = (
-        name => 'Counter',
-        interface => [qw( next )],
-        implementation => {
-            methods => {
-                next => sub {
-                    my ($self) = @_;
+    Moduloop->assemble({
+        interface => [qw( add has )],
 
-                    $self->{-count}++;
-                }
-            },
-            has  => {
-                count => { default => 0 },
-            },
-        },
-    );
+        implementation => 'Example::Usage::HashSet',
+    });
 
-    Moduloop->minionize(\%Class);
-    my $counter = Counter->new;
+    package Example::Synopsis::HashSet;
 
-    is $counter->next => 0;
-    is $counter->next => 1;
+    use Moduloop::Implementation
+        has => { set => { default => sub { {} } } },
+    ;
 
-I<This example was included for completeness. Creating a class this way is not recommended for real world
-projects as it doesn't scale up as well as the mainstream usage (i.e. using separate packages).>
+    sub has {
+        my ($self, $e) = @_;
+        exists $self->{$SET}{$e};
+    }
+
+    sub add {
+        my ($self, $e) = @_;
+        ++$self->{$SET}{$e};
+    }
+
+    1;
+
+Here the interface and implementation packages are both in the same file. 
 
 =head2 Specification
 
