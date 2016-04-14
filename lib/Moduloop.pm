@@ -109,7 +109,7 @@ sub assemble {
     $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
-    _make_util_class($spec);
+    _make_builder_class($spec);
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
     _check_role_requirements($spec);
@@ -118,7 +118,7 @@ sub assemble {
     return $spec->{name};
 }
 
-sub utility_class {
+sub builder_class {
     my ($class) = @_;
 
     return $Util_class{ $class }
@@ -365,9 +365,9 @@ sub _raise_role_conflict {
 sub _get_object_maker {
 
     sub {
-        my ($utility_class, $init) = @_;
+        my ($builder_class, $init) = @_;
 
-        my $class = $utility_class->main_class;
+        my $class = $builder_class->main_class;
 
         my $stash = Package::Stash->new($class);
 
@@ -404,7 +404,7 @@ sub _add_class_methods {
     }
 }
 
-sub _make_util_class {
+sub _make_builder_class {
     my ($spec) = @_;
 
     my $stash = Package::Stash->new("$spec->{name}::__Util");
@@ -474,15 +474,15 @@ sub _add_default_constructor {
                 confess "Unknown args: [@unknown]";
             }
 
-            my $utility_class = utility_class($class);
-            my $obj = $utility_class->new_object;
+            my $builder_class = builder_class($class);
+            my $obj = $builder_class->new_object;
             for my $name ( keys %{ $spec->{construct_with} } ) {
 
                 if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
                     confess "Param '$name' was not provided.";
                 }
                 if ( defined $arg->{$name} ) {
-                    $utility_class->assert($name, $arg->{$name});
+                    $builder_class->assert($name, $arg->{$name});
                 }
 
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name }
@@ -498,7 +498,7 @@ sub _add_default_constructor {
                 }
             }
 
-            $utility_class->build($obj, $arg);
+            $builder_class->build($obj, $arg);
             return $obj;
         };
 

@@ -162,14 +162,14 @@ is preferable due being more concise).
 
 =head1 Writing your own constructor
 
-If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of the utility class.
+If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of the Builder class.
 
-=head2 The utility class
+=head2 The Builder class
 
-Each class has a corresponding utility class. Within a class method, the utility class
-is obtained by calling the C<utility_class> routine (see example below). 
+Each class has a corresponding Builder class. Within a class method, the Builder class
+is obtained by calling the C<builder_class> routine (see example below). 
 
-The utility_class has the following construction related methods
+The Builder class has the following construction related methods
 
 =head3 new_object
 
@@ -211,13 +211,13 @@ We'll rewrite the counter example above and also show the more manual way of usi
     sub new {
         my ($class, $start) = @_;
 
-        my $util = Moduloop::utility_class($class);
-        $util->assert(start => $start);
-        my $obj = $util->new_object({count => $start});
+        my $builder = Moduloop::builder_class($class);
+        $builder->assert(start => $start);
+        my $obj = $builder->new_object({count => $start});
         return $obj;
     }
 
-    Moduloop->minionize;
+    Moduloop->assemble;
 
 This can be simplified using the 'class_methods' declaration
 
@@ -237,9 +237,9 @@ This can be simplified using the 'class_methods' declaration
             new => sub {
                 my ($class, $start) = @_;
 
-                my $util = Moduloop::utility_class($class);
-                $util->assert(start => $start);
-                my $obj = $util->new_object({count => $start});
+                my $builder = Moduloop::builder_class($class);
+                $builder->assert(start => $start);
+                my $obj = $builder->new_object({count => $start});
                 return $obj;
             },
         },
