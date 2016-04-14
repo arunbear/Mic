@@ -1,6 +1,6 @@
 package FixedSizeQueueRole;
 
-use Minions::Role
+use Moduloop::Role
     has  => {
         q => { default => sub { [ ] } },
         max_size => { 

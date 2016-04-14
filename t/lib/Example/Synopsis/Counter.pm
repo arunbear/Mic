@@ -1,6 +1,6 @@
 package Example::Synopsis::Counter;
 
-use Minions
+use Moduloop
     interface => [ qw( next ) ],
     implementation => 'Example::Synopsis::Acme::Counter';
 

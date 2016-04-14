@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::Most;
 use AlphabetRole;
-use Minions ();
+use Moduloop ();
 
 {
     package AlphabetImpl;
@@ -19,7 +19,7 @@ use Minions ();
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 {
@@ -49,7 +49,7 @@ use Minions ();
         },
         implementation => 'KeyboardImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 package main;

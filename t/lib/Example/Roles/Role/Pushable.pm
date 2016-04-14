@@ -1,6 +1,6 @@
 package Example::Roles::Role::Pushable;
 
-use Minions::Role
+use Moduloop::Role
     has  => {
         items => { default => sub { [ ] } },
     }, 

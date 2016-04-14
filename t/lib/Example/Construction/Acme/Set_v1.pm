@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Set_v1;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has => { 
         set => { 
             default => sub { {} },

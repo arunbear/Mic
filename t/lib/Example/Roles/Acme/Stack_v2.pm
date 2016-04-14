@@ -1,6 +1,6 @@
 package Example::Roles::Acme::Stack_v2;
 
-use Minions::Implementation
+use Moduloop::Implementation
     roles => ['Example::Roles::Role::Pushable'],
 
     requires => {

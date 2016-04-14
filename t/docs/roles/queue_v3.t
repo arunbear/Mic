@@ -3,7 +3,7 @@ use Test::Lib;
 use Test::More;
 use Test::Output;
 
-use Minions
+use Moduloop
     bind => {
         'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3',
     };

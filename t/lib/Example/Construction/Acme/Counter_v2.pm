@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Counter_v2;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         count => { },
     }, 

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package Alpha;
@@ -63,7 +63,7 @@ use Minions ();
     );
     our $Error;
 
-    eval { Minions->minionize }
+    eval { Moduloop->minionize }
       or $Error = $@;
 }
 

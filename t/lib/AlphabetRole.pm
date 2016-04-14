@@ -1,6 +1,6 @@
 package AlphabetRole;
 
-use Minions::Role;
+use Moduloop::Role;
 
 sub alpha   { 'alpha' }
 sub bravo   { 'bravo' }

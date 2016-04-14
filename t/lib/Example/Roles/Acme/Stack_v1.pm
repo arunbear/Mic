@@ -1,6 +1,6 @@
 package Example::Roles::Acme::Stack_v1;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         items => { default => sub { [ ] } },
     }, 

@@ -1,6 +1,6 @@
 package Example::Synopsis::Acme::Counter;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has => {
         count => { default => 0 },
     } 

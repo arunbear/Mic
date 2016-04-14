@@ -2,7 +2,7 @@ package Example::Delegates::Acme::FixedSizeQueue_v1;
 
 use Example::Delegates::Queue;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         q => { 
             default => sub { Example::Delegates::Queue->new },

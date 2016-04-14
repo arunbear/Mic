@@ -1,6 +1,6 @@
 package FixedSizeQueueImpl;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         q => { default => sub { [ ] } },
         max_size => { 

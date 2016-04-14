@@ -1,6 +1,6 @@
 use strict;
 use Test::Most tests => 4;
-use Minions ();
+use Moduloop ();
 
 my %Class = (
     interface => [qw( next )],
@@ -18,7 +18,7 @@ my %Class = (
     },
 );
 
-my $counter = Minions->minionize(\%Class)->new;
+my $counter = Moduloop->minionize(\%Class)->new;
 
 is $counter->next => 0;
 is $counter->next => 1;

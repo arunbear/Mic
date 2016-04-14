@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::More;
 
-use Minions
+use Moduloop
     bind => { 
         'Example::Roles::FixedSizeQueue' => 'Example::Roles::Acme::FixedSizeQueue_v2' 
     };

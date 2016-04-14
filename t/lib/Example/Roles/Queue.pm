@@ -1,6 +1,6 @@
 package Example::Roles::Queue;
 
-use Minions
+use Moduloop
     interface => [qw( push pop size )],
 
     implementation => 'Example::Roles::Acme::Queue_v1',

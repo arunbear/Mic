@@ -1,6 +1,6 @@
 package Example::Construction::Counter;
 
-use Minions
+use Moduloop
     interface => [ qw( next ) ],
 
     construct_with => {

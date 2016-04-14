@@ -1,6 +1,6 @@
 package Example::Roles::Role::Queue;
 
-use Minions::Role
+use Moduloop::Role
     has  => {
         q => { default => sub { [ ] } },
     }, 

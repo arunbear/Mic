@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package Lawyer;
@@ -44,7 +44,7 @@ use Minions ();
 package main;
 
 throws_ok {
-    Minions->minionize(\ %BusyDude::__meta__);
+    Moduloop->minionize(\ %BusyDude::__meta__);
 } qr/Cannot have 'clients' in both Server and Lawyer/;
 
 done_testing();

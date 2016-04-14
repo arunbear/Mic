@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package SetImpl;
@@ -33,7 +33,7 @@ use Minions ();
         },
         implementation => 'SetImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 package main;

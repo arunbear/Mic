@@ -1,6 +1,6 @@
 package FixedSizeQueueImplWithRole;
 
-use Minions::Implementation
+use Moduloop::Implementation
     roles => ['FixedSizeQueueRole'],
     has  => {
         max_size => { 

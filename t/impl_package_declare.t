@@ -3,16 +3,16 @@ use Test::More;
 
 package Counter;
 
-use Minions ();
+use Moduloop ();
 
-Minions->minionize({
+Moduloop->minionize({
     interface => [qw(next)],
     implementation => 'Counter::Impl',
 });
 
 package Counter::Impl;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         count => { default => 0 },
     } 

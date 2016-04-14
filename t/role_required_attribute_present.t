@@ -1,12 +1,12 @@
 # use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package Greeter;
 
-    use Minions::Role
+    use Moduloop::Role
         requires => { attributes => ['name'] },
         attr_style => '_2',
     ;
@@ -19,7 +19,7 @@ use Minions ();
 
 {
     package PersonImpl;
-    use Minions::Implementation
+    use Moduloop::Implementation
         roles => [qw( Greeter )],
         has => { name => { init_arg => 'name' } }
     ;
@@ -35,7 +35,7 @@ use Minions ();
         },
         implementation => 'PersonImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 package main;

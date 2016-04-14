@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package ProcessImpl;
@@ -32,7 +32,7 @@ use Minions ();
         interface => [qw( id )],
         implementation => 'ProcessImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 package main;

@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 BEGIN {
 our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[0] == int $_[0] });
@@ -11,7 +11,7 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
     package CounterImpl;
     use Scalar::Util;
 
-    use Minions::Implementation
+    use Moduloop::Implementation
         has  => {
             count => {
                 default => 0,
@@ -60,16 +60,16 @@ our %Assert = (is_integer => sub { Scalar::Util::looks_like_number($_[0]) && $_[
         },
         implementation => 'CounterImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 package main;
 
-lives_ok { my $counter = Counter->new() } 'Minions::Error::AssertionFailure';
-throws_ok { my $counter = Counter->new(start => 'asd') } 'Minions::Error::AssertionFailure';
+lives_ok { my $counter = Counter->new() } 'Moduloop::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 'asd') } 'Moduloop::Error::AssertionFailure';
 throws_ok { my $counter = Counter->new(starr => 'asd') } qr/Unknown args: \[starr\]/;
-throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } 'Minions::Error::AssertionFailure';
-throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } 'Minions::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } 'Moduloop::Error::AssertionFailure';
+throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } 'Moduloop::Error::AssertionFailure';
 lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
 
 done_testing();

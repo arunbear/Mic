@@ -1,6 +1,6 @@
 package Example::Roles::FixedSizeQueue;
 
-use Minions
+use Moduloop
     interface => [qw( push pop size )],
 
     construct_with  => {

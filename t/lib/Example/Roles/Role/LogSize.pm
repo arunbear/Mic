@@ -1,6 +1,6 @@
 package Example::Roles::Role::LogSize;
 
-use Minions::Role
+use Moduloop::Role
     semiprivate => ['log_info'],
     requires => {
         methods => [qw/ size /],

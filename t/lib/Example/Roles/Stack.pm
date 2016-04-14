@@ -1,6 +1,6 @@
 package Example::Roles::Stack;
 
-use Minions
+use Moduloop
     interface => [qw( push pop size )],
 
     implementation => 'Example::Roles::Acme::Stack_v1',

@@ -1,6 +1,6 @@
 package Example::Roles::Acme::FixedSizeQueue_v3;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         max_size => { 
             init_arg => 'max_size',

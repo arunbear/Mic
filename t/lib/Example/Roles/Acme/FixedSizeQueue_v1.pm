@@ -1,6 +1,6 @@
 package Example::Roles::Acme::FixedSizeQueue_v1;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         q => { default => sub { [ ] } },
 

@@ -1,12 +1,12 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package Greeter;
 
-    use Minions::Role
+    use Moduloop::Role
         requires => { attributes => ['name'] }
     ;
 
@@ -36,7 +36,7 @@ use Minions ();
 package main;
 
 throws_ok {
-    Minions->minionize(\ %Person::__meta__);
+    Moduloop->minionize(\ %Person::__meta__);
 } qr/Attribute 'name', required by role Greeter, is not defined./;
 
 done_testing();

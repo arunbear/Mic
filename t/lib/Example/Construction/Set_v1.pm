@@ -1,6 +1,6 @@
 package Example::Construction::Set_v1;
 
-use Minions
+use Moduloop
 
     interface => [qw( add has size )],
     construct_with => { items => {} },

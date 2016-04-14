@@ -1,12 +1,12 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Minions ();
+use Moduloop ();
 
 {
     package SorterRole;
 
-    use Minions::Role
+    use Moduloop::Role
         requires => { methods => ['cmp'] }
     ;
 
@@ -39,7 +39,7 @@ use Minions ();
         interface => [qw( sort )],
         implementation => 'SorterImpl',
     );
-    Minions->minionize;
+    Moduloop->minionize;
 }
 
 package main;
