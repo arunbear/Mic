@@ -3,7 +3,7 @@
 The Default constructor will accept any named parameters defined by 'construct_with'. In the absence of a 'construct_with'
 declaration, any parameters passed to the default constructor are ignored.
 
-The example counter in the L<Moduloop/SYNOPSIS> always starts at zero. Let's upgrade it to start from a user supplied value, so we can use it this way
+Imagine a counter that starts from a user supplied value, so we can use it this way
 
     use Test::More tests => 3;
     use Example::Construction::Counter;
@@ -14,8 +14,8 @@ The example counter in the L<Moduloop/SYNOPSIS> always starts at zero. Let's upg
     is $counter->next => 11;
     is $counter->next => 12;
 
-To make this work, we change the interface to accept a starting value when constructing the counter,
-and we change the implementation to make use of this starting value.
+To make this work, we use 'construct_with' to define the constructor parameter
+representing the starting value.
 
     package Example::Construction::Counter;
 
@@ -44,7 +44,7 @@ and we change the implementation to make use of this starting value.
     sub next {
         my ($self) = @_;
 
-        $self->{$__count}++;
+        $self->{$COUNT}++;
     }
 
     1;
@@ -103,13 +103,13 @@ In the implementation, we convert the argument array to a hash
     sub has {
         my ($self, $e) = @_;
 
-        exists $self->{$__set}{$e};
+        exists $self->{$SET}{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
 
-        ++$self->{$__set}{$e};
+        ++$self->{$SET}{$e};
     }
 
     1;
@@ -129,12 +129,12 @@ BUILD can be used for validating the relation between attributes
     sub BUILD {
         my (undef, $self) = @_;
 
-        $self->{-team1} != $self->{-team2}
+        $self->{$TEAM1} != $self->{$TEAM2}
           or confess "Teams must be different";
 
-        $self->{-team1}->number_of_players 
+        $self->{$TEAM1}->number_of_players 
           == 
-        $self->{-team2}->number_of_players
+        $self->{$TEAM2}->number_of_players
           or confess "Teams must have the same number of players";
     }
 
@@ -155,7 +155,7 @@ is preferable due being more concise).
     sub BUILD {
         my (undef, $self, $arg) = @_;
 
-        $self->{$__count} = $arg->{start};
+        $self->{$COUNT} = $arg->{start};
     }
 
     ...
