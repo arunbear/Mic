@@ -1,7 +1,7 @@
 package Example::Construction::Counter_v3;
 
 use strict;
-use Minions
+use Moduloop
     interface => [ qw( next ) ],
 
     construct_with => {
@@ -15,9 +15,9 @@ use Minions
         new => sub {
             my ($class, $start) = @_;
 
-            my $util = Minions::utility_class($class);
-            $util->assert(start => $start);
-            my $obj = $util->new_object({count => $start});
+            my $builder = Moduloop::builder_class($class);
+            $builder->assert(start => $start);
+            my $obj = $builder->new_object({count => $start});
             return $obj;
         },
     },

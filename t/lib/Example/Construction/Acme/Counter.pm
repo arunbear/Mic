@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Counter;
 
-use Minions::Implementation
+use Moduloop::Implementation
     has  => {
         count => { init_arg => 'start' },
     }, 
