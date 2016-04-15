@@ -134,25 +134,6 @@ to prevent all objects from sharing the same reference).
 This is like the C<assert> declared in a class package, except that these assertions are not run at
 construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
 
-=head3 handles => ARRAYREF | HASHREF
-
-This declares that methods can be forwarded from the object to this attribute in one of two ways
-described below. These forwarding methods are generated as public methods if they are declared in
-the interface, and as semiprivate routines otherwise.
-
-=head3 handles => ARRAYREF
-
-All methods in the given array will be forwarded.
-
-=head3 handles => HASHREF
-
-Method forwarding will be set up such that a method whose name is a key in the given hash will be
-forwarded to a method whose name is the corresponding value in the hash.
-
-=for comment
-=head3 handles => SCALAR
-The scalar is assumed to be a role, and methods provided directly (i.e. not including methods in sub-roles) by the role will be forwarded.
-
 =head3 init_arg => SCALAR
 
 This causes the attribute to be populated with the value of a similarly named constructor parameter.
@@ -172,6 +153,139 @@ Readers should only be created if they are needed by end users of the class.
 This can be a string which if present will be the name of a generated writer method.
 
 Writers should only be created if they are needed by end users of the class.
+
+=head2 forwards => ARRAYREF
+
+A reference to an array of hashes, each of which specifies methods delegated to an object stored in one of the implementation
+'s attributes.
+
+    forwards => [
+        { 
+            send => 'start',
+            to   => 'engine'
+        },
+        { 
+            send => 'power',
+            to   => 'flywheel',
+            as   => 'brake',
+        },
+        { 
+            send => [qw(play pause rewind fast_forward shuffle)],
+            to   => 'ipod',
+        },
+        { 
+            send => [qw(accelerate decelerate)],
+            to => 'brakes',
+            as => [qw(start stop)],
+        },
+        { 
+            send => 'drive',
+            to => [qw(right_rear_wheel left_rear_wheel)],
+            as => [qw(rotate_clockwise rotate_anticlockwise)]
+        },
+    ],
+
+(I<This is inspired by L<Class::Delegator>>)
+
+These forwarding methods are generated as public methods if they are declared in
+the interface, and as semiprivate routines otherwise.
+
+=head3 Specifying methods to be delegated
+
+The names of methods to be redispatched are specified using the C<send> key. The corresponding value may be specified as a single string or as an array of strings. A single string specifies a single method to be delegated, while an array reference is a list of methods to be delegated.
+
+=head3 Specifying methods to be delegated
+
+The C<to> key specifies the attribute(s) to which the method(s) specified by the send parameter are to be delegated.
+
+=head3 Specifying the name of a delegated method
+ 
+Sometimes it's necessary for the name of the method that's being delegated to
+be different from the name of the method to which you're delegating execution.
+For example, your class might already have a method with the same name as the
+method to which you're delegating. The C<as> key allows you translate
+the method name or names in a delegation specification. The value associated with
+an C<as> key specifies the name of the method to be invoked, and may be
+a string or an array (with the number of elements in the array matching the
+number of elements in a corresponding C<send> array).
+ 
+If the attribute is specified via a single string, that string is taken as the
+name of the attribute to which the associated method (or methods) should be
+delegated. For example, to delegate invocations of C<$self-E<gt>power(...)> to
+C<$self-E<gt>{$FLYWHEEL}-E<gt>brake(...)>:
+ 
+    forwards => [
+        {
+            send => 'power',
+              to => 'flywheel',
+              as => 'brake',
+        },
+    ]
+ 
+If both the C<send> and the C<as> parameters specify array references, each
+local method name and deleted method name form a pair, which is invoked. For
+example:
+ 
+  forwards => [
+        {
+            send => [qw(accelerate decelerate)],
+              to => 'brakes',
+              as => [qw(start stop)],
+        },
+  ]
+ 
+In this example, the C<accelerate> method will be delegated to the C<start>
+method of the C<brakes> attribute and the C<decelerate> method will be
+delegated to the C<stop> method of the C<brakes> attribute.
+
+=head3 Delegation to multiple attributes in parallel
+ 
+An array reference can be used as the value of the C<to> key to specify
+a list of attributes, I<all of which> are delegated to--in the same order
+as they appear in the array. In this case, the C<send> key B<must> be a
+scalar value, not an array of methods to delegate.
+ 
+For example, to distribute invocations of C<$self-E<gt>drive(...)> to both
+C<$self-E<gt>{$LEFT_REAR_WHEEL}-E<gt>drive(...)> and
+C<$self-E<gt>{$RIGHT_REAR_WHEEl}-E<gt>drive(...)>:
+ 
+  forwards => [{
+      send => 'drive',
+        to => [qw(left_rear_wheel right_rear_wheel)]
+  }]
+ 
+Note that using an array to specify parallel delegation has an effect on the
+return value of the delegation method specified by the C<send> key. In a
+scalar context, the original call returns a reference to an array containing
+the (scalar context) return values of each of the calls. In a list context,
+the original call returns a list of array references containing references to
+the individual (list context) return lists of the calls. So, for example, if
+the C<cost> method of a class were delegated like so:
+ 
+  forwards => [{
+      send => 'cost',
+        to => ['supplier', 'manufacturer', 'distributor']
+  }]
+ 
+then the total cost could be calculated like this:
+ 
+  use List::Util 'sum';
+  my $total = sum @{$obj->cost()};
+ 
+If both the C<"to"> and the C<"as"> keys specify multiple values,
+then each attribute and method name form a pair, which is invoked. For
+example:
+ 
+  forwards => [{
+      send => 'escape',
+        to => [ qw(flywheel smokescreen ) ],
+        as => [ qw( engage release ) ],
+  }]
+ 
+would sequentially call, within the C<escape()> delegation method:
+ 
+  $self->{$FLYWHEEL}->engage(...);
+  $self->{$SMOKESCReen}->release(...);
 
 =head2 roles => ARRAYREF
 
