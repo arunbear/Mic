@@ -6,14 +6,18 @@ use Moduloop::Implementation
     has  => {
         q => { 
             default => sub { Example::Delegates::Queue->new },
-
-            handles => [qw( size pop )],
         },
 
         max_size => { 
             init_arg => 'max_size',
         },
     }, 
+    forwards => [
+        {
+            send => [qw( size pop )],
+            to   => 'q'
+        },
+    ],
 ;
 
 sub push {
