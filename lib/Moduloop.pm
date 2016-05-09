@@ -87,6 +87,7 @@ sub assemble {
             has     => {
                 %{ $meta->{has} || { } },
             },
+            forwards => $meta->{forwards},
         };
         $spec->{roles} = $meta->{roles};
         $spec->{traitlibs} = $meta->{traitlibs};
@@ -596,8 +597,8 @@ sub _add_methods {
                 return $self;
             };
         }
-        _add_delegates($spec, $meta, $name);
     }
+    _add_delegates($spec);
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         next unless $in_interface->{$name};
@@ -639,35 +640,56 @@ sub _add_autoload {
 }
 
 sub _add_delegates {
-    my ($spec, $meta, $name) = @_;
+    my ($spec) = @_;
 
-    if ( $meta->{handles} ) {
-        my $method;
-        my $target_method = {};
-        if ( ref $meta->{handles} eq 'ARRAY' ) {
-            $method = { map { $_ => 1 } @{ $meta->{handles} } };
-        }
-        elsif( ref $meta->{handles} eq 'HASH' ) {
-            $method = $meta->{handles};
-            $target_method = $method;
-        }
-        elsif( ! ref $meta->{handles} ) {
-            (undef, $method) = _load_role($meta->{handles});
-        }
-        my $in_interface = _interface($spec);
-        my $obfu_name = Moduloop::_Guts::obfu_name($name, $spec);
+    my %local_method;
 
-        foreach my $meth ( keys %{ $method } ) {
-            if ( defined $spec->{implementation}{methods}{$meth} ) {
-                confess "Cannot override implemented method '$meth' with a delegated method";
+    foreach my $desc (@{ $spec->{implementation}{forwards} }) {
+
+        my $as = ref $desc->{as} eq 'ARRAY' ? $desc->{as} : [$desc->{as}];
+        if(ref $desc->{to} eq 'ARRAY') {
+            foreach my $i (0 .. $#{ $desc->{to} }) {
+                push @{ $local_method{ $desc->{send} }{targets} }, {
+                    to => $desc->{to}[$i],
+                    as => $as->[$i] || $desc->{send},
+                };
             }
-            else {
-                my $target = $target_method->{$meth} || $meth;
-                $spec->{implementation}{methods}{$meth} =
-                  $in_interface->{$meth}
-                    ? sub { shift->{$obfu_name}->$target(@_) }
-                    : sub { shift; shift->{$obfu_name}->$target(@_) };
+        }
+        else {
+            my $send = ref $desc->{send} eq 'ARRAY' ? $desc->{send} : [$desc->{send}];
+            foreach my $i (0 .. $#$send) {
+                push @{ $local_method{ $send->[$i] }{targets} }, {
+                    to => $desc->{to},
+                    as => $as->[$i] || $send->[$i],
+                };
             }
+        }
+    }
+
+    return unless %local_method;
+    my $in_interface = _interface($spec);
+    foreach my $meth ( keys %local_method ) {
+        if ( defined $spec->{implementation}{methods}{$meth} ) {
+            croak "Cannot override implemented method '$meth' with a delegated method";
+        }
+        $spec->{implementation}{methods}{$meth} = sub { 
+            my $obj;
+            if( ! $in_interface->{$meth} ) {
+                shift;
+            }
+            $obj = shift;
+
+            my @results;
+            foreach my $desc ( @{ $local_method{$meth}{targets} } ) {
+                my $obfu_name = Moduloop::_Guts::obfu_name($desc->{to}, $spec);
+                my $target = $desc->{as};
+                push @results, $obj->{$obfu_name}->$target(@_);
+            }
+            if (@results == 1) {
+                return $results[0];
+            }
+            return unless defined wantarray;
+            return wantarray ? @results : [@results];
         }
     }
 }
