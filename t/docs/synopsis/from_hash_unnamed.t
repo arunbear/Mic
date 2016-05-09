@@ -18,7 +18,7 @@ my %Class = (
     },
 );
 
-my $counter = Moduloop->minionize(\%Class)->new;
+my $counter = Moduloop->assemble(\%Class)->new;
 
 is $counter->next => 0;
 is $counter->next => 1;

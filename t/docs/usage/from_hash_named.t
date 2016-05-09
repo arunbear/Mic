@@ -19,7 +19,7 @@ my %Class = (
     },
 );
 
-Moduloop->minionize(\%Class);
+Moduloop->assemble(\%Class);
 my $counter = Counter->new;
 
 is $counter->next => 0;
