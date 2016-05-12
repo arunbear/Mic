@@ -232,7 +232,7 @@ The two implementations are very similar, both containing an "items" attribute, 
 
 Suppose we wanted to factor out the commonality of the two implementations. We can use a traitlib to do this:
 
-    package Example::TraitLibs::Role::Pushable;
+    package Example::TraitLibs::TraitLib::Pushable;
 
     use Moduloop::TraitLib
         has  => {
@@ -261,7 +261,7 @@ Now using this traitlib, the Queue implementation can be simplified to this:
 
     use Moduloop::Implementation
         traits => {
-            Example::TraitLibs::Role::Pushable => {
+            Example::TraitLibs::TraitLib::Pushable => {
                 methods    => [qw( push size )],
                 attributes => [qw/items/]
             }
@@ -282,7 +282,7 @@ And the Stack implementation can be simplified to this:
 
     use Moduloop::Implementation
         traits => {
-            Example::TraitLibs::Role::Pushable => {
+            Example::TraitLibs::TraitLib::Pushable => {
                 methods    => [qw( push size )],
                 attributes => [qw/items/]
             }
@@ -328,9 +328,9 @@ An implementation can get its functionality from more than one traitlib. As an e
 
 Such functionality does not logically belong in the Pushable traitlib, but we could create a new traitlib for it
 
-    package Example::TraitLibs::Role::LogSize;
+    package Example::TraitLibs::TraitLib::LogSize;
 
-    use Moduloop::Role
+    use Moduloop::TraitLib
         semiprivate => ['log_info'],
         requires => {
             methods => [qw/ size /],
@@ -351,11 +351,11 @@ Now we can use this role too
 
     use Moduloop::Implementation
         traits => {
-            Example::TraitLibs::Role::Pushable => {
+            Example::TraitLibs::TraitLib::Pushable => {
                 methods    => [qw( push size )],
                 attributes => [qw/items/]
             },
-            Example::TraitLibs::Role::LogSize => {
+            Example::TraitLibs::TraitLib::LogSize => {
                 methods    => [qw( log_info )],
             }
         },
@@ -401,8 +401,8 @@ And use the queue like this
     6> $q->DOES
     $res[4] = [
         'Example::TraitLibs::Queue',
-        'Example::TraitLibs::Role::LogSize',
-        'Example::TraitLibs::Role::Pushable'
+        'Example::TraitLibs::TraitLib::LogSize',
+        'Example::TraitLibs::TraitLib::Pushable'
     ]
 
     7>

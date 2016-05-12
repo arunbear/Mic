@@ -309,7 +309,7 @@ Any attributes and/or routines defined in the specified traitlibs will be added 
 
 =over 
 
-=item Implementation trumps Roles
+=item Implementation trumps TraitLibs
 
 An attribute/routine defined in a traitlib won't get added to the implementation if the implementation already has an attribute/routine with the same name.
 
@@ -323,7 +323,7 @@ L<Moduloop::TraitLib> describes how traitlibs are configured.
 
 =head2 semiprivate => ARRAYREF
 
-These are perhaps only useful when used in conjunction with Roles. They work the same way as in L<Moduloop::Role>.
+These are perhaps only useful when used in conjunction with TraitLibs. They work the same way as in L<Moduloop::TraitLib>.
 
 =head2 attr_style => SCALAR
 
