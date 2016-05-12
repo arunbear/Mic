@@ -12,7 +12,6 @@ use Sub::Name;
 
 use Exception::Class (
     'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
-    'Moduloop::Error::InterfaceMismatch',
     'Moduloop::Error::MethodDeclaration',
     'Moduloop::Error::TraitConflict',
 );
@@ -258,19 +257,11 @@ sub _add_traitlib_methods {
     my ($spec, $from_traitlib, $traitlib, $traitlib_meta, $code_for) = @_;
 
     my $in_class_interface = _interface($spec);
-    my $in_traitlib_interface  = _interface($traitlib_meta);
     my $is_semiprivate     = _interface($traitlib_meta, 'semiprivate');
-
-    all { defined $in_class_interface->{$_} } keys %$in_traitlib_interface
-      or Moduloop::Error::InterfaceMismatch->throw(
-        error => "Interfaces do not match: Class => $spec->{name}, Role => $traitlib"
-      );
 
     my $wanted = $spec->{implementation}{traits}{$traitlib}{methods};
     for my $name ( @{$wanted} ) {
-        if (    $in_traitlib_interface->{$name}
-             || $in_class_interface->{$name}
-           ) {
+        if ( $in_class_interface->{$name} ) {
             if (my $other_traitlib = $from_traitlib->{method}{$name}) {
                 _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
             }
