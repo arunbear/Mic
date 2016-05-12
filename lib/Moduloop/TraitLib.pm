@@ -1,4 +1,4 @@
-package Moduloop::Role;
+package Moduloop::TraitLib;
 
 require Moduloop::Implementation;
 
@@ -7,7 +7,7 @@ our @ISA = qw( Moduloop::Implementation );
 sub update_args {
     my ($class, $arg) = @_;
 
-    $arg->{role} = 1;    
+    $arg->{traitlib} = 1;
 }
 
 1;
@@ -16,31 +16,37 @@ __END__
 
 =head1 NAME
 
-Moduloop::Role
+Moduloop::TraitLib
 
 =head1 SYNOPSIS
 
-    package Foo::Role;
+    package Foo::TraitLib;
 
-    use Moduloop::Role
+    use Moduloop::TraitLib
         has  => {
             beans => { default => sub { [ ] } },
         }, 
         requires => {
-            methods => [qw/some required methods/],
+            methods    => [qw/some required methods/],
             attributes => [qw/some required attributes/],
         },
-        roles => [qw/all these roles/],
+        traits => [
+            traitlib1 => {
+                methods    => [qw/some methods/],
+                attributes => [qw/some attributes/],
+            },
+            ...
+        ],
         semiprivate => [qw/some internal subs/],
     ;
 
 =head1 DESCRIPTION
 
-Roles provide reusable implementation details, i.e. they solve the problem of what to do when the same implementation details are found in more than one implementation package.
+TraitLibs provide reusable implementation details, i.e. they solve the problem of what to do when the same implementation details are found in more than one implementation package.
 
 =head1 CONFIGURATION
 
-A role package can be configured either using Moduloop::Role or with a package variable C<%__meta__>. Both methods make use of the following keys:
+A traitlib package can be configured either using Moduloop::TraitLib or with a package variable C<%__meta__>. Both methods make use of the following keys:
 
 =head2 has => HASHREF
 
@@ -52,15 +58,15 @@ A hash with keys:
 
 =head3 methods => ARRAYREF
 
-Any methods listed here must be provided by an implementation package or a role.
+Any methods listed here must be provided by an implementation package or a traitlib.
 
 =head3 attributes => ARRAYREF
 
-Any attributes listed here must be provided by an implementation package or a role.
+Any attributes listed here must be provided by an implementation package or a traitlib.
 
-Variables with names corresponding to these attributes will be created in the role package to allow accessing the attributes e.g.
+Variables with names corresponding to these attributes will be created in the traitlib package to allow accessing the attributes e.g.
 
-    use Moduloop::Role
+    use Moduloop::TraitLib
         requires => {
             attributes => [qw/length width/]
 
@@ -71,16 +77,16 @@ Variables with names corresponding to these attributes will be created in the ro
         $self->{$LENGTH} * $self->{$WIDTH};
     }
 
-=head2 roles => ARRAYREF
+=head2 traits => ARRAYREF
 
-A list of roles which the current role is composed out of (roles can be built from other roles).
+A list of traitlibs which the current traitlib is composed out of (traitlibs can be built from other traitlibs). The structure of this list is just like the C<traits> specification in L<Moduloop::Implementation>
 
 =head2 semiprivate => ARRAYREF
 
-A list of semiprivate methods. These are methods provided by the role that are not indended
-to be used by end users of the class that the role was used in.
+A list of semiprivate methods. These are methods provided by the traitlib that are not indended
+to be used by end users of the class that the traitlib was used in.
 
-Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Moduloop::Role (and also by Moduloop::Implementation).
+Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Moduloop::TraitLib (and also by Moduloop::Implementation).
 
 A semiprivate method can then be called like this
 
@@ -92,11 +98,11 @@ As this syntax is somewhat cumbersome, it is also possible to call a semiprivate
  
     $self->some_work(...);
 
-but this is only valid if called within the object's implementation package, or a role that the implementation is composed out of.
+but this is only valid if called within the object's implementation package, or a traitlib that the implementation is composed out of.
 
-=head2 role => 1
+=head2 traitlib => 1
 
-Only needed if Moduloop::Role is not used. This indicates that the package is a Role.
+Only needed if Moduloop::TraitLib is not used. This indicates that the package is a TraitLib.
 
 =head1 EXAMPLES
 
@@ -105,9 +111,9 @@ Only needed if Moduloop::Role is not used. This indicates that the package is a 
 First consider a queue which we would use like this:
 
     use Test::More;
-    use Example::Roles::Queue_v1;
+    use Example::TraitLibs::Queue_v1;
 
-    my $q = Example::Roles::Queue_v1->new;
+    my $q = Example::TraitLibs::Queue_v1->new;
 
     is $q->size => 0;
 
@@ -124,19 +130,19 @@ First consider a queue which we would use like this:
 
 The Queue class:
 
-    package Example::Roles::Queue_v1;
+    package Example::TraitLibs::Queue_v1;
 
     use Moduloop
         interface => [qw( push pop size )],
 
-        implementation => 'Example::Roles::Acme::Queue_v1',
+        implementation => 'Example::TraitLibs::Acme::Queue_v1',
     ;
 
     1;
 
 And its implementation:
 
-    package Example::Roles::Acme::Queue_v1;
+    package Example::TraitLibs::Acme::Queue_v1;
 
     use Moduloop::Implementation
         has  => {
@@ -166,9 +172,9 @@ And its implementation:
 Now consider a stack with this usage:
 
     use Test::More;
-    use Example::Roles::Stack;
+    use Example::TraitLibs::Stack;
 
-    my $s = Example::Roles::Stack->new;
+    my $s = Example::TraitLibs::Stack->new;
 
     is $s->size => 0;
 
@@ -185,17 +191,17 @@ Now consider a stack with this usage:
 
 Its class and implementation:
 
-    package Example::Roles::Stack;
+    package Example::TraitLibs::Stack;
 
     use Moduloop
         interface => [qw( push pop size )],
 
-        implementation => 'Example::Roles::Acme::Stack_v1',
+        implementation => 'Example::TraitLibs::Acme::Stack_v1',
     ;
 
     1;
 
-    package Example::Roles::Acme::Stack_v1;
+    package Example::TraitLibs::Acme::Stack_v1;
 
     use Moduloop::Implementation
         has  => {
@@ -224,11 +230,11 @@ Its class and implementation:
 
 The two implementations are very similar, both containing an "items" attribute, the "size" and "push" methods. The "pop" methods are almost the same, the only difference being whether an item is removed from the front or the back of the array.
 
-Suppose we wanted to factor out the commonality of the two implementations. We can use a role to do this:
+Suppose we wanted to factor out the commonality of the two implementations. We can use a traitlib to do this:
 
-    package Example::Roles::Role::Pushable;
+    package Example::TraitLibs::Role::Pushable;
 
-    use Moduloop::Role
+    use Moduloop::TraitLib
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -247,18 +253,19 @@ Suppose we wanted to factor out the commonality of the two implementations. We c
 
     1;
 
-The role provides the "items" attribute, the "size" and "push" methods.
+The traitlib provides the "items" attribute, the "size" and "push" methods.
 
-Now using this role, the Queue implementation can be simplified to this:
+Now using this traitlib, the Queue implementation can be simplified to this:
 
-    package Example::Roles::Acme::Queue_v2;
+    package Example::TraitLibs::Acme::Queue_v2;
 
     use Moduloop::Implementation
-        roles => ['Example::Roles::Role::Pushable'],
-
-        requires => {
-            attributes => [qw/items/]
-        };
+        traits => [
+            Example::TraitLibs::Role::Pushable => {
+                methods    => [qw( push size )],
+                attributes => [qw/items/]
+            }
+        ],
     ;
 
     sub pop {
@@ -271,14 +278,15 @@ Now using this role, the Queue implementation can be simplified to this:
 
 And the Stack implementation can be simplified to this:
 
-    package Example::Roles::Acme::Stack_v2;
+    package Example::TraitLibs::Acme::Stack_v2;
 
     use Moduloop::Implementation
-        roles => ['Example::Roles::Role::Pushable'],
-
-        requires => {
-            attributes => [qw/items/]
-        };
+        traits => [
+            Example::TraitLibs::Role::Pushable => {
+                methods    => [qw( push size )],
+                attributes => [qw/items/]
+            }
+        ],
     ;
 
     sub pop {
@@ -295,11 +303,11 @@ To test these new implementations, we don't even need to update the main classes
 
     use Moduloop
         bind => {
-            'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v2',
+            'Example::TraitLibs::Queue' => 'Example::TraitLibs::Acme::Queue_v2',
         };
-    use Example::Roles::Queue;
+    use Example::TraitLibs::Queue;
 
-    my $q = Example::Roles::Queue->new;
+    my $q = Example::TraitLibs::Queue->new;
 
     is $q->size => 0;
 
@@ -314,13 +322,13 @@ To test these new implementations, we don't even need to update the main classes
     is $q->size => 1;
     done_testing();
 
-=head2 Using multiple roles
+=head2 Using multiple traitlibs
 
-An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Moduloop::Implementation/PRIVATE ROUTINES>.
+An implementation can get its functionality from more than one traitlib. As an example consider adding logging of the size as was done in L<Moduloop::Implementation/PRIVATE ROUTINES>.
 
-Such functionality does not logically belong in the Pushable role, but we could create a new role for it
+Such functionality does not logically belong in the Pushable traitlib, but we could create a new traitlib for it
 
-    package Example::Roles::Role::LogSize;
+    package Example::TraitLibs::Role::LogSize;
 
     use Moduloop::Role
         semiprivate => ['log_info'],
@@ -339,17 +347,18 @@ Such functionality does not logically belong in the Pushable role, but we could 
 
 Now we can use this role too
 
-    package Example::Roles::Acme::Queue_v3;
+    package Example::TraitLibs::Acme::Queue_v3;
 
     use Moduloop::Implementation
-        roles => [qw/
-            Example::Roles::Role::Pushable
-            Example::Roles::Role::LogSize
-        /],
-
-        requires => {
-            attributes => [qw/items/]
-        };
+        traits => [
+            Example::TraitLibs::Role::Pushable => {
+                methods    => [qw( push size )],
+                attributes => [qw/items/]
+            },
+            Example::TraitLibs::Role::LogSize => {
+                methods    => [qw( log_info )],
+            }
+        ],
     ;
 
     sub pop {
@@ -367,13 +376,13 @@ Now we can use this role too
 And use the queue like this
 
     % reply -I t/lib
-    0> use Moduloop bind => { 'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3' }
-    1> use Example::Roles::Queue
-    2> my $q = Example::Roles::Queue->new
+    0> use Moduloop bind => { 'Example::TraitLibs::Queue' => 'Example::TraitLibs::Acme::Queue_v3' }
+    1> use Example::TraitLibs::Queue
+    2> my $q = Example::TraitLibs::Queue->new
     $res[0] = bless( {
-        '83cb834b-' => 'Example::Roles::Queue::__Private',
+        '83cb834b-' => 'Example::TraitLibs::Queue::__Private',
         '83cb834b-items' => []
-    }, 'Example::Roles::Queue::__Moduloop' )
+    }, 'Example::TraitLibs::Queue::__Moduloop' )
 
     3> $q->push(1)
     $res[1] = 1
@@ -391,9 +400,9 @@ And use the queue like this
 
     6> $q->DOES
     $res[4] = [
-        'Example::Roles::Queue',
-        'Example::Roles::Role::LogSize',
-        'Example::Roles::Role::Pushable'
+        'Example::TraitLibs::Queue',
+        'Example::TraitLibs::Role::LogSize',
+        'Example::TraitLibs::Role::Pushable'
     ]
 
     7>

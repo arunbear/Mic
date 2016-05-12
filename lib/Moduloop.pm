@@ -88,9 +88,8 @@ sub assemble {
                 %{ $meta->{has} || { } },
             },
             forwards => $meta->{forwards},
+            traits   => $meta->{traits},
         };
-        $spec->{roles} = $meta->{roles};
-        $spec->{traitlibs} = $meta->{traitlibs};
         my $is_semiprivate = _interface($meta, 'semiprivate');
 
         foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
@@ -102,7 +101,6 @@ sub assemble {
     $obj_stash = Package::Stash->new("$spec->{name}::__Moduloop");
 
     _prep_interface($spec);
-    _compose_roles($spec);
     _compose_traitlibs($spec);
 
     my $private_stash = Package::Stash->new("$spec->{name}::__Private");
@@ -113,7 +111,6 @@ sub assemble {
     _make_builder_class($spec);
     _add_class_methods($spec, $cls_stash);
     _add_methods($spec, $obj_stash, $private_stash);
-    _check_role_requirements($spec);
     _check_traitlib_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
@@ -147,43 +144,15 @@ sub _prep_interface {
     }
 }
 
-sub _compose_roles {
-    my ($spec, $roles, $from_role) = @_;
-
-    if ( ! $roles ) {
-        $roles = $spec->{roles};
-    }
-
-    $from_role ||= {};
-
-    for my $role ( @{ $roles } ) {
-
-        if ( $spec->{composed_role}{$role} ) {
-            confess "Cannot compose role '$role' twice";
-        }
-        else {
-            $spec->{composed_role}{$role}++;
-        }
-
-        my ($meta, $method) = _load_role($role);
-        $spec->{required_by_role}{$role} = $meta->{requires};
-        _compose_roles($spec, $meta->{roles} || [], $from_role);
-
-        _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
-        _add_role_methods($spec, $from_role, $role, $meta, $method);
-    }
-}
-
 sub _compose_traitlibs {
     my ($spec, $traitlibs, $from_traitlib) = @_;
 
     if ( ! $traitlibs ) {
-        $traitlibs = $spec->{traitlibs};
+        $traitlibs = $spec->{implementation}{traits};
     }
 
     $from_traitlib ||= {};
-
-    for my $traitlib ( @{ $traitlibs } ) {
+    for my $traitlib ( keys %{ $traitlibs } ) {
 
         if ( $spec->{composed_traitlib}{$traitlib} ) {
             confess "Cannot compose traitlib '$traitlib' twice";
@@ -194,23 +163,11 @@ sub _compose_traitlibs {
 
         my ($meta, $method) = _load_traitlib($traitlib);
         $spec->{required_by_traitlib}{$traitlib} = $meta->{requires};
-        _compose_traitlibs($spec, $meta->{traitlibs} || [], $from_traitlib);
+        _compose_traitlibs($spec, $meta->{traits} || {}, $from_traitlib);
 
         _add_traitlib_items($spec, $from_traitlib, $traitlib, $meta->{has}, 'has');
         _add_traitlib_methods($spec, $from_traitlib, $traitlib, $meta, $method);
     }
-}
-
-sub _load_role {
-    my ($role) = @_;
-
-    my $stash  = _get_stash($role);
-    my $meta   = $stash->get_symbol('%__meta__');
-    $meta->{role}
-      or confess "$role is not a role";
-
-    my $method = $stash->get_all_symbols('CODE');
-    return ($meta, $method);
 }
 
 sub _load_traitlib {
@@ -223,12 +180,6 @@ sub _load_traitlib {
 
     my $method = $stash->get_all_symbols('CODE');
     return ($meta, $method);
-}
-
-sub _check_role_requirements {
-    my ($spec) = @_;
-
-    _check_traitlib_requirements($spec, 'required_by_role');
 }
 
 sub _check_traitlib_requirements {
@@ -282,30 +233,14 @@ sub _get_stash {
     return $stash;
 }
 
-sub _add_role_items {
-    my ($spec, $from_role, $role, $item, $type) = @_;
-
-    for my $name ( keys %$item ) {
-        if (my $other_role = $from_role->{$name}) {
-            _raise_role_conflict($name, $role, $other_role);
-        }
-        else{
-            if ( ! $spec->{implementation}{$type}{$name} ) {
-                $spec->{implementation}{$type}{$name} = $item->{$name};
-                $from_role->{$name} = $role;
-            }
-        }
-    }
-}
-
 sub _add_traitlib_items {
     my ($spec, $from_traitlib, $traitlib, $item, $type) = @_;
 
-    my $wanted = $spec->{implementation}{traitlibs}{$traitlib}{attributes};
+    my $wanted = $spec->{implementation}{traits}{$traitlib}{attributes};
     for my $name ( @{$wanted} ) {
 
         if (my $other_traitlib = $from_traitlib->{$name}) {
-            _raise_role_conflict($name, $traitlib, $other_traitlib);
+            _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
         }
         if (exists $item->{$name}) {
             if ( ! $spec->{implementation}{$type}{$name} ) {
@@ -314,52 +249,53 @@ sub _add_traitlib_items {
             }
         }
         else {
-            confess "Attribute $name not available via traitlib $traitlib";
+            confess "Attribute '$name' not available via traitlib $traitlib";
         }
     }
 }
 
-sub _add_role_methods {
-    my ($spec, $from_role, $role, $role_meta, $code_for) = @_;
+sub _add_traitlib_methods {
+    my ($spec, $from_traitlib, $traitlib, $traitlib_meta, $code_for) = @_;
 
     my $in_class_interface = _interface($spec);
-    my $in_role_interface  = _interface($role_meta);
-    my $is_semiprivate     = _interface($role_meta, 'semiprivate');
+    my $in_traitlib_interface  = _interface($traitlib_meta);
+    my $is_semiprivate     = _interface($traitlib_meta, 'semiprivate');
 
-    all { defined $in_class_interface->{$_} } keys %$in_role_interface
+    all { defined $in_class_interface->{$_} } keys %$in_traitlib_interface
       or Moduloop::Error::InterfaceMismatch->throw(
-        error => "Interfaces do not match: Class => $spec->{name}, Role => $role"
+        error => "Interfaces do not match: Class => $spec->{name}, Role => $traitlib"
       );
 
-    for my $name ( keys %$code_for ) {
-        if (    $in_role_interface->{$name}
+    my $wanted = $spec->{implementation}{traits}{$traitlib}{methods};
+    for my $name ( @{$wanted} ) {
+        if (    $in_traitlib_interface->{$name}
              || $in_class_interface->{$name}
            ) {
-            if (my $other_role = $from_role->{method}{$name}) {
-                _raise_role_conflict($name, $role, $other_role);
+            if (my $other_traitlib = $from_traitlib->{method}{$name}) {
+                _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
             }
             if ( ! $spec->{implementation}{methods}{$name} ) {
                 $spec->{implementation}{methods}{$name} = $code_for->{$name};
-                $from_role->{method}{$name} = $role;
+                $from_traitlib->{method}{$name} = $traitlib;
             }
         }
         elsif ( $is_semiprivate->{$name} ) {
-            if (my $other_role = $from_role->{semiprivate}{$name}) {
-                _raise_role_conflict($name, $role, $other_role);
+            if (my $other_traitlib = $from_traitlib->{semiprivate}{$name}) {
+                _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
             }
             if ( ! $spec->{implementation}{semiprivate}{$name} ) {
                 $spec->{implementation}{semiprivate}{$name} = $code_for->{$name};
-                $from_role->{semiprivate}{$name} = $role;
+                $from_traitlib->{semiprivate}{$name} = $traitlib;
             }
         }
     }
 }
 
-sub _raise_role_conflict {
-    my ($name, $role, $other_role) = @_;
+sub _raise_traitlib_conflict {
+    my ($name, $traitlib, $other_traitlib) = @_;
 
     Moduloop::Error::RoleConflict->throw(
-        error => "Cannot have '$name' in both $role and $other_role"
+        error => "Cannot have '$name' in both $traitlib and $other_traitlib"
     );
 }
 
