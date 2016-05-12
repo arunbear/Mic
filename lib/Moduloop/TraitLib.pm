@@ -30,13 +30,13 @@ Moduloop::TraitLib
             methods    => [qw/some required methods/],
             attributes => [qw/some required attributes/],
         },
-        traits => [
+        traits => { 
             traitlib1 => {
                 methods    => [qw/some methods/],
                 attributes => [qw/some attributes/],
             },
             ...
-        ],
+        },
         semiprivate => [qw/some internal subs/],
     ;
 
@@ -77,9 +77,9 @@ Variables with names corresponding to these attributes will be created in the tr
         $self->{$LENGTH} * $self->{$WIDTH};
     }
 
-=head2 traits => ARRAYREF
+=head2 traits => HASHREF
 
-A list of traitlibs which the current traitlib is composed out of (traitlibs can be built from other traitlibs). The structure of this list is just like the C<traits> specification in L<Moduloop::Implementation>
+A hash of traitlibs which the current traitlib is composed out of (traitlibs can be built from other traitlibs). The structure of this list is just like the C<traits> specification in L<Moduloop::Implementation>
 
 =head2 semiprivate => ARRAYREF
 
@@ -260,12 +260,12 @@ Now using this traitlib, the Queue implementation can be simplified to this:
     package Example::TraitLibs::Acme::Queue_v2;
 
     use Moduloop::Implementation
-        traits => [
+        traits => {
             Example::TraitLibs::Role::Pushable => {
                 methods    => [qw( push size )],
                 attributes => [qw/items/]
             }
-        ],
+        },
     ;
 
     sub pop {
@@ -281,12 +281,12 @@ And the Stack implementation can be simplified to this:
     package Example::TraitLibs::Acme::Stack_v2;
 
     use Moduloop::Implementation
-        traits => [
+        traits => {
             Example::TraitLibs::Role::Pushable => {
                 methods    => [qw( push size )],
                 attributes => [qw/items/]
             }
-        ],
+        },
     ;
 
     sub pop {
@@ -350,7 +350,7 @@ Now we can use this role too
     package Example::TraitLibs::Acme::Queue_v3;
 
     use Moduloop::Implementation
-        traits => [
+        traits => {
             Example::TraitLibs::Role::Pushable => {
                 methods    => [qw( push size )],
                 attributes => [qw/items/]
@@ -358,7 +358,7 @@ Now we can use this role too
             Example::TraitLibs::Role::LogSize => {
                 methods    => [qw( log_info )],
             }
-        ],
+        },
     ;
 
     sub pop {
