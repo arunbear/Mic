@@ -1,15 +1,15 @@
 package Example::Roles::Acme::Queue_v3;
 
 use Moduloop::Implementation
-    roles => [qw/
-        Example::Roles::Role::Pushable
-        Example::Roles::Role::LogSize
-    /],
-
-    requires => {
-        attributes => [qw/items/]
+    traits => {
+        Example::Roles::Role::Pushable => {
+            methods    => [qw( push size )],
+            attributes => ['items']
+        },
+        Example::Roles::Role::LogSize => {
+            methods    => [qw( log_info )],
+        }
     },
-    attr_style => 'uc'
 ;
 
 sub pop {

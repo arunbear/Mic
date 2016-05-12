@@ -1,6 +1,6 @@
 package Example::Roles::Role::Pushable;
 
-use Moduloop::Role
+use Moduloop::TraitLib
     has  => {
         items => { default => sub { [ ] } },
     }, 

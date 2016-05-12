@@ -1,6 +1,6 @@
 package Example::Roles::Role::LogSize;
 
-use Moduloop::Role
+use Moduloop::TraitLib
     semiprivate => ['log_info'],
     requires => {
         methods => [qw/ size /],

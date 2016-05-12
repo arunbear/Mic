@@ -7,7 +7,12 @@ use Moduloop::Implementation
         },
     }, 
     semiprivate => ['after_push'],
-    roles => ['Example::Roles::Role::Queue']
+    traits => {
+        Example::Roles::Role::Queue => {
+            methods    => [qw( push pop size )],
+            attributes => ['q']
+        }
+    },
 ;
 
 sub after_push {

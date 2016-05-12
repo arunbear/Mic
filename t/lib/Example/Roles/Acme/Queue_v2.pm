@@ -1,11 +1,12 @@
 package Example::Roles::Acme::Queue_v2;
 
 use Moduloop::Implementation
-    roles => ['Example::Roles::Role::Pushable'],
-
-    requires => {
-        attributes => [qw/items/]
-    };
+    traits => {
+        Example::Roles::Role::Pushable => {
+            methods    => [qw( push size )],
+            attributes => ['items']
+        }
+    },
 ;
 
 sub pop {

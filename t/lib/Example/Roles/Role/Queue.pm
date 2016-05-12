@@ -1,6 +1,6 @@
 package Example::Roles::Role::Queue;
 
-use Moduloop::Role
+use Moduloop::TraitLib
     has  => {
         q => { default => sub { [ ] } },
     }, 
