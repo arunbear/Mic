@@ -1,4 +1,4 @@
-package Example::Roles::Role::LogSize;
+package Example::TraitLibs::TraitLib::LogSize;
 
 use Moduloop::TraitLib
     semiprivate => ['log_info'],

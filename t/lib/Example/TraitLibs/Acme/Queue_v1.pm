@@ -1,4 +1,4 @@
-package Example::Roles::Acme::Queue_v1;
+package Example::TraitLibs::Acme::Queue_v1;
 
 use Moduloop::Implementation
     has  => {

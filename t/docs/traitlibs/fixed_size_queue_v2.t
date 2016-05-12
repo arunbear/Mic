@@ -4,11 +4,11 @@ use Test::More;
 
 use Moduloop
     bind => { 
-        'Example::Roles::FixedSizeQueue' => 'Example::Roles::Acme::FixedSizeQueue_v2' 
+        'Example::TraitLibs::FixedSizeQueue' => 'Example::TraitLibs::Acme::FixedSizeQueue_v2' 
     };
-use Example::Roles::FixedSizeQueue;
+use Example::TraitLibs::FixedSizeQueue;
 
-my $q = Example::Roles::FixedSizeQueue->new(max_size => 3);
+my $q = Example::TraitLibs::FixedSizeQueue->new(max_size => 3);
 
 $q->push($_) for 1 .. 3;
 is $q->size => 3;

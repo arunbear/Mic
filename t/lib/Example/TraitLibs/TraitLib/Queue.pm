@@ -1,4 +1,4 @@
-package Example::Roles::Role::Queue;
+package Example::TraitLibs::TraitLib::Queue;
 
 use Moduloop::TraitLib
     has  => {

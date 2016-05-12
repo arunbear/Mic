@@ -1,4 +1,4 @@
-package Example::Roles::FixedSizeQueue;
+package Example::TraitLibs::FixedSizeQueue;
 
 use Moduloop
     interface => [qw( push pop size )],
@@ -9,7 +9,7 @@ use Moduloop
         },
     }, 
 
-    implementation => 'Example::Roles::Acme::FixedSizeQueue_v1',
+    implementation => 'Example::TraitLibs::Acme::FixedSizeQueue_v1',
 ;
 
 1;

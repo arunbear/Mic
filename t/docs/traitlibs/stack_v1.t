@@ -1,9 +1,9 @@
 use strict;
 use Test::Lib;
 use Test::More;
-use Example::Roles::Stack;
+use Example::TraitLibs::Stack;
 
-my $s = Example::Roles::Stack->new;
+my $s = Example::TraitLibs::Stack->new;
 
 is $s->size => 0;
 

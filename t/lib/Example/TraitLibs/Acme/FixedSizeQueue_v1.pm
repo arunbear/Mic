@@ -1,4 +1,4 @@
-package Example::Roles::Acme::FixedSizeQueue_v1;
+package Example::TraitLibs::Acme::FixedSizeQueue_v1;
 
 use Moduloop::Implementation
     has  => {

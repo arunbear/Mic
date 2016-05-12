@@ -1,12 +1,12 @@
-package Example::Roles::Acme::Queue_v3;
+package Example::TraitLibs::Acme::Queue_v3;
 
 use Moduloop::Implementation
     traits => {
-        Example::Roles::Role::Pushable => {
+        Example::TraitLibs::TraitLib::Pushable => {
             methods    => [qw( push size )],
             attributes => ['items']
         },
-        Example::Roles::Role::LogSize => {
+        Example::TraitLibs::TraitLib::LogSize => {
             methods    => [qw( log_info )],
         }
     },

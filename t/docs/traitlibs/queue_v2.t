@@ -4,11 +4,11 @@ use Test::More;
 
 use Moduloop
     bind => {
-        'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v2',
+        'Example::TraitLibs::Queue' => 'Example::TraitLibs::Acme::Queue_v2',
     };
-use Example::Roles::Queue;
+use Example::TraitLibs::Queue;
 
-my $q = Example::Roles::Queue->new;
+my $q = Example::TraitLibs::Queue->new;
 
 is $q->size => 0;
 

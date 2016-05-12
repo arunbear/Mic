@@ -1,6 +1,6 @@
-package Example::Roles::Role::Pushable;
+package Example::TraitLibs::Acme::Stack_v1;
 
-use Moduloop::TraitLib
+use Moduloop::Implementation
     has  => {
         items => { default => sub { [ ] } },
     }, 
@@ -15,6 +15,12 @@ sub push {
     my ($self, $val) = @_;
 
     push @{ $self->{$ITEMS} }, $val;
+}
+
+sub pop {
+    my ($self) = @_;
+
+    pop @{ $self->{$ITEMS} };
 }
 
 1;

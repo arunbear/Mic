@@ -1,8 +1,8 @@
-package Example::Roles::Acme::Queue_v2;
+package Example::TraitLibs::Acme::Queue_v2;
 
 use Moduloop::Implementation
     traits => {
-        Example::Roles::Role::Pushable => {
+        Example::TraitLibs::TraitLib::Pushable => {
             methods    => [qw( push size )],
             attributes => ['items']
         }

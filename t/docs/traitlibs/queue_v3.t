@@ -5,11 +5,11 @@ use Test::Output;
 
 use Moduloop
     bind => {
-        'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3',
+        'Example::TraitLibs::Queue' => 'Example::TraitLibs::Acme::Queue_v3',
     };
-use Example::Roles::Queue;
+use Example::TraitLibs::Queue;
 
-my $q = Example::Roles::Queue->new;
+my $q = Example::TraitLibs::Queue->new;
 
 $q->push(1);
 

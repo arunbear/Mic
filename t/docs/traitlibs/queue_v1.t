@@ -1,9 +1,9 @@
 use strict;
 use Test::Lib;
 use Test::More;
-use Example::Roles::Queue;
+use Example::TraitLibs::Queue;
 
-my $q = Example::Roles::Queue->new;
+my $q = Example::TraitLibs::Queue->new;
 
 is $q->size => 0;
 

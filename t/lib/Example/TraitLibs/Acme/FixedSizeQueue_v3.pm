@@ -1,4 +1,4 @@
-package Example::Roles::Acme::FixedSizeQueue_v3;
+package Example::TraitLibs::Acme::FixedSizeQueue_v3;
 
 use Moduloop::Implementation
     has  => {
@@ -8,8 +8,8 @@ use Moduloop::Implementation
     }, 
     semiprivate => ['after_push'],
     roles => [qw/
-        Example::Roles::Role::Queue
-        Example::Roles::Role::LogSize
+        Example::TraitLibs::TraitLib::Queue
+        Example::TraitLibs::TraitLib::LogSize
     /]
 ;
 
