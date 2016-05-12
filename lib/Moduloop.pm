@@ -14,7 +14,7 @@ use Exception::Class (
     'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
     'Moduloop::Error::InterfaceMismatch',
     'Moduloop::Error::MethodDeclaration',
-    'Moduloop::Error::RoleConflict',
+    'Moduloop::Error::TraitConflict',
 );
 use Moduloop::_Guts;
 
@@ -294,7 +294,7 @@ sub _add_traitlib_methods {
 sub _raise_traitlib_conflict {
     my ($name, $traitlib, $other_traitlib) = @_;
 
-    Moduloop::Error::RoleConflict->throw(
+    Moduloop::Error::TraitConflict->throw(
         error => "Cannot have '$name' in both $traitlib and $other_traitlib"
     );
 }
@@ -900,7 +900,7 @@ their respective modules.
 
 Behavioural and Role introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list (or array ref depending on context) of methods or roles respectiively supported by the object.
 
-See the section "Using multiple roles" from L<Moduloop::Role/EXAMPLES> for an example.
+See the section "Using multiple roles" from L<Moduloop::TraitLib/EXAMPLES> for an example.
 
 Also note that for any class C<Foo> created using Moduloop, and for any object created with C<Foo>'s constructor, the following will always return a true value
 
