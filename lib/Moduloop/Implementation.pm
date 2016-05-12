@@ -292,10 +292,18 @@ would sequentially call, within the C<escape()> delegation method:
   $self->{$FLYWHEEL}->engage(...);
   $self->{$SMOKESCReen}->release(...);
 
-=head2 traitlibs => HASHREF
+=head2 traits => HASHREF
 
-A reference to a hash containing where the keys are names of TraitLib packages, and the values are hashrefs that
+A reference to a hash where the keys are names of TraitLib packages, and the values are hashrefs that
 specify which attributes and methods are being borrowed form the TraitLib e.g. 
+
+        traits => {
+            traitlib1 => {
+                methods    => [qw/some methods/],
+                attributes => [qw/some attributes/],
+            },
+            ...
+        },
 
 Any attributes and/or routines defined in the specified traitlibs will be added to the implementation subject to the following rules 
 
