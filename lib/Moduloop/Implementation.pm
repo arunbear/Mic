@@ -292,25 +292,26 @@ would sequentially call, within the C<escape()> delegation method:
   $self->{$FLYWHEEL}->engage(...);
   $self->{$SMOKESCReen}->release(...);
 
-=head2 roles => ARRAYREF
+=head2 traitlibs => HASHREF
 
-A reference to an array containing the names of one or more Role packages. 
+A reference to a hash containing where the keys are names of TraitLib packages, and the values are hashrefs that
+specify which attributes and methods are being borrowed form the TraitLib e.g. 
 
-Any attributes and/or routines defined in the specified roles will be added to the implementation subject to the following rules 
+Any attributes and/or routines defined in the specified traitlibs will be added to the implementation subject to the following rules 
 
 =over 
 
 =item Implementation trumps Roles
 
-An attribute/routine defined in a role won't get added to the implementation if the implementation already has an attribute/routine with the same name.
+An attribute/routine defined in a traitlib won't get added to the implementation if the implementation already has an attribute/routine with the same name.
 
 =item Conflicts not allowed
 
-An exception will be raised if the same attribute/routine would be provided by two roles.
+An exception will be raised if the same attribute/routine would be provided by two traitlibs.
 
 =back
 
-L<Moduloop::Role> describes how roles are configured.
+L<Moduloop::TraitLib> describes how traitlibs are configured.
 
 =head2 semiprivate => ARRAYREF
 
