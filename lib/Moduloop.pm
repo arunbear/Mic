@@ -289,9 +289,7 @@ sub _raise_traitlib_conflict {
     );
 }
 
-sub _get_object_maker {
-
-    sub {
+sub _object_maker {
         my ($builder_class, $init) = @_;
 
         my $class = $builder_class->main_class;
@@ -316,7 +314,6 @@ sub _get_object_maker {
         bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };
         lock_keys(%obj);
         return \ %obj;
-    };
 }
 
 sub _add_class_methods {
@@ -338,7 +335,7 @@ sub _make_builder_class {
     $Util_class{ $spec->{name} } = $stash->name;
 
     my %method = (
-        new_object => _get_object_maker(),
+        new_object => \&_object_maker,
     );
 
     $method{main_class} = sub { $spec->{name} };
