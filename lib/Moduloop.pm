@@ -4,7 +4,6 @@ use strict;
 use 5.008_005;
 use Carp;
 use Hash::Util qw( lock_keys );
-use List::MoreUtils qw( all );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
