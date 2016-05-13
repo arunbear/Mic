@@ -345,7 +345,7 @@ Such functionality does not logically belong in the Pushable traitlib, but we co
 
     1;
 
-Now we can use this role too
+Now we can use this traitlib too
 
     package Example::TraitLibs::Acme::Queue_v3;
 
