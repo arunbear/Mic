@@ -1,17 +1,20 @@
 package Example::TraitLibs::Acme::Stack_v2;
 
 use Moduloop::Implementation
-    roles => ['Example::TraitLibs::TraitLib::Pushable'],
+    traits => {
+        Example::TraitLibs::TraitLib::Pushable => {
+            methods    => [qw( push size )],
 
-    requires => {
-        attributes => [qw/items/]
-    };
+            attributes => [qw/items/]
+        }
+    },
 ;
 
 sub pop {
     my ($self) = @_;
 
-    pop @{ $self->{$__items} };
+    pop @{ $self->{$ITEMS} };
+
 }
 
 1;
