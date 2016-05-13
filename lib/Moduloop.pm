@@ -290,30 +290,30 @@ sub _raise_traitlib_conflict {
 }
 
 sub _object_maker {
-        my ($builder_class, $init) = @_;
+    my ($builder_class, $init) = @_;
 
-        my $class = $builder_class->main_class;
+    my $class = $builder_class->main_class;
 
-        my $stash = Package::Stash->new($class);
+    my $stash = Package::Stash->new($class);
 
-        my $spec = $stash->get_symbol('%__meta__');
-        my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
-        my %obj = (
-            $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
-        );
+    my $spec = $stash->get_symbol('%__meta__');
+    my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
+    my %obj = (
+        $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
+    );
 
-        while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-            my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
-            $obj{$obfu_name} = $init->{$attr}
-              ? $init->{$attr}
-              : (ref $meta->{default} eq 'CODE'
-                ? $meta->{default}->()
-                : $meta->{default});
-        }
+    while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
+        my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
+        $obj{$obfu_name} = $init->{$attr}
+            ? $init->{$attr}
+            : (ref $meta->{default} eq 'CODE'
+            ? $meta->{default}->()
+            : $meta->{default});
+    }
 
-        bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };
-        lock_keys(%obj);
-        return \ %obj;
+    bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };
+    lock_keys(%obj);
+    return \ %obj;
 }
 
 sub _add_class_methods {
