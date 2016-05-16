@@ -308,21 +308,18 @@ sub _object_maker {
         };
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-        if ( $spec->{implementation}{arrayimp}  ) {
-            my $offset = $spec->{implementation}{slot_offset}{$attr};
-            $obj->[ $offset ] = $init->{$attr}
+        my $init_val = $init->{$attr}
                 ? $init->{$attr}
                 : (ref $meta->{default} eq 'CODE'
-                ? $meta->{default}->()
-                : $meta->{default});
+                  ? $meta->{default}->()
+                  : $meta->{default});
+        if ( $spec->{implementation}{arrayimp} ) {
+            my $offset = $spec->{implementation}{slot_offset}{$attr};
+            $obj->[$offset] = $init_val;
         }
         else {
             my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
-            $obj->{$obfu_name} = $init->{$attr}
-                ? $init->{$attr}
-                : (ref $meta->{default} eq 'CODE'
-                ? $meta->{default}->()
-                : $meta->{default});
+            $obj->{$obfu_name} = $init_val;
         }
     }
 
