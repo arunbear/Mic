@@ -7,6 +7,7 @@ use Hash::Util qw( lock_keys );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
+use Scalar::Util qw( reftype );
 use Sub::Name;
 
 use Exception::Class (
@@ -87,6 +88,8 @@ sub assemble {
             },
             forwards => $meta->{forwards},
             traits   => $meta->{traits},
+            arrayimp => $meta->{arrayimp},
+            slot_offset => $meta->{slot_offset},
         };
         my $is_semiprivate = _interface($meta, 'semiprivate');
 
@@ -298,21 +301,35 @@ sub _object_maker {
 
     my $spec = $stash->get_symbol('%__meta__');
     my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
-    my $obj = {
-        $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
-    };
+    my $obj = $spec->{implementation}{arrayimp}
+      ? [ ${ $stash->get_symbol('$__Private_pkg') } ]
+      : {
+            $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
+        };
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
-        my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
-        $obj->{$obfu_name} = $init->{$attr}
-            ? $init->{$attr}
-            : (ref $meta->{default} eq 'CODE'
-            ? $meta->{default}->()
-            : $meta->{default});
+        if ( $spec->{implementation}{arrayimp}  ) {
+            my $offset = $spec->{implementation}{slot_offset}{$attr};
+            $obj->[ $offset ] = $init->{$attr}
+                ? $init->{$attr}
+                : (ref $meta->{default} eq 'CODE'
+                ? $meta->{default}->()
+                : $meta->{default});
+        }
+        else {
+            my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
+            $obj->{$obfu_name} = $init->{$attr}
+                ? $init->{$attr}
+                : (ref $meta->{default} eq 'CODE'
+                ? $meta->{default}->()
+                : $meta->{default});
+        }
     }
 
     bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
-    lock_keys(%$obj);
+    if ( reftype $obj eq 'HASH' ) {
+        lock_keys(%$obj);
+    }
     return $obj;
 }
 
@@ -343,8 +360,12 @@ sub _make_builder_class {
     my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
     $method{build} = sub {
         my (undef, $obj, $arg) = @_;
-        if ( my $builder = $obj->{$obfu_pkg}->can('BUILD') ) {
-            $builder->($obj->{$obfu_pkg}, $obj, $arg);
+
+        my $priv_pkg = reftype $obj eq 'ARRAY'
+          ? $obj->[0]
+          : $obj->{$obfu_pkg};
+        if ( my $builder = $priv_pkg->can('BUILD') ) {
+            $builder->($priv_pkg, $obj, $arg);
         }
     };
 
