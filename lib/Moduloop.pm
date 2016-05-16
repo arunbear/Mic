@@ -568,7 +568,10 @@ sub _add_autoload {
         ) {
             my $stash = _get_stash($spec->{implementation}{package});
             my $sp_var = ${ $stash->get_symbol('$__') };
-            return $self->{$sp_var}->$called($self, @_);
+            my $priv_pkg = reftype $self eq 'ARRAY'
+              ? $self->[0]
+              : $self->{$sp_var};
+            return $priv_pkg->$called($self, @_);
         }
         elsif( $called eq 'DESTROY' ) {
             return;
