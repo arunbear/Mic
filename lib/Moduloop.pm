@@ -517,24 +517,37 @@ sub _add_methods {
 
         if ( !  $spec->{implementation}{methods}{$name}
              && $meta->{reader}
-             && $in_interface->{$name} ) {
+             && $in_interface->{ $meta->{reader} } ) {
 
-            my $name = $meta->{reader} == 1 ? $name : $meta->{reader};
+            my $name = $meta->{reader};
             my $obfu_name = Moduloop::_Guts::obfu_name($name, $spec);
-            $spec->{implementation}{methods}{$name} = sub { $_[0]->{$obfu_name} };
+            $spec->{implementation}{methods}{$name} = sub { 
+                my ($self) = @_;
+
+                if ( reftype $self eq 'HASH' ) {
+                    return $self->{$obfu_name};
+                }
+                return $self->[ $spec->{implementation}{slot_offset}{$name} ];
+            };
         }
 
         if ( !  $spec->{implementation}{methods}{$name}
              && $meta->{writer}
-             && $in_interface->{$name} ) {
+             && $in_interface->{ $meta->{writer} } ) {
 
             my $name = $meta->{writer};
             my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{$name} = sub {
                 my ($self, $new_val) = @_;
 
-                $self->{$obfu_pkg}->ASSERT($name, $new_val);
-                $self->{ Moduloop::_Guts::obfu_name($name, $spec) } = $new_val;
+                if ( reftype $self eq 'HASH' ) {
+                    $self->{$obfu_pkg}->ASSERT($name, $new_val);
+                    $self->{ Moduloop::_Guts::obfu_name($name, $spec) } = $new_val;
+                }
+                else {
+                    $self->[0]->ASSERT($name, $new_val);
+                    $self->[ $spec->{implementation}{slot_offset}{$name} ] = $new_val;
+                }
                 return $self;
             };
         }
