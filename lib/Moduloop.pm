@@ -298,22 +298,22 @@ sub _object_maker {
 
     my $spec = $stash->get_symbol('%__meta__');
     my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
-    my %obj = (
+    my $obj = {
         $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
-    );
+    };
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
         my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
-        $obj{$obfu_name} = $init->{$attr}
+        $obj->{$obfu_name} = $init->{$attr}
             ? $init->{$attr}
             : (ref $meta->{default} eq 'CODE'
             ? $meta->{default}->()
             : $meta->{default});
     }
 
-    bless \ %obj => ${ $stash->get_symbol('$__Obj_pkg') };
-    lock_keys(%obj);
-    return \ %obj;
+    bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
+    lock_keys(%$obj);
+    return $obj;
 }
 
 sub _add_class_methods {
