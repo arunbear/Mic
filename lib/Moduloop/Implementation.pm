@@ -24,6 +24,7 @@ sub define {
     $class->add_attribute_syms(\%arg, $stash);
 
     $stash->add_symbol('%__meta__', \%arg);
+    $class->install_subs($stash);
 }
 
 sub add_attribute_syms {
@@ -68,6 +69,8 @@ sub add_obfu_name {
 }
 
 sub update_args {}
+
+sub install_subs {}
 
 1;
 
