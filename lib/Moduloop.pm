@@ -435,8 +435,14 @@ sub _add_default_constructor {
                 if ( $attr ) {
                     _copy_assertions($spec, $name, $attr);
                     my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
-                    my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec) ;
-                    $obj->{$obfu_name} = $sub ? $sub->($arg->{$name}) : $arg->{$name};
+                    my $attr_val = $sub ? $sub->($arg->{$name}) : $arg->{$name};
+                    if ( reftype $obj eq 'HASH' ) {
+                        my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
+                        $obj->{$obfu_name} = $attr_val;
+                    }
+                    else {
+                        $obj->[ $spec->{implementation}{slot_offset}{$attr} ] = $attr_val;
+                    }
                 }
             }
 
@@ -640,7 +646,10 @@ sub _add_delegates {
             foreach my $desc ( @{ $local_method{$meth}{targets} } ) {
                 my $obfu_name = Moduloop::_Guts::obfu_name($desc->{to}, $spec);
                 my $target = $desc->{as};
-                push @results, $obj->{$obfu_name}->$target(@_);
+                my $delegate = reftype $obj eq 'HASH'
+                  ? $obj->{$obfu_name}
+                  : $obj->[ $spec->{implementation}{slot_offset}{ $desc->{to} } ];
+                push @results, $delegate->$target(@_);
             }
             if (@results == 1) {
                 return $results[0];
