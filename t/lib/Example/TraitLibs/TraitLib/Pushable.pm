@@ -8,13 +8,13 @@ use Moduloop::TraitLib
 
 sub size {
     my ($self) = @_;
-    scalar @{ $self->{$ITEMS} };
+    scalar @{ GET_ATTR($self, $ITEMS) };
 }
 
 sub push {
     my ($self, $val) = @_;
 
-    push @{ $self->{$ITEMS} }, $val;
+    push @{ GET_ATTR($self, $ITEMS) }, $val;
 }
 
 1;
