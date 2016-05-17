@@ -17,17 +17,26 @@ sub add_attribute_syms {
     my @slots = (
         '__', # semiprivate pkg
         keys %{ $arg->{has} },
+        ( map {
+            @{ $arg->{traits}{$_}{attributes} || []  }
+          }
+          keys %{ $arg->{traits} }
+        ),
     );
+    my %seen_attr;
     foreach my $i ( 0 .. $#slots ) {
-        $class->add_sym($stash, $slots[$i], $i);
+        next if exists $seen_attr{ $slots[$i] };
+
+        $seen_attr{ $slots[$i] }++;
+        $class->add_sym($arg, $stash, $slots[$i], $i);
     }
 }
 
 sub add_sym {
-    my ($class, $stash, $slot, $i) = @_;
+    my ($class, $arg, $stash, $slot, $i) = @_;
 
     Readonly my $sym_val => $i;
-    $Moduloop::_Guts::slot_offset{$slot} = $sym_val;
+    $arg->{slot_offset}{$slot} = $sym_val;
 
     $stash->add_symbol(
         sprintf('$%s', uc $slot),
