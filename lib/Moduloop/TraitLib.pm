@@ -1,5 +1,6 @@
 package Moduloop::TraitLib;
 
+use Scalar::Util qw( reftype );
 require Moduloop::Implementation;
 
 our @ISA = qw( Moduloop::Implementation );
@@ -10,6 +11,40 @@ sub update_args {
     $arg->{traitlib} = 1;
 }
 
+sub install_subs {
+    my ($class, $stash) = @_;
+
+    my $meta = \ %Moduloop::_Guts::Implementation_meta;
+
+    $stash->add_symbol('&GET_ATTR',
+        sub {
+            my ($obj, $attr) = @_;
+
+            if ( reftype $obj eq 'ARRAY' ) {
+                $attr =~ s/.*-//;
+                my $offset = $meta->{ref $obj}{slot_offset}{$attr};
+                return $obj->[$offset];
+            }
+            else {
+                return $obj->{$attr};
+            }
+        }
+    );
+    $stash->add_symbol('&SET_ATTR',
+        sub {
+            my ($obj, $attr, $val) = @_;
+
+            if ( reftype $obj eq 'ARRAY' ) {
+                $attr =~ s/.*-//;
+                my $offset = $meta->{ref $obj}{slot_offset}{$attr};
+                $obj->[$offset] = $val;
+            }
+            else {
+                $obj->{$attr} = $val;
+            }
+        }
+    );
+}
 1;
 
 __END__
