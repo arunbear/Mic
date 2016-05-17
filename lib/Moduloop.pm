@@ -324,6 +324,8 @@ sub _object_maker {
     }
 
     bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
+    $Moduloop::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
+
     if ( reftype $obj eq 'HASH' ) {
         lock_keys(%$obj);
     }

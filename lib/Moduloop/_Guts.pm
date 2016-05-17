@@ -3,6 +3,7 @@ package Moduloop::_Guts;
 use Digest::MD5 qw( md5_hex );
 
 our %obfu_name;
+our %Implementation_meta;
 
 sub obfu_name {
     my ($name, $spec) = @_;
