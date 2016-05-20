@@ -168,6 +168,7 @@ sub _compose_traitlibs {
 
         _add_traitlib_items($spec, $from_traitlib, $traitlib, $meta->{has}, 'has');
         _add_traitlib_methods($spec, $from_traitlib, $traitlib, $meta, $method);
+        _add_traitlib_forwards($spec, $from_traitlib, $traitlib, $meta);
     }
 }
 
@@ -281,6 +282,27 @@ sub _add_traitlib_methods {
                 $from_traitlib->{semiprivate}{$name} = $traitlib;
             }
         }
+    }
+}
+
+sub _add_traitlib_forwards {
+    my ($spec, $from_traitlib, $traitlib, $traitlib_meta) = @_;
+
+    my %wanted = 
+        map { $_ => 1 }
+        @{ $spec->{implementation}{traits}{$traitlib}{methods} };
+
+    for my $desc ( @{ $traitlib_meta->{forwards} } ) {
+        my $send = ref $desc->{send} eq 'ARRAY' ? $desc->{send} : [$desc->{send}];
+        foreach my $name ( @$send ) {
+            if (my $other_traitlib = $from_traitlib->{forwarded}{$name}) {
+                _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
+            }
+            if ( $wanted{$name} ) {
+                $from_traitlib->{forwarded}{$name} = $traitlib;
+            }
+        }
+        push @{ $spec->{implementation}{forwards} }, $desc;
     }
 }
 
@@ -562,9 +584,11 @@ sub _add_methods {
     }
     _add_delegates($spec);
 
+    # use Data::Dump 'pp'; warn pp($spec->{name});
+    # require Enbugger; Enbugger->stop if $spec->{name} eq "Example::TraitLibs::FixedSizeQueue";
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         next unless $in_interface->{$name};
-        $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub);
+        $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub); 
     }
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
         $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
