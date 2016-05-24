@@ -23,9 +23,9 @@ use Moduloop::TraitLib
 sub push {
     my ($self, $val) = @_;
 
-    GET_ATTR($self, 'Q')->push($val);
+    GET_ATTR($self, $Q)->push($val);
 
-    if ($self->size > GET_ATTR($self, 'MAX_SIZE')) {
+    if ($self->size > GET_ATTR($self, $MAX_SIZE)) {
         $self->pop;        
     }
 }
