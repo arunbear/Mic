@@ -294,15 +294,19 @@ sub _add_traitlib_forwards {
 
     for my $desc ( @{ $traitlib_meta->{forwards} } ) {
         my $send = ref $desc->{send} eq 'ARRAY' ? $desc->{send} : [$desc->{send}];
+        my $wanted_methods;
         foreach my $name ( @$send ) {
             if (my $other_traitlib = $from_traitlib->{forwarded}{$name}) {
                 _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
             }
             if ( $wanted{$name} ) {
                 $from_traitlib->{forwarded}{$name} = $traitlib;
+                $wanted_methods++;
             }
         }
-        push @{ $spec->{implementation}{forwards} }, $desc;
+        if ( $wanted_methods ) {
+            push @{ $spec->{implementation}{forwards} }, $desc;
+        }
     }
 }
 
