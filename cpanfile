@@ -1,5 +1,6 @@
 requires 'perl', '5.008005';
 
+requires 'Carp::Assert::More', '1.14';
 requires 'Exception::Class', '1.38';
 requires 'List::MoreUtils',  '0.33';
 requires 'Package::Stash', '0.36';
