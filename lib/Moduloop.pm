@@ -3,7 +3,9 @@ package Moduloop;
 use strict;
 use 5.008_005;
 use Carp;
+use Carp::Assert::More;
 use Hash::Util qw( lock_keys );
+use List::MoreUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
@@ -639,8 +641,16 @@ sub _add_delegates {
 
     foreach my $desc (@{ $spec->{implementation}{forwards} }) {
 
+        my $send = ref $desc->{send} eq 'ARRAY'
+          ? [uniq @{ $desc->{send} }]
+          : [$desc->{send}];
+
+        if ( any { exists $local_method{$_} } @{ $send } ) {
+            next;
+        }
         my $as = ref $desc->{as} eq 'ARRAY' ? $desc->{as} : [$desc->{as}];
         if(ref $desc->{to} eq 'ARRAY') {
+            assert_nonref($desc->{send});
             foreach my $i (0 .. $#{ $desc->{to} }) {
                 push @{ $local_method{ $desc->{send} }{targets} }, {
                     to => $desc->{to}[$i],
@@ -649,7 +659,6 @@ sub _add_delegates {
             }
         }
         else {
-            my $send = ref $desc->{send} eq 'ARRAY' ? $desc->{send} : [$desc->{send}];
             foreach my $i (0 .. $#$send) {
                 push @{ $local_method{ $send->[$i] }{targets} }, {
                     to => $desc->{to},
