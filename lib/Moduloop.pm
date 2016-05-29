@@ -64,7 +64,7 @@ sub assemble {
     my @args = %$spec;
     validate(@args, {
         interface => { type => ARRAYREF | SCALAR },
-        implementation => { type => SCALAR | HASHREF },
+        implementation => { type => SCALAR },
         construct_with => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
         build_args     => { type => CODEREF, optional => 1 },
@@ -75,30 +75,28 @@ sub assemble {
 
     my $obj_stash;
 
-    if ( ! ref $spec->{implementation} ) {
-        my $pkg = $Bound_implementation_of{ $spec->{name} } || $spec->{implementation};
-        $pkg ne $spec->{name}
-          or confess "$spec->{name} cannot be its own implementation.";
-        my $stash = _get_stash($pkg);
+    my $pkg = $Bound_implementation_of{ $spec->{name} } || $spec->{implementation};
+    $pkg ne $spec->{name}
+      or confess "$spec->{name} cannot be its own implementation.";
+    my $stash = _get_stash($pkg);
 
-        my $meta = $stash->get_symbol('%__meta__');
-        $spec->{implementation} = {
-            package => $pkg,
-            methods => $stash->get_all_symbols('CODE'),
-            has     => {
-                %{ $meta->{has} || { } },
-            },
-            forwards => $meta->{forwards},
-            traits   => $meta->{traits},
-            arrayimp => $meta->{arrayimp},
-            slot_offset => $meta->{slot_offset},
-        };
-        my $is_semiprivate = _interface($meta, 'semiprivate');
+    my $meta = $stash->get_symbol('%__meta__');
+    $spec->{implementation} = {
+        package => $pkg,
+        methods => $stash->get_all_symbols('CODE'),
+        has     => {
+            %{ $meta->{has} || { } },
+        },
+        forwards => $meta->{forwards},
+        traits   => $meta->{traits},
+        arrayimp => $meta->{arrayimp},
+        slot_offset => $meta->{slot_offset},
+    };
+    my $is_semiprivate = _interface($meta, 'semiprivate');
 
-        foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
-            if ( $is_semiprivate->{$sub} ) {
-                $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
-            }
+    foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
+        if ( $is_semiprivate->{$sub} ) {
+            $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
         }
     }
     $obj_stash = Package::Stash->new("$spec->{name}::__Moduloop");
