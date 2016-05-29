@@ -19,7 +19,7 @@ use Exception::Class (
 );
 use Moduloop::_Guts;
 
-our $VERSION = '1.000000';
+our $VERSION = '0.000001';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
