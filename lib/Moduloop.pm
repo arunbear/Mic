@@ -26,6 +26,11 @@ my %Bound_implementation_of;
 my %Interface_for;
 my %Util_class;
 
+my %Orig_Class_meta;
+my %Object_stash;
+my %Private_stash;
+validation_options(allow_extra => 1);
+
 sub import {
     my ($class, %arg) = @_;
 
@@ -52,9 +57,22 @@ sub assemble {
     if ( $caller_pkg eq __PACKAGE__ ) {
         $caller_pkg = (caller 1)[0];
     }
-    my $cls_stash = Package::Stash->new($caller_pkg);
-    $spec = { %{ $spec || {} }, %{ $cls_stash->get_symbol('%__meta__') || {} } };
-    $spec->{name} = $caller_pkg;
+    my $cls_stash = Package::Stash->new($spec->{name} || $caller_pkg);
+
+    # $spec = { %{ $spec || {} }, %{ $cls_stash->get_symbol('%__meta__') || {} } };
+    if (! $spec->{implementation}) {
+        if ( ! $cls_stash->has_symbol('%__meta__') ) {
+            $cls_stash->add_symbol('%__meta__', $spec);
+        }
+        _add_class_methods({
+                class_methods => { load_imp => \&_imp_loader }
+            },
+            $cls_stash,
+            { default_constructor => 0 }
+        );
+        return;
+    }
+    $spec->{name} ||= $caller_pkg;
 
     my @args = %$spec;
     validate(@args, {
@@ -75,6 +93,7 @@ sub assemble {
     my $stash = _get_stash($pkg);
 
     my $meta = $stash->get_symbol('%__meta__');
+    $spec->{implementation_name} = $spec->{implementation};
     $spec->{implementation} = {
         package => $pkg,
         methods => $stash->get_all_symbols('CODE'),
@@ -93,14 +112,16 @@ sub assemble {
             $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
         }
     }
-    $obj_stash = Package::Stash->new("$spec->{name}::__Moduloop");
+    $obj_stash = Package::Stash->new("$spec->{implementation_name}::__Moduloop");
+    $Object_stash{ $spec->{implementation_name} } = $obj_stash->name;
 
     _prep_interface($spec);
     _compose_traitlibs($spec);
 
-    my $private_stash = Package::Stash->new("$spec->{name}::__Private");
-    $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
-    $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
+    my $private_stash = Package::Stash->new("$spec->{implementation_name}::__Private");
+    $Private_stash{ $spec->{implementation_name} } = $private_stash->name;
+    # $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name); #TODO use global lookup instead
+    # $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
     _make_builder_class($spec);
@@ -109,6 +130,26 @@ sub assemble {
     _check_traitlib_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
+}
+
+sub _imp_loader {
+    my (undef, $imp_name) = @_;
+
+    my $stash = _get_stash($imp_name);
+    my $imp_meta = $stash->get_symbol('%__meta__');
+
+    my $cls_stash = _get_stash($imp_meta->{interface});
+    my $cls_meta;
+    if ( ! exists $Orig_Class_meta{ $imp_meta->{interface} } ) {
+        $cls_meta = $cls_stash->get_symbol('%__meta__');
+        $Orig_Class_meta{ $imp_meta->{interface} } = { %$cls_meta };
+    }
+    else {
+        $cls_meta = $Orig_Class_meta{ $imp_meta->{interface} };
+    }
+    $cls_meta->{name} = $imp_meta->{interface};
+    $cls_meta->{implementation} = $imp_name;
+    __PACKAGE__->assemble($cls_meta);
 }
 
 sub builder_class {
@@ -322,9 +363,11 @@ sub _object_maker {
     my $spec = $stash->get_symbol('%__meta__');
     my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
     my $obj = $spec->{implementation}{arrayimp}
-      ? [ ${ $stash->get_symbol('$__Private_pkg') } ]
+      # ? [ ${ $stash->get_symbol('$__Private_pkg') } ]
+      ? [ $Private_stash{ $spec->{implementation_name} } ]
       : {
-            $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
+            $pkg_key => $Private_stash{ $spec->{implementation_name} } ,
+            # $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
         };
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
@@ -343,7 +386,8 @@ sub _object_maker {
         }
     }
 
-    bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
+    # bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
+    bless $obj => $Object_stash{ $spec->{implementation_name} };
     $Moduloop::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
 
     if ( reftype $obj eq 'HASH' ) {
@@ -353,10 +397,14 @@ sub _object_maker {
 }
 
 sub _add_class_methods {
-    my ($spec, $stash) = @_;
+    my ($spec, $stash, $opt) = @_;
 
     $spec->{class_methods} ||= $stash->get_all_symbols('CODE');
-    _add_default_constructor($spec);
+
+    if (    ! defined $opt->{default_constructor}
+         || $opt->{default_constructor} != 0 ) {
+        _add_default_constructor($spec);
+    }
 
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
         $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
