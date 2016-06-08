@@ -22,6 +22,7 @@ use Moduloop::_Guts;
 our $VERSION = '0.000001';
 $VERSION = eval $VERSION;
 
+my $Class_count = 0;
 my %Bound_implementation_of;
 my %Interface_for;
 my %Util_class;
