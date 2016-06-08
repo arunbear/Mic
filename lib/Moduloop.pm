@@ -48,14 +48,18 @@ sub import {
 sub assemble {
     my (undef, $spec) = @_;
 
-    my $caller_pkg = (caller)[0];
+    my $cls_stash;
+    if ( ! $spec->{name} ) {
+        my $caller_pkg = (caller)[0];
 
-    if ( $caller_pkg eq __PACKAGE__ ) {
-        $caller_pkg = (caller 1)[0];
+        if ( $caller_pkg eq __PACKAGE__ ) {
+            $caller_pkg = (caller 1)[0];
+        }
+        $cls_stash = Package::Stash->new($caller_pkg);
+        $spec = { %$spec, %{ $cls_stash->get_symbol('%__meta__') || {} } };
+        $spec->{name} = $caller_pkg;
     }
-    my $cls_stash = Package::Stash->new($caller_pkg);
-    $spec = { %{ $spec || {} }, %{ $cls_stash->get_symbol('%__meta__') || {} } };
-    $spec->{name} = $caller_pkg;
+    $spec->{name} ||= "Moduloop::Class_${\ ++$Class_count }";
 
     my @args = %$spec;
     validate(@args, {
@@ -67,6 +71,7 @@ sub assemble {
         name => { type => SCALAR, optional => 1 },
         no_attribute_vars => { type => BOOLEAN, optional => 1 },
     });
+    $cls_stash    ||= Package::Stash->new($spec->{name});
 
     my $obj_stash;
 
