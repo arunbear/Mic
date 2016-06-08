@@ -45,6 +45,13 @@ sub import {
     }
 }
 
+sub load_class {
+    my ($class, $spec) = @_;
+
+    $spec->{name} ||= "Moduloop::Class_${\ ++$Class_count }";
+    $class->assemble($spec);
+}
+
 sub assemble {
     my (undef, $spec) = @_;
 
@@ -59,7 +66,6 @@ sub assemble {
         $spec = { %$spec, %{ $cls_stash->get_symbol('%__meta__') || {} } };
         $spec->{name} = $caller_pkg;
     }
-    $spec->{name} ||= "Moduloop::Class_${\ ++$Class_count }";
 
     my @args = %$spec;
     validate(@args, {
