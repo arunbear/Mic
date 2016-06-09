@@ -946,11 +946,9 @@ If this is set to a true value, then the corresponding key/value pair need not b
 A hash that maps a description to a unary predicate (i.e. a sub ref that takes one value and returns true or false).
 The default constructor will call these predicates to validate the parameters passed to it.
 
-=head3 implementation => STRING | HASHREF
+=head3 implementation => STRING
 
 The name of a package that defines the subroutines declared in the interface.
-
-Alternatively an implementation can be hashref as shown in the synopsis above.
 
 L<Moduloop::Implementation> describes how implementations are configured.
 
