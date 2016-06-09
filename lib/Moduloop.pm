@@ -71,7 +71,7 @@ sub assemble {
     validate(@args, {
         interface => { type => ARRAYREF | SCALAR },
         implementation => { type => SCALAR },
-        construct_with => { type => HASHREF, optional => 1 },
+        constructor    => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
         build_args     => { type => CODEREF, optional => 1 },
         name => { type => SCALAR, optional => 1 },
@@ -401,17 +401,13 @@ sub _make_builder_class {
     };
 
     $method{assert} = sub {
-        my (undef, $slot, $val) = @_;
+        shift;
+        my ($slot, $val) = @_;
 
-        return unless exists $spec->{construct_with}{$slot};
-
-        my $meta = $spec->{construct_with}{$slot};
-
-        for my $desc ( keys %{ $meta->{assert} || {} } ) {
-            my $code = $meta->{assert}{$desc};
-            $code->($val)
-              or assert_failed error => "Parameter '$slot' failed check '$desc'";
-        }
+        return unless exists $spec->{constructor}{kv_args}{$slot};
+        validate(@_, {
+            $slot => $spec->{constructor}{kv_args}{$slot},
+        });
     };
 
     my $class_var_stash = Package::Stash->new("$spec->{name}::__ClassVar");
@@ -435,9 +431,11 @@ sub _make_builder_class {
 sub _add_default_constructor {
     my ($spec) = @_;
 
-    if ( ! exists $spec->{class_methods}{new} ) {
-        $spec->{class_methods}{new} = sub {
+    my $sub_name = $spec->{constructor}{name} || 'new';
+    if ( ! exists $spec->{class_methods}{$sub_name} ) {
+        $spec->{class_methods}{$sub_name} = sub {
             my $class = shift;
+            validate(@_, $spec->{constructor}{kv_args} || {});
             my ($arg);
 
             if ( scalar @_ == 1 ) {
@@ -446,20 +444,10 @@ sub _add_default_constructor {
             elsif ( scalar @_ > 1 ) {
                 $arg = { @_ };
             }
-            if (my @unknown = grep { ! exists $spec->{construct_with}{$_} } keys %$arg) {
-                confess "Unknown args: [@unknown]";
-            }
 
             my $builder_class = builder_class($class);
             my $obj = $builder_class->new_object;
-            for my $name ( keys %{ $spec->{construct_with} } ) {
-
-                if ( ! $spec->{construct_with}{$name}{optional} && ! defined $arg->{$name} ) {
-                    confess "Param '$name' was not provided.";
-                }
-                if ( defined $arg->{$name} ) {
-                    $builder_class->assert($name, $arg->{$name});
-                }
+            for my $name ( keys %{ $spec->{constructor}{kv_args} } ) {
 
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name }
                                         keys %{ $spec->{implementation}{has} };
@@ -499,7 +487,7 @@ sub _add_default_constructor {
 sub _copy_assertions {
     my ($spec, $name, $attr) = @_;
 
-    my $meta = $spec->{construct_with}{$name};
+    my $meta = $spec->{constructor}{kv_args}{$name};
 
     for my $desc ( keys %{ $meta->{assert} || {} } ) {
         next if exists $spec->{implementation}{has}{$attr}{assert}{$desc};
