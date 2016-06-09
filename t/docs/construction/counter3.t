@@ -10,4 +10,4 @@ is $counter->next => 11;
 is $counter->next => 12;
 
 throws_ok { Example::Construction::Counter_v3->new('abc') } 
-          qr/Parameter 'start' failed check 'is_integer'/;
+          qr/The 'start' parameter \Q("abc")\E to Example::Construction::Counter_v3::__Util::assert did not pass the 'is_integer' callback/;

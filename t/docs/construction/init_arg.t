@@ -9,6 +9,6 @@ is $counter->next => 10;
 is $counter->next => 11;
 is $counter->next => 12;
 
-throws_ok { Example::Construction::Counter->new } qr/Param 'start' was not provided/;
+throws_ok { Example::Construction::Counter->new } qr/Mandatory parameter 'start' missing/;
 throws_ok { Example::Construction::Counter->new(start => 'abc') } 
-          qr/Parameter 'start' failed check 'is_integer'/;
+          qr/The 'start' parameter \Q("abc")\E to Example::Construction::Counter::new did not pass the 'is_integer' callback/;

@@ -3,7 +3,7 @@ package Example::Construction::Set_v1;
 use Moduloop
 
     interface => [qw( add has size )],
-    construct_with => { items => {} },
+    constructor => { kv_args => { items => {} } },
 
     build_args => sub {
         my ($class, @items) = @_;
