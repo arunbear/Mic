@@ -1,7 +1,7 @@
 =head1 The Default constructor
 
-The Default constructor will accept any named parameters defined by 'construct_with'. In the absence of a 'construct_with'
-declaration, any parameters passed to the default constructor are ignored.
+The Default constructor will accept any named parameters defined by 'constructor/kv_args'. In the absence of such configuration,
+any parameters passed to the default constructor are ignored.
 
 Imagine a counter that starts from a user supplied value, so we can use it this way
 
@@ -14,7 +14,7 @@ Imagine a counter that starts from a user supplied value, so we can use it this 
     is $counter->next => 11;
     is $counter->next => 12;
 
-To make this work, we use 'construct_with' to define the constructor parameter
+To make this work, we use 'construct/kv_args' to define the constructor parameter
 representing the starting value.
 
     package Example::Construction::Counter;
@@ -22,12 +22,14 @@ representing the starting value.
     use Moduloop
         interface => [ qw( next ) ],
 
-        construct_with => {
-            start => {
-                assert => {
-                    is_integer => sub { $_[0] =~ /^\d+$/ }
+        constructor => { 
+            kv_args => {
+                start => {
+                    callbacks => {
+                        is_integer => sub { $_[0] =~ /^\d+$/ }
+                    },
                 },
-            },
+            }
         },
         implementation => 'Example::Construction::Acme::Counter';
 
@@ -73,7 +75,7 @@ This can be acheieved using the "build_args" declaration, with which we use a su
     use Moduloop
         interface => [qw( add has )],
 
-        construct_with => { items => {} },
+        constructor => { kv_args => { items => {} } },
 
         build_args => sub {
             my ($class, @items) = @_;
@@ -198,12 +200,14 @@ We'll rewrite the counter example above and also show the more manual way of usi
     our %__meta__ = (
         interface => [ qw( next ) ],
 
-        construct_with => {
-            start => {
-                assert => {
-                    is_integer => sub { $_[0] =~ /^\d+$/ }
+        constructor => { 
+            kv_args => {
+                start => {
+                    callbacks => {
+                        is_integer => sub { $_[0] =~ /^\d+$/ }
+                    },
                 },
-            },
+            }
         },
         implementation => 'Example::Construction::Acme::Counter',
     );
@@ -226,12 +230,14 @@ This can be simplified using the 'class_methods' declaration
     use Moduloop
         interface => [ qw( next ) ],
 
-        construct_with => {
-            start => {
-                assert => {
-                    is_integer => sub { $_[0] =~ /^\d+$/ }
+        constructor => { 
+            kv_args => {
+                start => {
+                    callbacks => {
+                        is_integer => sub { $_[0] =~ /^\d+$/ }
+                    },
                 },
-            },
+            }
         },
         class_methods => {
             new => sub {

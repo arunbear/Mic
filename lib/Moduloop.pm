@@ -848,17 +848,14 @@ A class can be defined when importing Moduloop e.g.
     use Moduloop
         interface => [ qw( list of methods ) ],
 
-        construct_with => {
-            arg_name => {
-                assert => {
-                    desc => sub {
-                        # return true if arg is valid
-                        # or false otherwise
-                    }
+        constructor => { 
+            kv_args => {
+                # A Params::Validate spec
+                arg_name => {
+                    # ...
                 },
-                optional => $boolean,
-            },
-            # ... other args
+                # ... other args
+            }
         },
 
         implementation => 'An::Implementation::Package',
@@ -917,22 +914,19 @@ An exception is raised if this is empty or missing.
 The messages named in this array must have corresponding subroutine definitions in a declared implementation,
 otherwise an exception is raised.
 
-=head3 construct_with => HASHREF
+=head3 constructor => HASHREF
 
-An optional reference to a hash whose keys are the names of keyword parameters that are passed to the default constructor.
-
-The values these keys are mapped to are themselves hash refs which can have the following keys.
+An optional reference to a hash which can be used to customise the behaviour of the default constructor.
 
 See L<Moduloop::Manual::Construction> for more about construction.
 
-=head4 optional => BOOLEAN (Default: false)
+=head4 name => STRING (Default: 'new')
 
-If this is set to a true value, then the corresponding key/value pair need not be passed to the constructor.
+The name of the constructor.
 
-=head4 assert => HASHREF
+=head4 kv_args => HASHREF
 
-A hash that maps a description to a unary predicate (i.e. a sub ref that takes one value and returns true or false).
-The default constructor will call these predicates to validate the parameters passed to it.
+A hash that usded to define and validate named parameters to the default constructor. See L<Params::Validate> (especially the C<validate> function) for how this validation works.
 
 =head3 implementation => STRING
 
