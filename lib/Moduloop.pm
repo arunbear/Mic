@@ -69,7 +69,7 @@ sub assemble {
 
     my @args = %$spec;
     validate(@args, {
-        interface => { type => ARRAYREF | SCALAR },
+        interface => { type => ARRAYREF | HASHREF | SCALAR },
         implementation => { type => SCALAR },
         constructor    => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
@@ -699,6 +699,9 @@ sub _interface {
         interface   => [qw( AUTOLOAD can DOES DESTROY )],
         semiprivate => [qw( BUILD )],
     );
+    if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
+        $spec->{$type} = [ keys %{ $spec->{$type} } ];
+    }
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
 }
 
