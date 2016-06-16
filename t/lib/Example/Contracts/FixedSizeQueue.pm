@@ -2,8 +2,24 @@ package Example::Contracts::FixedSizeQueue;
 
 use Moduloop
     interface => {
-        push => {},
-        pop => {},
+        push => {
+            ensure => {
+                size_increased => sub {
+                    my ($self, $old) = @_;
+                    $self->size == $old->size + 1;
+                },
+            }
+        },
+
+        pop => {
+            require => {
+                not_empty => sub {
+                    my ($self) = @_;
+                    $self->size > 0;
+                },
+            }
+        },
+
         size => {},
     },
 
