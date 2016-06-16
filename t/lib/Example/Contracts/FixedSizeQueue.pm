@@ -5,14 +5,18 @@ use Moduloop
         head => {},
         tail => {},
         size => {},
+        max_size => {},
 
         push => {
             ensure => {
                 size_increased => sub {
                     my ($self, $old) = @_;
-                    $self->size == $old->size + 1;
+
+                    return $self->size < $self->max_size
+                      ? $self->size == $old->size + 1
+                      : 1;
                 },
-                size_increased => sub {
+                tail_updated => sub {
                     my ($self, $old, $results, $item) = @_;
                     $self->tail == $item;
                 },
