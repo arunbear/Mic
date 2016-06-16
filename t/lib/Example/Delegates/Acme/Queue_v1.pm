@@ -6,6 +6,16 @@ use Moduloop::Implementation
     }, 
 ;
 
+sub head {
+    my ($self) = @_;
+    $self->{$Q}[0];
+}
+
+sub tail {
+    my ($self) = @_;
+    $self->{$Q}[-1];
+}
+
 sub size {
     my ($self) = @_;
     scalar @{ $self->{$Q} };

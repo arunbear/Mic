@@ -2,11 +2,19 @@ package Example::Contracts::FixedSizeQueue;
 
 use Moduloop
     interface => {
+        head => {},
+        tail => {},
+        size => {},
+
         push => {
             ensure => {
                 size_increased => sub {
                     my ($self, $old) = @_;
                     $self->size == $old->size + 1;
+                },
+                size_increased => sub {
+                    my ($self, $old, $results, $item) = @_;
+                    $self->tail == $item;
                 },
             }
         },
@@ -17,10 +25,14 @@ use Moduloop
                     my ($self) = @_;
                     $self->size > 0;
                 },
+            },
+            ensure => {
+                returns_old_head => sub {
+                    my ($self, $old, $results) = @_;
+                    $results->[0] == $old->head;
+                },
             }
         },
-
-        size => {},
     },
 
     constructor => {
@@ -31,7 +43,7 @@ use Moduloop
         }
     },
 
-    implementation => 'Example::Delegates::Acme::FixedSizeQueue_v1',
+    implementation => 'Example::Contracts::Acme::FixedSizeQueue_v1',
 ;
 
 1;
