@@ -10,6 +10,7 @@ use Moduloop::Implementation
 
         max_size => { 
             init_arg => 'max_size',
+            reader   => 'max_size',
         },
     }, 
     forwards => [
