@@ -2,6 +2,7 @@ package Moduloop;
 
 use strict;
 use 5.008_005;
+use Class::Method::Modifiers qw(install_modifier);
 use Carp;
 use Carp::Assert::More;
 use Hash::Util qw( lock_keys );
@@ -16,6 +17,7 @@ use Exception::Class (
     'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
     'Moduloop::Error::MethodDeclaration',
     'Moduloop::Error::TraitConflict',
+    'Moduloop::Error::ContractViolation',
 );
 use Moduloop::_Guts;
 
@@ -24,16 +26,27 @@ $VERSION = eval $VERSION;
 
 my $Class_count = 0;
 my %Bound_implementation_of;
+my %Contracts_for;
 my %Interface_for;
 my %Util_class;
 
 sub import {
     my ($class, %arg) = @_;
 
-    if ( my $bindings = $arg{bind} ) {
+    if ( $arg{bind} || $arg{contracts} ) {
 
-        foreach my $class ( keys %$bindings ) {
-            $Bound_implementation_of{$class} = $bindings->{$class};
+        if ( my $bindings = $arg{bind} ) {
+
+            foreach my $class ( keys %$bindings ) {
+                $Bound_implementation_of{$class} = $bindings->{$class};
+            }
+        }
+
+        if ( my $contracts = $arg{contracts} ) {
+
+            foreach my $class ( keys %$contracts ) {
+                $Contracts_for{$class} = $contracts->{$class};
+            }
         }
     }
     elsif ( my $methods = $arg{declare_interface} ) {
@@ -582,15 +595,33 @@ sub _add_methods {
     }
     _add_delegates($spec);
 
-    # use Data::Dump 'pp'; warn pp($spec->{name});
-    # require Enbugger; Enbugger->stop if $spec->{name} eq "Example::TraitLibs::FixedSizeQueue";
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         next unless $in_interface->{$name};
         $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub); 
+        _add_pre_conditions($spec, $stash, $name);
     }
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
         $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
     }
+}
+
+sub _add_pre_conditions {
+    my ($spec, $stash, $name) = @_;
+
+    return unless $Contracts_for{ $spec->{name} }{pre};
+    my $pre_cond_hash = $spec->{pre_and_post_conds}{$name}{require}
+      or return;
+
+    my $guard = sub {
+        foreach my $desc (keys %{ $pre_cond_hash }) {
+            my $sub = $pre_cond_hash->{$desc};
+            $sub->(@_)
+              or Moduloop::Error::TraitConflict->throw(
+                    error => "Method '$name' failed precondition '$desc'"
+              );
+        }
+    };
+    install_modifier($stash->name, 'before', $name, $guard);
 }
 
 sub _add_autoload {
@@ -700,6 +731,7 @@ sub _interface {
         semiprivate => [qw( BUILD )],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
+        $spec->{pre_and_post_conds} = $spec->{$type};
         $spec->{$type} = [ keys %{ $spec->{$type} } ];
     }
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
