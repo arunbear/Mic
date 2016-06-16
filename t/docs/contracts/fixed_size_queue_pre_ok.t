@@ -1,6 +1,8 @@
 use strict;
 use Test::Lib;
 use Test::More;
+use Moduloop
+    contracts => { 'Example::Contracts::FixedSizeQueue' => { pre => 1 } };
 use Example::Contracts::FixedSizeQueue;
 
 my $q = Example::Contracts::FixedSizeQueue->new(max_size => 3);
