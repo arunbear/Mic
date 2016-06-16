@@ -11,6 +11,7 @@ use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
 use Scalar::Util qw( reftype );
+use Storable qw( dclone );
 use Sub::Name;
 
 use Exception::Class (
@@ -599,6 +600,7 @@ sub _add_methods {
         next unless $in_interface->{$name};
         $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub); 
         _add_pre_conditions($spec, $stash, $name);
+        _add_post_conditions($spec, $stash, $name);
     }
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
         $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
@@ -622,6 +624,33 @@ sub _add_pre_conditions {
         }
     };
     install_modifier($stash->name, 'before', $name, $guard);
+}
+
+sub _add_post_conditions {
+    my ($spec, $stash, $name) = @_;
+
+    return unless $Contracts_for{ $spec->{name} }{post};
+    my $post_cond_hash = $spec->{pre_and_post_conds}{$name}{ensure}
+      or return;
+
+    my $guard = sub {
+        my $orig = shift;
+        my $self = shift;
+
+        my $old = dclone($self);
+        my $results = [$orig->($self, @_)];
+
+        foreach my $desc (keys %{ $post_cond_hash }) {
+            my $sub = $post_cond_hash->{$desc};
+            $sub->($self, $old, $results, @_)
+              or Moduloop::Error::TraitConflict->throw(
+                    error => "Method '$name' failed postcondition '$desc'"
+              );
+        }
+        return unless defined wantarray;
+        return wantarray ? @$results : $results->[0];
+    };
+    install_modifier($stash->name, 'around', $name, $guard);
 }
 
 sub _add_autoload {
