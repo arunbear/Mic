@@ -81,7 +81,7 @@ TraitLibs provide reusable implementation details, i.e. they solve the problem o
 
 =head1 CONFIGURATION
 
-A traitlib package can be configured either using Moduloop::TraitLib or with a package variable C<%__meta__>. Both methods make use of the following keys:
+A traitlib package is configured using Moduloop::TraitLib and providing a hash with the following keys:
 
 =head2 has => HASHREF
 
@@ -135,9 +135,41 @@ As this syntax is somewhat cumbersome, it is also possible to call a semiprivate
 
 but this is only valid if called within the object's implementation package, or a traitlib that the implementation is composed out of.
 
-=head2 traitlib => 1
+=head1 EXPORTED FUNCTIONS
 
-Only needed if Moduloop::TraitLib is not used. This indicates that the package is a TraitLib.
+The following functions are exported by default, and are intended for use in traitlibs which may be consumed by either hash
+or array based implementations.
+
+=head2 GET_ATTR($OBJ, $SYM)
+
+Returns the value of the attribute named by $SYM
+
+Sample code:
+
+    package Example::TraitLibs::TraitLib::Pushable;
+
+    use Moduloop::TraitLib
+        has  => {
+            items => { default => sub { [ ] } },
+        }, 
+    ;
+
+    sub size {
+        my ($self) = @_;
+        scalar @{ GET_ATTR($self, $ITEMS) };
+    }
+
+    sub push {
+        my ($self, $val) = @_;
+
+        push @{ GET_ATTR($self, $ITEMS) }, $val;
+    }
+
+    1;
+
+=head2 SET_ATTR($OBJ, $SYM, $VAL)
+
+Sets the value of the attribute named by $SYM to $VAL
 
 =head1 EXAMPLES
 
