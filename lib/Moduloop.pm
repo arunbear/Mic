@@ -801,7 +801,7 @@ __END__
 
 =head1 NAME
 
-Moduloop - Simplifies the creation of loosely coupled object oriented code.
+Moduloop - Modular OOP made easy.
 
 =head1 SYNOPSIS
 
@@ -904,8 +904,9 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Moduloop (Modular OOP [rocks!]) is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming>, which means
-there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
+Moduloop is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming> and loosely coupled.
+
+Modularity means there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
 don't need to know about.
 
 Classes are built from a specification that declares the interface of the class (i.e. what commands instances of the classs respond to),
@@ -1054,7 +1055,7 @@ Also note that for any class C<Foo> created using Moduloop, and for any object c
 =head1 BUGS
 
 Please report any bugs or feature requests via the GitHub web interface at
-L<https://github.com/arunbear/minions/issues>.
+L<https://github.com/arunbear/Moduloop/issues>.
 
 =head1 ACKNOWLEDGEMENTS
 
