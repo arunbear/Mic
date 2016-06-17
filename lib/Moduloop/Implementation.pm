@@ -113,7 +113,7 @@ behaviours described by the class interface.
 
 =head1 CONFIGURATION
 
-An implementation package can be configured either using Moduloop::Implementation or with a package variable C<%__meta__>. Both methods make use of the following keys:
+A implementation package is configured using Moduloop::Implementation and providing a hash with the following keys:
 
 =head2 has => HASHREF
 
