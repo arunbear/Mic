@@ -50,34 +50,34 @@ __END__
 
 =head1 NAME
 
-Moduloop::Imp
+Moduloop::ArrayImp
 
 =head1 SYNOPSIS
 
-    package Example::Construction::Acme::Set_v1;
+    package Example::ArrayImps::HashSet;
 
-    use Moduloop::Imp
-        has => {
-            set => {
-                default => sub { {} },
-                init_arg => 'items',
-                map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
-            }
-        },
+    use Moduloop::ArrayImp
+        has => { set => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+
+        exists $self->[ $SET ]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+
+        ++$self->[ $SET ]{$e};
     }
 
     1;
 
 =head1 DESCRIPTION
 
-Moduloop::Imp is an alias of L<Moduloop::Implementation>, provided for convenience.
+Moduloop::ArrayImp can be used to create implementations based on blessed array refs (which may be desirable due to 
+having faster access and less memory usage compared to hash based objects). 
+
+Moduloop::ArrayImp is used in the same way as L<Moduloop::Implementation>,
+the only difference being that the former creates array based objects.
