@@ -47,6 +47,9 @@ sub import {
 
             foreach my $class ( keys %$contracts ) {
                 $Contracts_for{$class} = $contracts->{$class};
+                if ( $Contracts_for{$class}{all} ) {
+                    $Contracts_for{$class} = { map { $_ => 1 } qw/pre post invariants/ };
+                }
             }
         }
     }
