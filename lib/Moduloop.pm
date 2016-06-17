@@ -85,6 +85,7 @@ sub assemble {
     validate(@args, {
         interface => { type => ARRAYREF | HASHREF | SCALAR },
         implementation => { type => SCALAR },
+        invariants     => { type => HASHREF, optional => 1 },
         constructor    => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
         build_args     => { type => CODEREF, optional => 1 },
@@ -119,7 +120,7 @@ sub assemble {
             $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
         }
     }
-    $obj_stash = Package::Stash->new("$spec->{name}::__Moduloop");
+    $obj_stash = Package::Stash->new("$spec->{implementation}{package}::__Assembled");
 
     _prep_interface($spec);
     _compose_traitlibs($spec);
@@ -602,9 +603,33 @@ sub _add_methods {
         _add_pre_conditions($spec, $stash, $name);
         _add_post_conditions($spec, $stash, $name);
     }
+    _add_invariants($spec, $stash);
     while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
         $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
     }
+}
+
+sub _add_invariants {
+    my ($spec, $stash) = @_;
+
+    return unless $Contracts_for{ $spec->{name} }{invariants};
+    my $inv_hash = $spec->{invariants} 
+      or return;
+
+    my $guard = sub {
+        # skip methods called by the invariant
+        return if (caller 1)[0] eq $spec->{name};
+
+        foreach my $desc (keys %{ $inv_hash }) {
+            my $sub = $inv_hash->{$desc};
+            $sub->(@_)
+              or Moduloop::Error::ContractViolation->throw(
+                    error => "Invariant '$desc' violated",
+                    show_trace => 1,
+              );
+        }
+    };
+    install_modifier($stash->name, 'after', @{ $spec->{interface} }, $guard);
 }
 
 sub _add_pre_conditions {
