@@ -56,10 +56,10 @@ sub add_obfu_name {
     $Moduloop::_Guts::obfu_name{$slot} = $sym_val;
 
     my $prefix = '';
-    if($slot eq '' || $arg->{attr_style} eq '_2') {
+    if($slot eq '') {
         $prefix = '__';
     }
-    elsif($arg->{attr_style} eq 'uc' || ! $arg->{attr_style}) {
+    else {
         $slot = uc $slot;
     }
     $stash->add_symbol(
@@ -327,15 +327,6 @@ L<Moduloop::TraitLib> describes how traitlibs are configured.
 =head2 semiprivate => ARRAYREF
 
 These are perhaps only useful when used in conjunction with TraitLibs. They work the same way as in L<Moduloop::TraitLib>.
-
-=head2 attr_style => SCALAR
-
-If this is set to the string C<'_2'>, then an attribute named 'foo' can be accessed via its object using the symbol C<$__foo> e.g.
-
-    # implementation defined using Moduloop::Implementation
-    $self->{$__foo}
-
-This was the default behaviour in Moduloop 0.000008 and earlier.
 
 =head1 PRIVATE ROUTINES
 
