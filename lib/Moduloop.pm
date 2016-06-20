@@ -1042,6 +1042,67 @@ The implementation of a class can be quite easily changed from user code e.g. af
 Foo and bar will be bound to fake implementations (e.g. to aid with testing), instead of the implementations defined in
 their respective modules.
 
+=head2 Interface Sharing
+
+=head3 declare_interface => ARRAYREF | HASHREF
+
+If two or more classes share a common interface, we can reduce duplication by factoring out that interface using C<declare_interface>, which expects an interface specified in the same way as C<interface> 
+
+Suppose we wanted to use both versions of the set class (from the synopsis) in the same program.
+
+The first step is to extract the common interface:
+
+    package Example::Usage::SetInterface;
+
+    use Moduloop
+        declare_interface => [qw( add has )];
+    1;
+
+=head3 Moduloop->load_class(HASHREF)
+
+Then implementations of this interface can be loaded via C<load_class>:
+
+    use Test::More tests => 4;
+    use Example::Usage::SetInterface;
+
+    my $HashSetClass = Moduloop->load_class({
+        interface      => 'Example::Usage::SetInterface',
+        implementation => 'Example::Synopsis::HashSet',
+    });
+
+    Moduloop->load_class({
+        interface      => 'Example::Usage::SetInterface',
+        implementation => 'Example::Synopsis::ArraySet',
+        name           => 'ArraySet',
+    });
+
+    my $a_set = 'ArraySet'->new;
+    ok ! $a_set->has(1);
+    $a_set->add(1);
+    ok $a_set->has(1);
+
+    my $h_set = $HashSetClass->new;
+    ok ! $h_set->has(1);
+    $h_set->add(1);
+    ok $h_set->has(1);
+
+C<load_class> expects a hashref with the following keys:
+
+=head4 interface
+
+The name of an interface declared via C<declare_interface>.
+
+=head4 implementation
+
+The name of an implementation package.
+
+=head4 name (optional)
+
+The name of the class via which objects are created.
+
+This is optional and if not given, a synthetic name is used. In either case this name is 
+returned by C<load_class>
+
 =head2 Introspection
 
 Behavioural and trait introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list (or array ref depending on context) of methods or traitlibs respectiively supported by the object.
