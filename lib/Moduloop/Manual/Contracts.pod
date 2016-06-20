@@ -105,3 +105,30 @@ of description => subroutine pairs.
 Each such subroutine is a method that receives the object as its only parameter,
 and returns either a true or false result. If false is returned, an exception is raised indicating which invariant
 was violated.
+
+=head1 Enabling Contracts
+
+Contracts are not run by default, because they can result in many additional subroutine calls.
+
+To enable them, use the C<contracts> specifier when using Moduloop, e.g. to activate contracts
+for the Example::Contracts::FixedSizeQueue class/interface, the following can be done:
+
+    use Moduloop
+        contracts => { 'Example::Contracts::FixedSizeQueue' => { all => 1 } };
+
+turns on preconditions, postconditions and invariants.
+
+    use Moduloop
+        contracts => { 'Example::Contracts::FixedSizeQueue' => { pre => 1 } };
+
+turns on preconditions only.
+
+    use Moduloop
+        contracts => { 'Example::Contracts::FixedSizeQueue' => { post => 1 } };
+
+turns on postconditions only.
+
+    use Moduloop
+        contracts => { 'Example::Contracts::FixedSizeQueue' => { invariants => 1 } };
+
+turns on invariants only.
