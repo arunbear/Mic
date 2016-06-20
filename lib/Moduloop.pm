@@ -1067,6 +1067,8 @@ The first step is to extract the common interface:
         declare_interface => [qw( add has )];
     1;
 
+C<declare_interface> can be used in conjunction with C<invariants>, C<constructor> and C<class_methods>.
+
 =head3 Moduloop->load_class(HASHREF)
 
 Then implementations of this interface can be loaded via C<load_class>:
