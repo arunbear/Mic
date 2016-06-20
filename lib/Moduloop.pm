@@ -28,7 +28,7 @@ $VERSION = eval $VERSION;
 my $Class_count = 0;
 my %Bound_implementation_of;
 my %Contracts_for;
-my %Interface_for;
+my %Spec_for;
 my %Util_class;
 
 sub import {
@@ -53,9 +53,10 @@ sub import {
             }
         }
     }
-    elsif ( my $methods = $arg{declare_interface} ) {
+    elsif ( $arg{declare_interface} ) {
         my $caller_pkg = (caller)[0];
-        $Interface_for{$caller_pkg} = $methods;
+        $arg{interface} = delete $arg{declare_interface};
+        $Spec_for{$caller_pkg} = \%arg;
     }
     else {
         $class->assemble(\%arg);
@@ -155,7 +156,7 @@ sub _prep_interface {
     my $count = 0;
     {
 
-        if (my $methods = $Interface_for{ $spec->{interface} }) {
+        if (my $methods = $Spec_for{ $spec->{interface} }{interface}) {
             $spec->{interface_name} = $spec->{interface};
             $spec->{interface} = $methods;
         }
