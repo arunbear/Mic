@@ -999,12 +999,16 @@ Here the interface and implementation packages are both in the same file.
 
 The meaning of the keys in the specification hash are described next.
 
-=head3 interface => ARRAYREF
+=head3 interface => ARRAYREF | HASHREF
 
-A reference to an array containing the messages that minions belonging to this class should respond to.
+The interface is a list of messages that objects belonging to this class should respond to.
+
+It can be specified either as a reference to an array (which is how it appears in most examples in this documentation),
+or as a reference to a hash, in which case the values of the hash are L<contracts|Moduloop::Manual::Contracts> on the keys.
+
 An exception is raised if this is empty or missing.
 
-The messages named in this array must have corresponding subroutine definitions in a declared implementation,
+The messages named in this list must have corresponding subroutine definitions in a declared implementation,
 otherwise an exception is raised.
 
 =head3 constructor => HASHREF
@@ -1026,6 +1030,10 @@ A hash that usded to define and validate named parameters to the default constru
 The name of a package that defines the subroutines declared in the interface.
 
 L<Moduloop::Implementation> describes how implementations are configured.
+
+=head3 invariants => HASHREF
+
+See L<Moduloop::Manual::Contracts> for more details about invariants.
 
 =head2 Bindings
 

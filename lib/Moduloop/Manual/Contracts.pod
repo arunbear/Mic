@@ -1,0 +1,107 @@
+=head1 An Example
+
+The following example illustrates the use of contracts, which are assertions that constrain the visible behaviour of objects.
+
+    package Example::Contracts::FixedSizeQueue;
+
+    use Moduloop
+        interface => {
+            head => {},
+            tail => {},
+            size => {},
+            max_size => {},
+
+            push => {
+                ensure => {
+                    size_increased => sub {
+                        my ($self, $old) = @_;
+
+                        return $self->size < $self->max_size
+                          ? $self->size == $old->size + 1
+                          : 1;
+                    },
+                    tail_updated => sub {
+                        my ($self, $old, $results, $item) = @_;
+                        $self->tail == $item;
+                    },
+                }
+            },
+
+            pop => {
+                require => {
+                    not_empty => sub {
+                        my ($self) = @_;
+                        $self->size > 0;
+                    },
+                },
+                ensure => {
+                    returns_old_head => sub {
+                        my ($self, $old, $results) = @_;
+                        $results->[0] == $old->head;
+                    },
+                }
+            },
+        },
+
+        invariants => {
+            max_size_not_exceeded => sub {
+                my ($self) = @_;
+                $self->size <= $self->max_size;
+            },
+        },
+
+        constructor => {
+            kv_args => {
+                max_size => { 
+                    callbacks => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
+                },
+            }
+        },
+
+        implementation => 'Example::Contracts::Acme::FixedSizeQueue_v1',
+    ;
+
+    1;
+
+To define contracts, the interface is specified as a hash of hashes, where the keys are the methods in the interface,
+and values are contract definitions.
+
+=head1 Types of Contracts
+
+=head2 Preconditions (require)
+
+A precondition is an assertion that is run before a given method, that defines one or more conditions that must
+be met in order for the given method to be callable.
+
+Preconditions are specified using the C<require> key of a contract definition. The corresponding value is a hash
+of description => subroutine pairs.
+
+Each such subroutine is a method that receives the same parameters as the method the precondition is attached to,
+and returns either a true or false result. If false is returned, an exception is raised indicating which precondition
+was violated.
+
+=head2 Postconditions (ensure)
+
+A postcondition is an assertion that is run after a given method, that defines one or more conditions that must
+be met after the given method has been called.
+
+Postconditions are specified using the C<ensure> key of a contract definition. The corresponding value is a hash
+of description => subroutine pairs.
+
+Each such subroutine is a method that receives the following parameters: the object as it is after the method call,
+the object as it was before the method call, the results of the method call stored in array ref, and any parameters
+that were passed to the method.
+
+The subroutine should return either a true or false result. If false is returned, an exception is raised indicating which postcondition was violated.
+
+=head2 Invariants
+
+An invariant is an assertion that is run after every method in the interface, that defines one or more conditions that must
+be met after the method has been called.
+
+Invariants are specified using the C<invariants> key of a class/interface definition. The corresponding value is a hash
+of description => subroutine pairs.
+
+Each such subroutine is a method that receives the object as its only parameter,
+and returns either a true or false result. If false is returned, an exception is raised indicating which invariant
+was violated.
