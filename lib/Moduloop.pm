@@ -134,9 +134,9 @@ sub assemble {
     $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
+    _add_methods($spec, $obj_stash, $private_stash);
     _make_builder_class($spec);
     _add_class_methods($spec, $cls_stash);
-    _add_methods($spec, $obj_stash, $private_stash);
     _check_traitlib_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
@@ -429,6 +429,14 @@ sub _make_builder_class {
         });
     };
 
+    $method{check_invariants} = sub {
+        shift;
+        my ($obj) = @_;
+
+        return unless exists $spec->{invariant_guard};
+        $spec->{invariant_guard}->($obj);
+    };
+
     my $class_var_stash = Package::Stash->new("$spec->{name}::__ClassVar");
 
     $method{get_var} = sub {
@@ -488,6 +496,7 @@ sub _add_default_constructor {
             }
 
             $builder_class->build($obj, $arg);
+            $builder_class->check_invariants($obj);
             return $obj;
         };
 
