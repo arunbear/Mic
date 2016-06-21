@@ -604,13 +604,16 @@ sub _add_methods {
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         next unless $in_interface->{$name};
         $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub); 
+    }
+    while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
+        $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
+    }
+
+    foreach my $name ( @{ $spec->{interface} } ) {
         _add_pre_conditions($spec, $stash, $name);
         _add_post_conditions($spec, $stash, $name);
     }
     _add_invariants($spec, $stash);
-    while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
-        $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
-    }
 }
 
 sub _add_invariants {
@@ -620,7 +623,7 @@ sub _add_invariants {
     my $inv_hash = $spec->{invariant} 
       or return;
 
-    my $guard = sub {
+    $spec->{invariant_guard} ||= sub {
         # skip methods called by the invariant
         return if (caller 1)[0] eq $spec->{name};
 
@@ -633,7 +636,9 @@ sub _add_invariants {
               );
         }
     };
-    install_modifier($stash->name, 'after', @{ $spec->{interface} }, $guard);
+    foreach my $type ( qw[before after] ) {
+        install_modifier($stash->name, $type, @{ $spec->{interface} }, $spec->{invariant_guard});
+    }
 }
 
 sub _add_pre_conditions {
