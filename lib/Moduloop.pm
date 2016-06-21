@@ -48,7 +48,7 @@ sub import {
             foreach my $class ( keys %$contracts ) {
                 $Contracts_for{$class} = $contracts->{$class};
                 if ( $Contracts_for{$class}{all} ) {
-                    $Contracts_for{$class} = { map { $_ => 1 } qw/pre post invariants/ };
+                    $Contracts_for{$class} = { map { $_ => 1 } qw/pre post invariant/ };
                 }
             }
         }
@@ -89,7 +89,7 @@ sub assemble {
     validate(@args, {
         interface => { type => ARRAYREF | HASHREF | SCALAR },
         implementation => { type => SCALAR },
-        invariants     => { type => HASHREF, optional => 1 },
+        invariant     => { type => HASHREF, optional => 1 },
         constructor    => { type => HASHREF, optional => 1 },
         class_methods  => { type => HASHREF, optional => 1 },
         build_args     => { type => CODEREF, optional => 1 },
@@ -616,8 +616,8 @@ sub _add_methods {
 sub _add_invariants {
     my ($spec, $stash) = @_;
 
-    return unless $Contracts_for{ $spec->{name} }{invariants};
-    my $inv_hash = $spec->{invariants} 
+    return unless $Contracts_for{ $spec->{name} }{invariant};
+    my $inv_hash = $spec->{invariant} 
       or return;
 
     my $guard = sub {
@@ -1032,7 +1032,7 @@ The name of a package that defines the subroutines declared in the interface.
 
 L<Moduloop::Implementation> describes how implementations are configured.
 
-=head3 invariants => HASHREF
+=head3 invariant => HASHREF
 
 See L<Moduloop::Manual::Contracts> for more details about invariants.
 
@@ -1067,7 +1067,7 @@ The first step is to extract the common interface:
         declare_interface => [qw( add has )];
     1;
 
-C<declare_interface> can be used in conjunction with C<invariants>, C<constructor> and C<class_methods>.
+C<declare_interface> can be used in conjunction with C<invariant>, C<constructor> and C<class_methods>.
 
 =head3 Moduloop->load_class(HASHREF)
 

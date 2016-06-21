@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::More;
 use Moduloop
-    contracts => { 'Example::Contracts::FixedSizeQueue' => { invariants => 1 } };
+    contracts => { 'Example::Contracts::FixedSizeQueue' => { invariant => 1 } };
 use Example::Contracts::FixedSizeQueue;
 
 my $q = Example::Contracts::FixedSizeQueue->new(max_size => 3);

@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::Most;
 use Moduloop
-    contracts => { 'Example::Contracts::FixedSizeQueue' => { invariants => 1 } },
+    contracts => { 'Example::Contracts::FixedSizeQueue' => { invariant => 1 } },
     bind      => { 'Example::Contracts::FixedSizeQueue' => 'Example::Contracts::Acme::FixedSizeQueue_v5' };
 use Example::Contracts::FixedSizeQueue;
 

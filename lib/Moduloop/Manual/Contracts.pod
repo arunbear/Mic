@@ -43,7 +43,7 @@ The following example illustrates the use of contracts, which are assertions tha
             },
         },
 
-        invariants => {
+        invariant => {
             max_size_not_exceeded => sub {
                 my ($self) = @_;
                 $self->size <= $self->max_size;
@@ -99,7 +99,7 @@ The subroutine should return either a true or false result. If false is returned
 An invariant is an assertion that is run after every method in the interface, that defines one or more conditions that must
 be met after the method has been called.
 
-Invariants are specified using the C<invariants> key of a class/interface definition. The corresponding value is a hash
+Invariants are specified using the C<invariant> key of a class/interface definition. The corresponding value is a hash
 of description => subroutine pairs.
 
 Each such subroutine is a method that receives the object as its only parameter,
@@ -129,6 +129,6 @@ turns on preconditions only.
 turns on postconditions only.
 
     use Moduloop
-        contracts => { 'Example::Contracts::FixedSizeQueue' => { invariants => 1 } };
+        contracts => { 'Example::Contracts::FixedSizeQueue' => { invariant => 1 } };
 
 turns on invariants only.
