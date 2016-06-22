@@ -437,6 +437,24 @@ sub _make_builder_class {
         $spec->{invariant_guard}->($obj);
     };
 
+    $method{check_postconditions} = sub {
+        shift;
+        my ($obj, $arg) = @_;
+
+        return unless $Contracts_for{ $spec->{name} }{post};
+
+        my $post_cond_hash = $spec->{constructor}{ensure}
+          or return;
+
+        foreach my $desc (keys %{ $post_cond_hash }) {
+            my $sub = $post_cond_hash->{$desc};
+            $sub->($obj, $arg)
+              or Moduloop::Error::ContractViolation->throw(
+                    error => "Method '$spec->{constructor}{name}' failed postcondition '$desc'"
+              );
+        }
+    };
+
     my $class_var_stash = Package::Stash->new("$spec->{name}::__ClassVar");
 
     $method{get_var} = sub {
@@ -458,7 +476,8 @@ sub _make_builder_class {
 sub _add_default_constructor {
     my ($spec) = @_;
 
-    my $sub_name = $spec->{constructor}{name} || 'new';
+    $spec->{constructor}{name} ||= 'new';
+    my $sub_name = $spec->{constructor}{name};
     if ( ! exists $spec->{class_methods}{$sub_name} ) {
         $spec->{class_methods}{$sub_name} = sub {
             my $class = shift;
@@ -497,6 +516,7 @@ sub _add_default_constructor {
 
             $builder_class->build($obj, $arg);
             $builder_class->check_invariants($obj);
+            $builder_class->check_postconditions($obj, $arg);
             return $obj;
         };
 
@@ -686,7 +706,7 @@ sub _add_post_conditions {
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
             $sub->($self, $old, $results, @_)
-              or Moduloop::Error::TraitConflict->throw(
+              or Moduloop::Error::ContractViolation->throw(
                     error => "Method '$name' failed postcondition '$desc'"
               );
         }
