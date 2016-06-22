@@ -1060,6 +1060,12 @@ The name of the constructor.
 
 A hash that usded to define and validate named parameters to the default constructor. See L<Params::Validate> (especially the C<validate> function) for how this validation works.
 
+=head4 ensure => HASHREF
+
+A hash that specifies postconditions that the constructor must satisfy.
+
+Postconditions are described in L<Moduloop::Manual::Contracts>.
+
 =head3 implementation => STRING
 
 The name of a package that defines the subroutines declared in the interface.

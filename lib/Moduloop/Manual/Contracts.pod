@@ -55,6 +55,12 @@ The following example illustrates the use of contracts, which are assertions tha
                 max_size => { 
                     callbacks => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
                 },
+            },
+            ensure => {
+                zero_sized => sub {
+                    my ($self) = @_;
+                    $self->size == 0;
+                },
             }
         },
 
@@ -94,10 +100,12 @@ that were passed to the method.
 
 The subroutine should return either a true or false result. If false is returned, an exception is raised indicating which postcondition was violated.
 
+Postconditions can also be specified for the constructor.
+
 =head2 Invariants
 
-An invariant is an assertion that is run after every method in the interface, that defines one or more conditions that must
-be met after the method has been called.
+An invariant is an assertion that is run before and after every method in the interface (including the constructor), that defines one or more conditions that must
+be met before and after the method has been called.
 
 Invariants are specified using the C<invariant> key of a class/interface definition. The corresponding value is a hash
 of description => subroutine pairs.
