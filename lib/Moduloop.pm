@@ -401,6 +401,8 @@ sub _make_builder_class {
     my $stash = Package::Stash->new("$spec->{name}::__Util");
     $Util_class{ $spec->{name} } = $stash->name;
 
+    my $constructor_spec = _constructor_spec($spec);
+
     my %method = (
         new_object => \&_object_maker,
     );
@@ -423,9 +425,9 @@ sub _make_builder_class {
         shift;
         my ($slot, $val) = @_;
 
-        return unless exists $spec->{constructor}{kv_args}{$slot};
+        return unless exists $constructor_spec->{kv_args}{$slot};
         validate(@_, {
-            $slot => $spec->{constructor}{kv_args}{$slot},
+            $slot => $constructor_spec->{kv_args}{$slot},
         });
     };
 
@@ -443,14 +445,14 @@ sub _make_builder_class {
 
         return unless $Contracts_for{ $spec->{name} }{post};
 
-        my $post_cond_hash = $spec->{constructor}{ensure}
+        my $post_cond_hash = $constructor_spec->{ensure}
           or return;
 
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
             $sub->($obj, $arg)
               or Moduloop::Error::ContractViolation->throw(
-                    error => "Method '$spec->{constructor}{name}' failed postcondition '$desc'"
+                    error => "Method '$constructor_spec->{name}' failed postcondition '$desc'"
               );
         }
     };
@@ -476,12 +478,14 @@ sub _make_builder_class {
 sub _add_default_constructor {
     my ($spec) = @_;
 
-    $spec->{constructor}{name} ||= 'new';
-    my $sub_name = $spec->{constructor}{name};
+    my $constructor_spec = _constructor_spec($spec);
+
+    $constructor_spec->{name} ||= 'new';
+    my $sub_name = $constructor_spec->{name};
     if ( ! exists $spec->{class_methods}{$sub_name} ) {
         $spec->{class_methods}{$sub_name} = sub {
             my $class = shift;
-            validate(@_, $spec->{constructor}{kv_args} || {});
+            validate(@_, $constructor_spec->{kv_args} || {});
             my ($arg);
 
             if ( scalar @_ == 1 ) {
@@ -493,7 +497,7 @@ sub _add_default_constructor {
 
             my $builder_class = builder_class($class);
             my $obj = $builder_class->new_object;
-            for my $name ( keys %{ $spec->{constructor}{kv_args} } ) {
+            for my $name ( keys %{ $constructor_spec->{kv_args} } ) {
 
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name }
                                         keys %{ $spec->{implementation}{has} };
@@ -535,13 +539,22 @@ sub _add_default_constructor {
 sub _copy_assertions {
     my ($spec, $name, $attr) = @_;
 
-    my $meta = $spec->{constructor}{kv_args}{$name};
+    my $constructor_spec = _constructor_spec($spec);
+    my $meta = $constructor_spec->{kv_args}{$name};
 
     for my $desc ( keys %{ $meta->{assert} || {} } ) {
         next if exists $spec->{implementation}{has}{$attr}{assert}{$desc};
 
         $spec->{implementation}{has}{$attr}{assert}{$desc} = $meta->{assert}{$desc};
     }
+}
+
+sub _constructor_spec {
+    my ($spec) = @_;
+
+    ! ref $spec->{interface}
+        ? $Spec_for{ $spec->{interface} }{constructor}
+        : $spec->{constructor};
 }
 
 sub _add_methods {
