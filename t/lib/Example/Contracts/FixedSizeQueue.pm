@@ -51,6 +51,12 @@ use Moduloop
             max_size => { 
                 callbacks => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
             },
+        },
+        ensure => {
+            zero_sized => sub {
+                my ($self) = @_;
+                $self->size == 0;
+            },
         }
     },
 
