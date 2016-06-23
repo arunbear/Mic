@@ -663,9 +663,9 @@ sub _add_invariants {
 
     return unless $Contracts_for{ $spec->{name} }{invariant};
     my $inv_hash = 
-      (ref $spec->{interface}
-          ? $spec->{invariant}
-          : $Spec_for{ $spec->{interface} }{invariant})
+      (! ref $spec->{interface}
+          ? $Spec_for{ $spec->{interface} }{invariant}
+          : $spec->{invariant})
       or return;
 
     $spec->{invariant_guard} ||= sub {
