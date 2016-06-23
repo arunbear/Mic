@@ -562,9 +562,10 @@ sub _copy_assertions {
 sub _constructor_spec {
     my ($spec) = @_;
 
-    ! ref $spec->{interface}
-        ? $Spec_for{ $spec->{interface} }{constructor}
-        : $spec->{constructor};
+    (!  ref $spec->{interface}
+     &&  $Spec_for{ $spec->{interface} }{constructor})
+
+    || $spec->{constructor};
 }
 
 sub _add_methods {
