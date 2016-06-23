@@ -530,7 +530,11 @@ sub _add_default_constructor {
             return $obj;
         };
 
-        my $build_args = $spec->{build_args} || $spec->{class_methods}{BUILDARGS};
+        my $build_args = 
+            (!  ref $spec->{interface}
+                &&  $Spec_for{ $spec->{interface} }{build_args})
+            || $spec->{build_args}
+            || $spec->{class_methods}{BUILDARGS};
         if ( $build_args ) {
             my $prev_new = $spec->{class_methods}{new};
 
