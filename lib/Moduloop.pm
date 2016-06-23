@@ -386,6 +386,12 @@ sub _object_maker {
 sub _add_class_methods {
     my ($spec, $stash) = @_;
 
+    {
+        if (!   ref $spec->{interface}
+            &&  (my $s = $Spec_for{ $spec->{interface} }{class_methods})) {
+            $spec->{class_methods} = $s;
+        }
+    }
     $spec->{class_methods} ||= $stash->get_all_symbols('CODE');
     _add_default_constructor($spec);
 
