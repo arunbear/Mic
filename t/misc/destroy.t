@@ -1,38 +1,36 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Moduloop ();
+
+{
+    package Process;
+    use Moduloop ();
+
+    Moduloop->assemble({
+        interface => [qw( id )],
+        implementation => 'ProcessImpl',
+    });
+}
 
 {
     package ProcessImpl;
 
-    our %__meta__ = (
-        role => 1,
-        has => { id => { reader => 1 } }
-    );
+    use Moduloop::Imp
+        has => { ID => { reader => 'id' } }
+    ;
     
     our $Count = 0;
 
     sub BUILD {
         my (undef, $self) = @_;
 
-        $self->{-id} = ++$Count;
+        $self->{$ID} = ++$Count;
     }
     
     sub DESTROY {
         my ($self) = @_;
         --$Count;
     }
-}
-
-{
-    package Process;
-
-    our %__meta__ = (
-        interface => [qw( id )],
-        implementation => 'ProcessImpl',
-    );
-    Moduloop->minionize;
 }
 
 package main;
