@@ -619,9 +619,8 @@ sub _add_methods {
              && $meta->{reader}
              && $in_interface->{ $meta->{reader} } ) {
 
-            my $name = $meta->{reader};
             my $obfu_name = Moduloop::_Guts::obfu_name($name, $spec);
-            $spec->{implementation}{methods}{$name} = sub { 
+            $spec->{implementation}{methods}{ $meta->{reader} } = sub { 
                 my ($self) = @_;
 
                 if ( reftype $self eq 'HASH' ) {
@@ -635,9 +634,8 @@ sub _add_methods {
              && $meta->{writer}
              && $in_interface->{ $meta->{writer} } ) {
 
-            my $name = $meta->{writer};
             my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
-            $spec->{implementation}{methods}{$name} = sub {
+            $spec->{implementation}{methods}{ $meta->{writer} } = sub {
                 my ($self, $new_val) = @_;
 
                 if ( reftype $self eq 'HASH' ) {
