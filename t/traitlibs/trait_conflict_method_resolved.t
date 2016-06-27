@@ -1,14 +1,11 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Moduloop ();
 
 {
     package Camper;
 
-    our %__meta__ = (
-        role => 1,
-    );
+    use Moduloop::TraitLib;
 
     sub pitch {
         my ($self) = @_;
@@ -18,9 +15,7 @@ use Moduloop ();
 {
     package BaseballPro;
 
-    our %__meta__ = (
-        role => 1,
-    );
+    use Moduloop::TraitLib;
 
     sub pitch {
         my ($self) = @_;
@@ -30,9 +25,16 @@ use Moduloop ();
 {
     package BusyDudeImpl;
 
-    our %__meta__ = (
-        roles => [qw( Camper BaseballPro )],
-    );
+    use Moduloop::Implementation
+        traits => {
+            Camper => {
+                methods    => [qw( pitch )],
+            },
+            BaseballPro => {
+                methods    => [qw( pitch )],
+            }
+        },
+    ;
 
     sub pitch {
         my ($self) = @_;
@@ -43,16 +45,15 @@ use Moduloop ();
 {
     package BusyDude;
 
-    our %__meta__ = (
+    use Moduloop
         interface => [qw( pitch )],
         implementation => 'BusyDudeImpl'
-    );
-    Moduloop->minionize;
+    ;
 }
 
 package main;
 
 my $dude = BusyDude->new;
-is($dude->pitch, "I'm so busy", '');
+is($dude->pitch, "I'm so busy", 'No trait conflicts');
 
 done_testing();
