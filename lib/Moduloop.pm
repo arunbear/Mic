@@ -339,7 +339,7 @@ sub _raise_traitlib_conflict {
     my ($name, $traitlib, $other_traitlib) = @_;
 
     Moduloop::Error::TraitConflict->throw(
-        error => "Cannot have '$name' in both $traitlib and $other_traitlib"
+        error => "Cannot borrow trait '$name' from both $traitlib and $other_traitlib"
     );
 }
 
