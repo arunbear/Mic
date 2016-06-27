@@ -137,9 +137,9 @@ The default value assigned to the attribute when the object is created. This can
 which will be excecuted to build the the default value (this would be needed if the default value is a reference,
 to prevent all objects from sharing the same reference).
 
-=head3 assert => HASHREF
+=head3 callbacks => HASHREF
 
-This is like the C<assert> declared in a class package, except that these assertions are not run at
+This is like the C<callbacks> declared in a class package (under C<constructor/kv_args>), except that these assertions are not run at
 construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
 
 =head3 init_arg => SCALAR
