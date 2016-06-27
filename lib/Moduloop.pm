@@ -552,10 +552,10 @@ sub _copy_assertions {
     my $constructor_spec = _constructor_spec($spec);
     my $meta = $constructor_spec->{kv_args}{$name};
 
-    for my $desc ( keys %{ $meta->{assert} || {} } ) {
-        next if exists $spec->{implementation}{has}{$attr}{assert}{$desc};
+    for my $desc ( keys %{ $meta->{callbacks} || {} } ) {
+        next if exists $spec->{implementation}{has}{$attr}{callbacks}{$desc};
 
-        $spec->{implementation}{has}{$attr}{assert}{$desc} = $meta->{assert}{$desc};
+        $spec->{implementation}{has}{$attr}{callbacks}{$desc} = $meta->{callbacks}{$desc};
     }
 }
 
@@ -574,17 +574,16 @@ sub _add_methods {
     my $in_interface = _interface($spec);
 
     $spec->{implementation}{semiprivate}{ASSERT} = sub {
-        my (undef, $slot, $val) = @_;
+        shift;
+        my ($slot, $val) = @_;
 
-        return unless exists $spec->{implementation}{has}{$slot};
+        my $slot_spec = $spec->{implementation}{has}{$slot}
+          or return;
+        return unless exists $slot_spec->{callbacks};
 
-        my $meta = $spec->{implementation}{has}{$slot};
-
-        for my $desc ( keys %{ $meta->{assert} || {} } ) {
-            my $code = $meta->{assert}{$desc};
-            $code->($val)
-              or assert_failed error => "Attribute '$slot' failed check '$desc'";
-        }
+        validate(@_, {
+            $slot => $slot_spec,
+        });
     };
     $spec->{implementation}{methods}{DOES} = sub {
         my ($self, $r) = @_;
