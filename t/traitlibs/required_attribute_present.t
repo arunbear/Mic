@@ -1,41 +1,45 @@
 # use strict;
 use Test::Lib;
 use Test::Most;
-use Moduloop ();
 
 {
     package Greeter;
 
-    use Moduloop::Role
-        requires => { attributes => ['name'] },
-        attr_style => '_2',
+    use Moduloop::TraitLib
+        requires => { attributes => ['NAME'] }
     ;
 
     sub greet {
         my ($self) = @_;
-        return "Hello, I am $self->{$__name}";
+        return "Hello, I am $self->{$NAME}";
     }
 }
 
 {
     package PersonImpl;
+
     use Moduloop::Implementation
-        roles => [qw( Greeter )],
-        has => { name => { init_arg => 'name' } }
+        traits => {
+            Greeter => {
+                methods => [qw( greet )],
+            },
+        },
+        has => { NAME => { init_arg => 'name' } }
     ;
 }
 
 {
     package Person;
 
-    our %__meta__ = (
+    use Moduloop
         interface => [qw( greet )],
-        construct_with => {
-            name => { },
+        constructor => {
+            kv_args => {
+                name => { },
+            }
         },
         implementation => 'PersonImpl',
-    );
-    Moduloop->minionize;
+    ;
 }
 
 package main;

@@ -4,10 +4,11 @@ use Test::Most;
 use Moduloop ();
 
 {
-    package SorterRole;
+    package SorterTraits;
 
-    use Moduloop::Role
-        requires => { methods => ['cmp'] }
+    use Moduloop::TraitLib
+        semiprivate => ['cmp'],
+        requires    => { methods => ['cmp'] }
     ;
 
     sub sort {
@@ -21,10 +22,14 @@ use Moduloop ();
 {
     package SorterImpl;
 
-    our %__meta__ = (
+    use Moduloop::Implementation
+        traits => {
+            SorterTraits => {
+                methods => [qw( sort )],
+            },
+        },
         semiprivate => ['cmp'],
-        roles => [qw( SorterRole )],
-    );
+    ;
 
     sub cmp ($$) {
         my ($x, $y) = @_;
@@ -35,11 +40,10 @@ use Moduloop ();
 {
     package Sorter;
 
-    our %__meta__ = (
+    use Moduloop
         interface => [qw( sort )],
         implementation => 'SorterImpl',
-    );
-    Moduloop->minionize;
+    ;
 }
 
 package main;
