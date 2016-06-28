@@ -287,8 +287,7 @@ sub _add_traitlib_methods {
     my $in_class_interface = _interface($spec);
     my $is_semiprivate     = _interface($traitlib_meta, 'semiprivate');
 
-    my $wanted = $spec->{implementation}{traits}{$traitlib}{methods};
-    for my $name ( @{$wanted} ) {
+    for my $name ( keys %{$code_for} ) {
         if ( $in_class_interface->{$name} ) {
             if (my $other_traitlib = $from_traitlib->{method}{$name}) {
                 _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
