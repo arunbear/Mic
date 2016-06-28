@@ -187,12 +187,18 @@ sub _compose_traitlibs {
             $spec->{composed_traitlib}{$traitlib}++;
         }
 
-        my ($meta, $method) = _load_traitlib($traitlib);
+        my ($meta, $code_for) = _load_traitlib($traitlib);
+        my $wanted_method = { map { $_ => 1 } @{ $traitlibs->{$traitlib}{methods} } };
+        $code_for = {
+            map { $_ => $code_for->{$_} }
+            grep { $wanted_method->{$_} }
+            keys %$code_for,
+        };
         $spec->{required_by_traitlib}{$traitlib} = $meta->{requires};
         _compose_traitlibs($spec, $meta->{traits} || {}, $from_traitlib);
 
         _add_traitlib_items($spec, $from_traitlib, $traitlib, $meta->{has}, 'has');
-        _add_traitlib_methods($spec, $from_traitlib, $traitlib, $meta, $method);
+        _add_traitlib_methods($spec, $from_traitlib, $traitlib, $meta, $code_for);
         _add_traitlib_forwards($spec, $from_traitlib, $traitlib, $meta);
     }
 }
