@@ -6,10 +6,16 @@ use Moduloop ();
 {
     package Alpha;
 
-    our %__meta__ = (
-        role => 1,
-        roles => [qw( Bravo Charlie )]
-    );
+    use Moduloop::TraitLib
+        traits => {
+            Bravo => {
+                methods => [qw( bravo delta )],
+            },
+            Charlie => {
+                methods => [qw( charlie )],
+            },
+        },
+    ;
 
     sub alpha { 'alpha' }
 }
@@ -17,10 +23,13 @@ use Moduloop ();
 {
     package Bravo;
 
-    our %__meta__ = (
-        role => 1,
-        roles => [qw( Delta )]
-    );
+    use Moduloop::TraitLib
+        traits => {
+            Delta => {
+                methods => [qw( delta )],
+            },
+        },
+    ;
 
     sub bravo { 'bravo' }
 }
@@ -28,9 +37,7 @@ use Moduloop ();
 {
     package Charlie;
 
-    our %__meta__ = (
-        role => 1,
-    );
+    use Moduloop::TraitLib;
 
     sub charlie { 'charlie' }
 }
@@ -38,9 +45,7 @@ use Moduloop ();
 {
     package Delta;
 
-    our %__meta__ = (
-        role => 1,
-    );
+    use Moduloop::TraitLib;
 
     sub delta { 'delta' }
 }
@@ -48,19 +53,22 @@ use Moduloop ();
 {
     package AlphabetImpl;
 
-    our %__meta__ = (
-        roles => [qw( Alpha )],
-    );
+    use Moduloop::Implementation
+        traits => {
+            Alpha => {
+                methods => [qw( alpha bravo charlie delta )],
+            },
+        },
+    ;
 }
 
 {
     package Alphabet;
 
-    our %__meta__ = (
+    use Moduloop
         interface => [qw( alpha bravo charlie delta )],
         implementation => 'AlphabetImpl',
-    );
-    Moduloop->minionize;
+    ;
 }
 
 package main;
