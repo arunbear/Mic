@@ -197,7 +197,7 @@ sub _compose_traitlibs {
         $spec->{required_by_traitlib}{$traitlib} = $meta->{requires};
         _compose_traitlibs($spec, $meta->{traits} || {}, $from_traitlib);
 
-        _add_traitlib_items($spec, $from_traitlib, $traitlib, $meta->{has}, 'has');
+        _add_traitlib_items($spec, $from_traitlib, $traitlib, $meta->{has});
         _add_traitlib_methods($spec, $from_traitlib, $traitlib, $meta, $code_for);
         _add_traitlib_forwards($spec, $from_traitlib, $traitlib, $meta);
     }
@@ -267,22 +267,16 @@ sub _get_stash {
 }
 
 sub _add_traitlib_items {
-    my ($spec, $from_traitlib, $traitlib, $item, $type) = @_;
+    my ($spec, $from_traitlib, $traitlib, $item) = @_;
 
-    my $wanted = $spec->{implementation}{traits}{$traitlib}{attributes};
-    for my $name ( @{$wanted} ) {
+    for my $name ( keys %{$item} ) {
 
         if (my $other_traitlib = $from_traitlib->{$name}) {
             _raise_traitlib_conflict($name, $traitlib, $other_traitlib);
         }
-        if (exists $item->{$name}) {
-            if ( ! $spec->{implementation}{$type}{$name} ) {
-                $spec->{implementation}{$type}{$name} = $item->{$name};
-                $from_traitlib->{$name} = $traitlib;
-            }
-        }
-        else {
-            confess "Attribute '$name' not available via traitlib $traitlib";
+        if ( ! $spec->{implementation}{has}{$name} ) {
+            $spec->{implementation}{has}{$name} = $item->{$name};
+            $from_traitlib->{$name} = $traitlib;
         }
     }
 }
