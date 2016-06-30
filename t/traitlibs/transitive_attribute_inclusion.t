@@ -16,6 +16,7 @@ use Test::Most;
         },
         has => { ALPHA => { default => 'alpha' } }
     ;
+    sub all_attr_vals { ( $ALPHA, $BRAVO, $CHARLIE, $DELTA ) }
 }
 
 {
@@ -29,6 +30,7 @@ use Test::Most;
         },
         has => { BRAVO => { default => 'bravo' } }
     ;
+    sub all_attr_vals { ( $BRAVO, $DELTA ) }
 }
 
 {
@@ -60,6 +62,8 @@ use Test::Most;
     ;
 
     sub as_hash { $_[0] }
+
+    sub all_attr_vals { ( $ALPHA, $BRAVO, $CHARLIE, $DELTA ) }
 }
 
 {
