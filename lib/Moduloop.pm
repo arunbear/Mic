@@ -969,7 +969,25 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Moduloop is a class builder that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming> and loosely coupled.
+Moduloop is a class building framework with the following features:
+
+=over
+
+=item *
+
+A
+
+=item *
+
+B
+
+=item *
+
+C
+
+=back
+
+that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming> and loosely coupled.
 
 Modularity means there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
 don't need to know about.
