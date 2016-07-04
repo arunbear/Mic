@@ -79,6 +79,30 @@ Moduloop::TraitLib
 
 TraitLibs provide reusable implementation details, i.e. they solve the problem of what to do when the same implementation details are found in more than one implementation package.
 
+TraitLibs are inspired by Roles in Perl6 and Moose, but their usage is much more self documenting compared to Roles,
+and unlike Roles, they do not suffer from the I<obscure action at a distance> problem i.e.
+
+    package My::Class
+
+    use Moo;
+
+    with qw(
+        My::RoleA
+        My::RoleB
+        My::RoleC
+    );
+
+    sub a_method {
+        my ($self) = @_;
+
+        $self->another_method();
+    }
+
+    1;
+
+Here C<another_method()> is not defined in My::Class, so it must come from one of the roles, but it is impossible
+to tell by inspection which role it came from.
+
 =head1 CONFIGURATION
 
 A traitlib package is configured using Moduloop::TraitLib and providing a hash with the following keys:

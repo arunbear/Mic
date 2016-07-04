@@ -975,19 +975,34 @@ Moduloop is a class building framework with the following features:
 
 =item *
 
-A
+Reduces the tedium and boilerplate code typically involved in creating classes.
 
 =item *
 
-B
+Makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming> and loosely coupled.
 
 =item *
 
-C
+Enables trivial swapping of implementations.
+
+=item *
+
+Encourages self documenting code.
+
+=item *
+
+Encourages robustness via Eiffel style L<contracts|Moduloop::Manual::Contracts>.
+
+=item *
+
+Supports code reuse via automated delegation and importable L<traits|Moduloop::TraitLib>.
+
+=item *
+
+Supports hash and array based objects.
 
 =back
 
-that makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/Modular_programming> and loosely coupled.
 
 Modularity means there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
 don't need to know about.
