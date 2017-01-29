@@ -704,14 +704,16 @@ sub _add_pre_conditions {
     my ($spec, $stash, $name) = @_;
 
     return unless $Contracts_for{ $spec->{name} }{pre};
-    my $pre_cond_hash = $spec->{pre_and_post_conds}{$name}{require}
+
+    my $pre_cond_hash = $spec->{pre_and_post_conds}{object}{$name}{require}
       or return;
 
     my $guard = sub {
         foreach my $desc (keys %{ $pre_cond_hash }) {
             my $sub = $pre_cond_hash->{$desc};
+            warn "$desc $name";
             $sub->(@_)
-              or Moduloop::Error::TraitConflict->throw(
+              or Moduloop::Error::ContractViolation->throw(
                     error => "Method '$name' failed precondition '$desc'"
               );
         }
@@ -723,7 +725,8 @@ sub _add_post_conditions {
     my ($spec, $stash, $name) = @_;
 
     return unless $Contracts_for{ $spec->{name} }{post};
-    my $post_cond_hash = $spec->{pre_and_post_conds}{$name}{ensure}
+
+    my $post_cond_hash = $spec->{pre_and_post_conds}{object}{$name}{ensure}
       or return;
 
     my $guard = sub {
@@ -854,7 +857,7 @@ sub _interface {
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
         $spec->{pre_and_post_conds} = $spec->{$type};
-        $spec->{$type} = [ keys %{ $spec->{$type} } ];
+        $spec->{$type} = [ keys %{ $spec->{$type}{object} } ];
     }
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
 }
