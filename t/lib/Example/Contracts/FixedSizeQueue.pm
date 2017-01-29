@@ -2,40 +2,42 @@ package Example::Contracts::FixedSizeQueue;
 
 use Moduloop
     interface => {
-        head => {},
-        tail => {},
-        size => {},
-        max_size => {},
+        object => {
+            head => {},
+            tail => {},
+            size => {},
+            max_size => {},
 
-        push => {
-            ensure => {
-                size_increased => sub {
-                    my ($self, $old) = @_;
+            push => {
+                ensure => {
+                    size_increased => sub {
+                        my ($self, $old) = @_;
 
-                    return $self->size < $self->max_size
-                      ? $self->size == $old->size + 1
-                      : 1;
-                },
-                tail_updated => sub {
-                    my ($self, $old, $results, $item) = @_;
-                    $self->tail == $item;
-                },
-            }
-        },
-
-        pop => {
-            require => {
-                not_empty => sub {
-                    my ($self) = @_;
-                    $self->size > 0;
-                },
+                        return $self->size < $self->max_size
+                          ? $self->size == $old->size + 1
+                          : 1;
+                    },
+                    tail_updated => sub {
+                        my ($self, $old, $results, $item) = @_;
+                        $self->tail == $item;
+                    },
+                }
             },
-            ensure => {
-                returns_old_head => sub {
-                    my ($self, $old, $results) = @_;
-                    $results->[0] == $old->head;
+
+            pop => {
+                require => {
+                    not_empty => sub {
+                        my ($self) = @_;
+                        $self->size > 0;
+                    },
                 },
-            }
+                ensure => {
+                    returns_old_head => sub {
+                        my ($self, $old, $results) = @_;
+                        $results->[0] == $old->head;
+                    },
+                }
+            },
         },
     },
 
