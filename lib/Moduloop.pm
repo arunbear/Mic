@@ -2,17 +2,8 @@ package Moduloop;
 
 use strict;
 use 5.008_005;
-use Class::Method::Modifiers qw(install_modifier);
 use Carp;
-use Carp::Assert::More;
-use Hash::Util qw( lock_keys );
-use List::MoreUtils qw( any uniq );
-use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
-use Package::Stash;
-use Scalar::Util qw( reftype );
-use Storable qw( dclone );
-use Sub::Name;
 
 use Exception::Class (
     'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
