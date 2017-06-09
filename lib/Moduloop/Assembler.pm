@@ -13,6 +13,14 @@ use Scalar::Util qw( reftype );
 use Storable qw( dclone );
 use Sub::Name;
 
+use Exception::Class (
+    'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
+    'Moduloop::Error::MethodDeclaration',
+    'Moduloop::Error::TraitConflict',
+    'Moduloop::Error::ContractViolation',
+);
+use Moduloop::_Guts;
+
 sub new {
     my ($class, %arg) = @_;
 

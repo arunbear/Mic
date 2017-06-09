@@ -4,15 +4,7 @@ use strict;
 use 5.008_005;
 use Carp;
 use Params::Validate qw(:all);
-
-use Exception::Class (
-    'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
-    'Moduloop::Error::MethodDeclaration',
-    'Moduloop::Error::TraitConflict',
-    'Moduloop::Error::ContractViolation',
-);
 use Moduloop::Assembler;
-use Moduloop::_Guts;
 
 our $VERSION = '0.000001';
 $VERSION = eval $VERSION;
