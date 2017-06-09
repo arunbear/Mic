@@ -20,16 +20,17 @@ use Exception::Class (
     'Moduloop::Error::TraitConflict',
     'Moduloop::Error::ContractViolation',
 );
+use Moduloop::Assembler;
 use Moduloop::_Guts;
 
 our $VERSION = '0.000001';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
-my %Bound_implementation_of;
-my %Contracts_for;
-my %Spec_for;
-my %Util_class;
+our %Bound_implementation_of;
+our %Contracts_for;
+our %Spec_for;
+our %Util_class;
 
 sub import {
     my ($class, %arg) = @_;
@@ -73,6 +74,7 @@ sub load_class {
 sub assemble {
     my (undef, $spec) = @_;
 
+    my $assembler = Moduloop::Assembler->new(-spec => $spec);
     my $cls_stash;
     if ( ! $spec->{name} ) {
         my $caller_pkg = (caller)[0];
@@ -80,9 +82,10 @@ sub assemble {
         if ( $caller_pkg eq __PACKAGE__ ) {
             $caller_pkg = (caller 1)[0];
         }
-        $cls_stash = Package::Stash->new($caller_pkg);
-        $spec = { %$spec, %{ $cls_stash->get_symbol('%__meta__') || {} } };
-        $spec->{name} = $caller_pkg;
+        $spec = $assembler->load_spec_from($caller_pkg);
+        # $cls_stash = Package::Stash->new($caller_pkg);
+        # $spec = { %$spec, %{ $cls_stash->get_symbol('%__meta__') || {} } };
+        # $spec->{name} = $caller_pkg;
     }
 
     my @args = %$spec;
@@ -96,50 +99,51 @@ sub assemble {
         name => { type => SCALAR, optional => 1 },
         no_attribute_vars => { type => BOOLEAN, optional => 1 },
     });
-    $cls_stash    ||= Package::Stash->new($spec->{name});
+    return $assembler->assemble;
+    # $cls_stash    ||= Package::Stash->new($spec->{name});
 
-    my $obj_stash;
+    # my $obj_stash;
 
-    my $pkg = $Bound_implementation_of{ $spec->{name} } || $spec->{implementation};
-    $pkg ne $spec->{name}
-      or confess "$spec->{name} cannot be its own implementation.";
-    my $stash = _get_stash($pkg);
+    # my $pkg = $Bound_implementation_of{ $spec->{name} } || $spec->{implementation};
+    # $pkg ne $spec->{name}
+    #   or confess "$spec->{name} cannot be its own implementation.";
+    # my $stash = _get_stash($pkg);
 
-    my $meta = $stash->get_symbol('%__meta__');
-    $spec->{implementation} = {
-        package => $pkg,
-        methods => $stash->get_all_symbols('CODE'),
-        has     => {
-            %{ $meta->{has} || { } },
-        },
-        forwards => $meta->{forwards},
-        traits   => $meta->{traits},
-        arrayimp => $meta->{arrayimp},
-        slot_offset => $meta->{slot_offset},
-    };
-    my $is_semiprivate = _interface($meta, 'semiprivate');
+    # my $meta = $stash->get_symbol('%__meta__');
+    # $spec->{implementation} = {
+    #     package => $pkg,
+    #     methods => $stash->get_all_symbols('CODE'),
+    #     has     => {
+    #         %{ $meta->{has} || { } },
+    #     },
+    #     forwards => $meta->{forwards},
+    #     traits   => $meta->{traits},
+    #     arrayimp => $meta->{arrayimp},
+    #     slot_offset => $meta->{slot_offset},
+    # };
+    # my $is_semiprivate = _interface($meta, 'semiprivate');
 
-    foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
-        if ( $is_semiprivate->{$sub} ) {
-            $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
-        }
-    }
-    $obj_stash = Package::Stash->new("$spec->{implementation}{package}::__Assembled");
+    # foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
+    #     if ( $is_semiprivate->{$sub} ) {
+    #         $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
+    #     }
+    # }
+    # $obj_stash = Package::Stash->new("$spec->{implementation}{package}::__Assembled");
 
-    _prep_interface($spec);
-    _compose_traitlibs($spec);
+    # _prep_interface($spec);
+    # _compose_traitlibs($spec);
 
-    my $private_stash = Package::Stash->new("$spec->{name}::__Private");
-    $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
-    $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
-    $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
+    # my $private_stash = Package::Stash->new("$spec->{name}::__Private");
+    # $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
+    # $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
+    # $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
-    _add_methods($spec, $obj_stash, $private_stash);
-    _make_builder_class($spec);
-    _add_class_methods($spec, $cls_stash);
-    _check_traitlib_requirements($spec);
-    _check_interface($spec);
-    return $spec->{name};
+    # _add_methods($spec, $obj_stash, $private_stash);
+    # _make_builder_class($spec);
+    # _add_class_methods($spec, $cls_stash);
+    # _check_traitlib_requirements($spec);
+    # _check_interface($spec);
+    # return $spec->{name};
 }
 
 sub builder_class {
