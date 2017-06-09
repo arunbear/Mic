@@ -627,7 +627,7 @@ sub _add_default_constructor {
                 $arg = { @_ };
             }
 
-            my $builder_class = builder_class($class);
+            my $builder_class = Moduloop::builder_class($class);
             my $obj = $builder_class->new_object;
             for my $name ( keys %{ $constructor_spec->{kv_args} } ) {
 
@@ -670,13 +670,6 @@ sub _add_default_constructor {
             };
         }
     }
-}
-
-sub builder_class {
-    my ($class) = @_;
-
-    return $Moduloop::Util_class{ $class }
-      or confess "Unknown class: $class";
 }
 
 sub _object_maker {
