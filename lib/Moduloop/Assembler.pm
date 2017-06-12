@@ -625,14 +625,13 @@ sub _add_default_constructor {
     if ( ! exists $spec->{class_methods}{$sub_name} ) {
         $spec->{class_methods}{$sub_name} = sub {
             my $class = shift;
-            validate(@_, $constructor_spec->{kv_args} || {});
             my ($arg);
 
             if ( scalar @_ == 1 ) {
                 $arg = shift;
             }
             elsif ( scalar @_ > 1 ) {
-                $arg = { @_ };
+                $arg = [@_];
             }
 
             my $builder_class = Moduloop::builder_class($class);
@@ -663,20 +662,6 @@ sub _add_default_constructor {
             $builder_class->check_postconditions($obj, $arg);
             return $obj;
         };
-
-        my $build_args = 
-            (!  ref $spec->{interface}
-                &&  $Moduloop::Spec_for{ $spec->{interface} }{build_args})
-            || $spec->{build_args}
-            || $spec->{class_methods}{BUILDARGS};
-        if ( $build_args ) {
-            my $prev_new = $spec->{class_methods}{new};
-
-            $spec->{class_methods}{new} = sub {
-                my $class = shift;
-                $prev_new->($class, $build_args->($class, @_));
-            };
-        }
     }
 }
 
