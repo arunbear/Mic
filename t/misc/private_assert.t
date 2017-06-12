@@ -67,12 +67,15 @@ use Test::Most;
 
 package main;
 
-lives_ok { my $counter = Counter->new() } 'No params';
-throws_ok { my $counter = Counter->new(starr => 'asd') } qr/was not listed in the validation options: starr/;
+TODO: {
+    local $TODO = "Will be retired, superseded by contracts";
+    lives_ok { my $counter = Counter->new() } 'No params';
+    throws_ok { my $counter = Counter->new(starr => 'asd') } qr/was not listed in the validation options: starr/;
 
-throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } qr/The 'step' parameter .+ did not pass the 'is_integer' callback/;
-throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } qr/The 'STEP' parameter .+ did not pass the 'is_integer' callback/;
-throws_ok  { my $counter = Counter->new(start => 'abc') } qr/The 'COUNT' parameter .+ did not pass the 'is_integer' callback/;
-lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
+    throws_ok { my $counter = Counter->new(start => 1, step => 'asd') } qr/The 'step' parameter .+ did not pass the 'is_integer' callback/;
+    throws_ok { my $counter = Counter->new(start => 1, -step => 'asd') } qr/The 'STEP' parameter .+ did not pass the 'is_integer' callback/;
+    throws_ok  { my $counter = Counter->new(start => 'abc') } qr/The 'COUNT' parameter .+ did not pass the 'is_integer' callback/;
+    lives_ok  { my $counter = Counter->new(start => 1) } 'Parameter is valid';
+}
 
 done_testing();
