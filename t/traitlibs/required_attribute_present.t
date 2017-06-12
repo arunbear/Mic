@@ -44,7 +44,7 @@ use Test::Most;
 
 package main;
 
-my $person = Person->new(name => 'Bob');
+my $person = Person->new({name => 'Bob'});
 is($person->greet, 'Hello, I am Bob', 'required attribute present');
 
 done_testing();

@@ -8,7 +8,7 @@ use Moduloop
     };
 use Example::TraitLibs::FixedSizeQueue;
 
-my $q = Example::TraitLibs::FixedSizeQueue->new(max_size => 3);
+my $q = Example::TraitLibs::FixedSizeQueue->new({max_size => 3});
 
 $q->push($_) for 1 .. 3;
 is $q->size => 3;
