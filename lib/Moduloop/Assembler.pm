@@ -636,17 +636,17 @@ sub _add_default_constructor {
 
             my $builder_class = Moduloop::builder_class($class);
             my $obj = $builder_class->new_object;
-            for my $name ( keys %{ $constructor_spec->{kv_args} } ) {
+            my $kv_args = ref $arg eq 'HASH' ? $arg : {};
+            for my $name ( keys %{ $kv_args } ) {
 
+                handle init_args
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name }
                                         keys %{ $spec->{implementation}{has} };
                 if ( $dup ) {
                     confess "Cannot have same init_arg '$name' for attributes '$attr' and '$dup'";
                 }
                 if ( $attr ) {
-                    _copy_assertions($spec, $name, $attr);
-                    my $sub = $spec->{implementation}{has}{$attr}{map_init_arg};
-                    my $attr_val = $sub ? $sub->($arg->{$name}) : $arg->{$name};
+                    my $attr_val = $arg->{$name};
                     if ( reftype $obj eq 'HASH' ) {
                         my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
                         $obj->{$obfu_name} = $attr_val;
