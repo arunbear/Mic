@@ -2,6 +2,16 @@ package Example::Contracts::FixedSizeQueue;
 
 use Moduloop
     interface => {
+        class => {
+            new => {
+                ensure => {
+                    zero_sized => sub {
+                        my ($obj) = @_;
+                        $obj->size == 0;
+                    },
+                }
+            },
+        },
         object => {
             head => {},
             tail => {},
@@ -54,12 +64,6 @@ use Moduloop
                 callbacks => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
             },
         },
-        ensure => {
-            zero_sized => sub {
-                my ($self) = @_;
-                $self->size == 0;
-            },
-        }
     },
 
     implementation => 'Example::Contracts::Acme::FixedSizeQueue_v1',
