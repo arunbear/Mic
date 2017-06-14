@@ -389,16 +389,26 @@ sub _add_post_conditions {
     my $post_cond_hash = $spec->{pre_and_post_conds}{$type}{$name}{ensure}
       or return;
 
+    my $constructor_spec = _constructor_spec($spec);
+
     my $guard = sub {
         my $orig = shift;
         my $self = shift;
 
-        my @old = $type eq 'object' ? ( dclone($self) ) : ();
+        my @old;
+        my @invocant = ($self);
+        if ($type eq 'object') {
+            @old = ( dclone($self) );
+        }
         my $results = [$orig->($self, @_)];
+        if ($type eq 'class' && $name eq $constructor_spec->{name}) {
+            $results = $results->[0];
+            @invocant = ();
+        }
 
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
-            $sub->($self, @old, $results, @_)
+            $sub->(@invocant, @old, $results, @_)
               or Moduloop::Error::ContractViolation->throw(
                     error => "Method '$name' failed postcondition '$desc'"
               );
