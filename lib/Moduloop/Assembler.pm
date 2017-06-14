@@ -401,14 +401,16 @@ sub _add_post_conditions {
             @old = ( dclone($self) );
         }
         my $results = [$orig->($self, @_)];
+        my $results_to_check = $results;
+
         if ($type eq 'class' && $name eq $constructor_spec->{name}) {
-            $results = $results->[0];
+            $results_to_check = $results->[0];
             @invocant = ();
         }
 
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
-            $sub->(@invocant, @old, $results, @_)
+            $sub->(@invocant, @old, $results_to_check, @_)
               or Moduloop::Error::ContractViolation->throw(
                     error => "Method '$name' failed postcondition '$desc'"
               );
@@ -464,24 +466,6 @@ sub _make_builder_class {
         $spec->{invariant_guard}->($obj);
     };
 
-    $method{check_postconditions} = sub {
-        shift;
-        my ($obj, $arg) = @_;
-
-        return unless $Moduloop::Contracts_for{ $spec->{name} }{post};
-
-        my $post_cond_hash = $constructor_spec->{ensure}
-          or return;
-
-        foreach my $desc (keys %{ $post_cond_hash }) {
-            my $sub = $post_cond_hash->{$desc};
-            $sub->($obj, $arg)
-              or Moduloop::Error::ContractViolation->throw(
-                    error => "Method '$constructor_spec->{name}' failed postcondition '$desc'"
-              );
-        }
-    };
-
     my $class_var_stash = Package::Stash->new("$spec->{name}::__ClassVar");
 
     $method{get_var} = sub {
@@ -515,6 +499,7 @@ sub _add_class_methods {
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
         $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
         subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
+        _add_post_conditions($spec, $stash, $sub, 'class');
     }
 }
 
@@ -669,7 +654,6 @@ sub _add_default_constructor {
 
             $builder_class->build($obj, $arg);
             $builder_class->check_invariants($obj);
-            $builder_class->check_postconditions($obj, $arg);
             return $obj;
         };
     }
