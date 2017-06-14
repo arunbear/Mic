@@ -326,7 +326,7 @@ sub _add_methods {
 
     foreach my $name ( @{ $spec->{interface} } ) {
         _add_pre_conditions($spec, $stash, $name);
-        _add_post_conditions($spec, $stash, $name);
+        _add_post_conditions($spec, $stash, $name, 'object');
     }
     _add_invariants($spec, $stash);
 }
@@ -382,23 +382,23 @@ sub _add_pre_conditions {
 }
 
 sub _add_post_conditions {
-    my ($spec, $stash, $name) = @_;
+    my ($spec, $stash, $name, $type) = @_;
 
     return unless $Moduloop::Contracts_for{ $spec->{name} }{post};
 
-    my $post_cond_hash = $spec->{pre_and_post_conds}{object}{$name}{ensure}
+    my $post_cond_hash = $spec->{pre_and_post_conds}{$type}{$name}{ensure}
       or return;
 
     my $guard = sub {
         my $orig = shift;
         my $self = shift;
 
-        my $old = dclone($self);
+        my @old = $type eq 'object' ? ( dclone($self) ) : ();
         my $results = [$orig->($self, @_)];
 
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
-            $sub->($self, $old, $results, @_)
+            $sub->($self, @old, $results, @_)
               or Moduloop::Error::ContractViolation->throw(
                     error => "Method '$name' failed postcondition '$desc'"
               );
@@ -639,7 +639,7 @@ sub _add_default_constructor {
             my $kv_args = ref $arg eq 'HASH' ? $arg : {};
             for my $name ( keys %{ $kv_args } ) {
 
-                handle init_args
+                # handle init_args
                 my ($attr, $dup) = grep { $spec->{implementation}{has}{$_}{init_arg} eq $name }
                                         keys %{ $spec->{implementation}{has} };
                 if ( $dup ) {
