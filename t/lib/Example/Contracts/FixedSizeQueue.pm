@@ -64,14 +64,6 @@ use Moduloop
         },
     },
 
-    constructor => {
-        kv_args => {
-            max_size => { 
-                callbacks => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
-            },
-        },
-    },
-
     implementation => 'Example::Contracts::Acme::FixedSizeQueue_v1',
 ;
 
