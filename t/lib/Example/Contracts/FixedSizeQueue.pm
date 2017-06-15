@@ -4,6 +4,12 @@ use Moduloop
     interface => {
         class => {
             new => {
+                require => {
+                    positive_int_size => sub {
+                        my (undef, $arg) = @_;
+                        $arg->{max_size} =~ /^\d+$/ && $arg->{max_size} > 0;
+                    },
+                },
                 ensure => {
                     zero_sized => sub {
                         my ($obj) = @_;
