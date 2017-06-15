@@ -325,7 +325,7 @@ sub _add_methods {
     }
 
     foreach my $name ( @{ $spec->{interface} } ) {
-        _add_pre_conditions($spec, $stash, $name);
+        _add_pre_conditions($spec, $stash, $name, 'object');
         _add_post_conditions($spec, $stash, $name, 'object');
     }
     _add_invariants($spec, $stash);
@@ -361,17 +361,16 @@ sub _add_invariants {
 }
 
 sub _add_pre_conditions {
-    my ($spec, $stash, $name) = @_;
+    my ($spec, $stash, $name, $type) = @_;
 
     return unless $Moduloop::Contracts_for{ $spec->{name} }{pre};
 
-    my $pre_cond_hash = $spec->{pre_and_post_conds}{object}{$name}{require}
+    my $pre_cond_hash = $spec->{pre_and_post_conds}{$type}{$name}{require}
       or return;
 
     my $guard = sub {
         foreach my $desc (keys %{ $pre_cond_hash }) {
             my $sub = $pre_cond_hash->{$desc};
-            warn "$desc $name";
             $sub->(@_)
               or Moduloop::Error::ContractViolation->throw(
                     error => "Method '$name' failed precondition '$desc'"
@@ -499,6 +498,7 @@ sub _add_class_methods {
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
         $stash->add_symbol("&$sub", $spec->{class_methods}{$sub});
         subname "$spec->{name}::$sub", $spec->{class_methods}{$sub};
+        _add_pre_conditions($spec, $stash, $sub, 'class');
         _add_post_conditions($spec, $stash, $sub, 'class');
     }
 }
