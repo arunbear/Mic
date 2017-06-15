@@ -604,10 +604,13 @@ sub _add_delegates {
 sub _constructor_spec {
     my ($spec) = @_;
 
-    (!  ref $spec->{interface}
-     &&  $Moduloop::Spec_for{ $spec->{interface} }{constructor})
-
-    || $spec->{constructor};
+    if(! ref $spec->{interface}) {
+        my $s;
+        $s = $Moduloop::Spec_for{ $spec->{interface} }{constructor}
+          and return $s;
+    }
+    $spec->{constructor} ||= {};
+    return $spec->{constructor};
 }
 
 sub _add_default_constructor {
