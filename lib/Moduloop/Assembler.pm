@@ -69,13 +69,7 @@ sub assemble {
         arrayimp => $meta->{arrayimp},
         slot_offset => $meta->{slot_offset},
     };
-    my $is_semiprivate = _interface($meta, 'semiprivate');
-
-    foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
-        if ( $is_semiprivate->{$sub} ) {
-            $spec->{implementation}{semiprivate}{$sub} = delete $spec->{implementation}{methods}{$sub};
-        }
-    }
+    _collect_non_instance_methods($spec, $meta);
     $obj_stash = Package::Stash->new("$spec->{implementation}{package}::__Assembled");
 
     _prep_interface($spec);
@@ -93,6 +87,26 @@ sub assemble {
     _check_traitlib_requirements($spec);
     _check_interface($spec);
     return $spec->{name};
+}
+
+sub _collect_non_instance_methods {
+    my ($spec, $meta) = @_;
+
+    my $is_semiprivate = _interface($meta, 'semiprivate');
+    my $is_classmethod = _interface($meta, 'classmethod');
+
+    foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
+        my $type;
+        if ( $is_semiprivate->{$sub} ) {
+            $type = 'semiprivate';
+        }
+        elsif ( $is_classmethod->{$sub} ) {
+            $type = 'classmethod';
+        }
+        if ($type) {
+            $spec->{implementation}{$type}{$sub} = delete $spec->{implementation}{methods}{$sub};
+        }
+    }
 }
 
 sub _get_stash {
@@ -117,6 +131,7 @@ sub _interface {
     my %must_allow = (
         interface   => [qw( AUTOLOAD can DOES DESTROY )],
         semiprivate => [qw( BUILD )],
+        classmethod => [  ],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
         $spec->{pre_and_post_conds} = $spec->{$type};
