@@ -7,7 +7,12 @@ use Test::Most;
     use Moduloop ();
 
     Moduloop->assemble({
-        interface => [qw( id )],
+        interface => { 
+            object => {
+                id => {},
+            },
+            class => { new => {} }
+        },
         implementation => 'ProcessImpl',
     });
 }
