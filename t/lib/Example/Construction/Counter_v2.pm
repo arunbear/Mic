@@ -4,7 +4,12 @@ use strict;
 use Moduloop ();
 
 our %__meta__ = (
-    interface => [ qw( next ) ],
+    interface => { 
+        object => {
+            next => {},
+        },
+        class => { new => {} }
+    },
 
     constructor => { 
         kv_args => {

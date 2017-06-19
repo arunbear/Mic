@@ -2,7 +2,12 @@ package Example::Construction::Counter_v3;
 
 use strict;
 use Moduloop
-    interface => [ qw( next ) ],
+    interface => { 
+        object => {
+            next => {},
+        },
+        class => { new => {} }
+    },
 
     constructor => { 
         kv_args => {

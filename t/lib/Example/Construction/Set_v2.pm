@@ -2,7 +2,14 @@ package Example::Construction::Set_v2;
 
 use Moduloop
 
-    interface => [qw( add has size )],
+    interface => { 
+        object => {
+            add => {},
+            has => {},
+            size => {},
+        },
+        class => { new => {} }
+    },
 
     implementation => 'Example::Construction::Acme::Set_v2',
 ;

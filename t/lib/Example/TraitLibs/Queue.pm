@@ -1,7 +1,14 @@
 package Example::TraitLibs::Queue;
 
 use Moduloop
-    interface => [qw( push pop size )],
+    interface => { 
+        object => {
+            push => {},
+            pop  => {},
+            size => {},
+        },
+        class => { new => {} }
+    },
 
     implementation => 'Example::TraitLibs::Acme::Queue_v1',
 ;

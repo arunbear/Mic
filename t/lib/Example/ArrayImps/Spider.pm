@@ -3,7 +3,14 @@ package Example::ArrayImps::Spider;
 use Moduloop ();
 
 Moduloop->assemble({
-    interface => [qw( crawl set_url url )],
+    interface => { 
+        object => {
+            crawl   => {},
+            set_url => {},
+            url     => {},
+        },
+        class => { new => {} }
+    },
 
     implementation => 'Example::ArrayImps::Acme::Spider',
 });

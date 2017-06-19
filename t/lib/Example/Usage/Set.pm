@@ -3,7 +3,13 @@ package Example::Usage::Set;
 use Moduloop ();
 
 Moduloop->assemble({
-    interface => [qw( add has )],
+    interface => { 
+        object => {
+            add => {},
+            has => {},
+        },
+        class => { new => {} }
+    },
 
     implementation => 'Example::Usage::HashSet',
 });

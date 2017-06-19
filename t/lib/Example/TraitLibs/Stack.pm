@@ -1,7 +1,14 @@
 package Example::TraitLibs::Stack;
 
 use Moduloop
-    interface => [qw( push pop size )],
+    interface => { 
+        object => {
+            push => {},
+            pop  => {},
+            size => {},
+        },
+        class => { new => {} }
+    },
 
     implementation => 'Example::TraitLibs::Acme::Stack_v1',
 ;

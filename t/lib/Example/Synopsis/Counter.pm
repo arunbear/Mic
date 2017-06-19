@@ -1,7 +1,12 @@
 package Example::Synopsis::Counter;
 
 use Moduloop
-    interface => [ qw( next ) ],
+    interface => { 
+        object => {
+            next => {},
+        },
+        class => { new => {} }
+    },
     implementation => 'Example::Synopsis::Acme::Counter';
 
 1;

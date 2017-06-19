@@ -1,7 +1,14 @@
 package Example::TraitLibs::FixedSizeQueue;
 
 use Moduloop
-    interface => [qw( push pop size )],
+    interface => { 
+        object => {
+            push => {},
+            pop  => {},
+            size => {},
+        },
+        class => { new => {} }
+    },
 
     constructor => {
         kv_args => {

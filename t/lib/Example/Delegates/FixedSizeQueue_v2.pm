@@ -1,7 +1,14 @@
 package Example::Delegates::FixedSizeQueue_v2;
 
 use Moduloop
-    interface => [qw( push q_pop q_size )],
+    interface => { 
+        object => {
+            push  => {},
+            q_pop => {},
+            q_size => {},
+        },
+        class => { new => {} }
+    },
 
     constructor => {
         kv_args => {

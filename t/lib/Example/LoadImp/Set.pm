@@ -1,6 +1,11 @@
 package Example::LoadImp::Set;
 
 use Moduloop
-    declare_interface => [qw( add has )]
-    ;
+    declare_interface => { 
+        object => {
+            add => {},
+            has => {},
+        },
+        class => { new => {} }
+    };
 1;

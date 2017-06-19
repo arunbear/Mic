@@ -4,7 +4,14 @@ use strict;
 use Moduloop ();
 
 our %__meta__ = (
-    interface => [qw(push size max_size)],
+    interface => { 
+        object => {
+            push => {},
+            size => {},
+            max_size => {},
+        },
+        class => { new => {} }
+    },
     implementation => 'FixedSizeQueueImpl',
     construct_with  => {
         max_size => { 
