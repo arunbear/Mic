@@ -66,7 +66,15 @@ use Moduloop ();
     package Alphabet;
 
     use Moduloop
-        interface => [qw( alpha bravo charlie delta )],
+        interface => { 
+            object => {
+                alpha   => {},
+                bravo   => {},
+                charlie => {},
+                delta   => {},
+            },
+            class => { new => {} }
+        },
         implementation => 'AlphabetImpl',
     ;
 }

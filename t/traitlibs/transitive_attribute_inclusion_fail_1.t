@@ -66,7 +66,12 @@ use Test::Most;
     package Alphabet;
 
     use Moduloop
-        interface => [qw( as_hash )],
+        interface => { 
+            object => {
+                as_hash => {},
+            },
+            class => { new => {} }
+        },
         implementation => 'AlphabetImpl',
     ;
 }

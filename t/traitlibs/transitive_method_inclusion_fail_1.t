@@ -68,7 +68,15 @@ use Moduloop ();
     use Moduloop ();
     eval { 
         Moduloop->assemble({
-            interface => [qw( alpha bravo charlie delta )],
+            interface => { 
+                object => {
+                    alpha   => {},
+                    bravo   => {},
+                    charlie => {},
+                    delta   => {},
+                },
+                class => { new => {} }
+            },
             implementation => 'AlphabetImpl',
         });
     }

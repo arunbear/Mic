@@ -41,7 +41,12 @@ use Moduloop ();
     package Sorter;
 
     use Moduloop
-        interface => [qw( sort )],
+        interface => { 
+            object => {
+                sort => {},
+            },
+            class => { new => {} }
+        },
         implementation => 'SorterImpl',
     ;
 }

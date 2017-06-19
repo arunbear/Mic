@@ -33,7 +33,12 @@ use Test::Most;
     use Moduloop ();
     eval { 
         Moduloop->assemble({
-            interface => [qw( greet )],
+            interface => { 
+                object => {
+                    greet => {},
+                },
+                class => { new => {} }
+            },
             implementation => 'PersonImpl',
         });
     }

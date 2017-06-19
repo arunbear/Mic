@@ -32,11 +32,11 @@ use Test::Most;
     package Person;
 
     use Moduloop
-        interface => [qw( greet )],
-        constructor => {
-            kv_args => {
-                name => { },
-            }
+        interface => { 
+            object => {
+                greet => {},
+            },
+            class => { new => {} }
         },
         implementation => 'PersonImpl',
     ;

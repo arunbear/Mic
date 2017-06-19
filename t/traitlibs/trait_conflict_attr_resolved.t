@@ -46,7 +46,12 @@ use Test::Most;
 {
     package BusyDude;
     use Moduloop
-        interface => [qw( serve )],
+        interface => { 
+            object => {
+                serve => {},
+            },
+            class => { new => {} }
+        },
         implementation => 'BusyDudeImpl'
     ;
 }

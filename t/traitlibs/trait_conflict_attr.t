@@ -48,7 +48,12 @@ use Test::Most;
     use Moduloop ();
     eval { 
         Moduloop->assemble({
-            interface => [qw( serve )],
+            interface => { 
+                object => {
+                    serve => {},
+                },
+                class => { new => {} }
+            },
             implementation => 'BusyDudeImpl'
         });
     }

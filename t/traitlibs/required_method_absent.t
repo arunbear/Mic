@@ -34,7 +34,12 @@ use Test::Most;
 
     eval { 
         Moduloop->assemble({
-            interface => [qw( sort )],
+            interface => { 
+                object => {
+                    sort => {},
+                },
+                class => { new => {} }
+            },
             implementation => 'SorterImpl',
         });
     }

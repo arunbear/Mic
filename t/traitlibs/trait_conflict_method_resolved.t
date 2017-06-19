@@ -46,7 +46,12 @@ use Test::Most;
     package BusyDude;
 
     use Moduloop
-        interface => [qw( pitch )],
+        interface => { 
+            object => {
+                pitch => {},
+            },
+            class => { new => {} }
+        },
         implementation => 'BusyDudeImpl'
     ;
 }

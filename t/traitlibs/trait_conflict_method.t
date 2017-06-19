@@ -43,7 +43,12 @@ use Test::Most;
     use Moduloop ();
     eval { 
         Moduloop->assemble({
-            interface => [qw( pitch )],
+            interface => { 
+                object => {
+                    pitch => {},
+                },
+                class => { new => {} }
+            },
             implementation => 'BusyDudeImpl'
         });
     }
