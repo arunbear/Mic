@@ -501,13 +501,7 @@ sub _make_builder_class {
 sub _add_class_methods {
     my ($spec, $stash) = @_;
 
-    {
-        if (!   ref $spec->{interface}
-            &&  (my $s = $Moduloop::Spec_for{ $spec->{interface} }{class_methods})) {
-            $spec->{class_methods} = $s;
-        }
-    }
-    $spec->{class_methods} ||= $stash->get_all_symbols('CODE');
+    $spec->{class_methods} = $spec->{implementation}{classmethod};
     _add_default_constructor($spec);
 
     foreach my $sub ( keys %{ $spec->{class_methods} } ) {
