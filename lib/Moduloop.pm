@@ -70,7 +70,7 @@ sub assemble {
 
     my @args = %$spec;
     validate(@args, {
-        interface => { type => ARRAYREF | HASHREF | SCALAR },
+        interface => { type => HASHREF | SCALAR },
         implementation => { type => SCALAR },
         invariant     => { type => HASHREF, optional => 1 },
         constructor    => { type => HASHREF, optional => 1 },
