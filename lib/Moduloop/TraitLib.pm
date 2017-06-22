@@ -16,6 +16,20 @@ sub install_subs {
 
     my $meta = \ %Moduloop::_Guts::Implementation_meta;
 
+    $stash->add_symbol('&ATTR',
+        sub : lvalue {
+            my ($obj, $attr) = @_;
+
+            if ( reftype $obj eq 'ARRAY' ) {
+                $attr =~ s/.*-//;
+                my $offset = $meta->{ref $obj}{slot_offset}{$attr};
+                return $obj->[$offset];
+            }
+            else {
+                return $obj->{$attr};
+            }
+        }
+    );
     $stash->add_symbol('&GET_ATTR',
         sub {
             my ($obj, $attr) = @_;
