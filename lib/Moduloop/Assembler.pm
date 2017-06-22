@@ -439,7 +439,6 @@ sub _make_builder_class {
     my ($spec) = @_;
 
     my $stash = Package::Stash->new("$spec->{name}::__Util");
-    # use Data::Dump 'pp'; die pp($stash);
     $Moduloop::Util_class{ $spec->{name} } = $stash->name;
 
     my $constructor_spec = _constructor_spec($spec);
@@ -641,8 +640,8 @@ sub _add_default_constructor {
                 $arg = [@_];
             }
 
-            my $builder_class = Moduloop::builder_class($class);
-            my $obj = $builder_class->new_object;
+            my $builder = Moduloop::builder_for($class);
+            my $obj = $builder->new_object;
             my $kv_args = ref $arg eq 'HASH' ? $arg : {};
             for my $name ( keys %{ $kv_args } ) {
 
@@ -664,17 +663,17 @@ sub _add_default_constructor {
                 }
             }
 
-            $builder_class->build($obj, $arg);
-            $builder_class->check_invariants($obj);
+            $builder->build($obj, $arg);
+            $builder->check_invariants($obj);
             return $obj;
         };
     }
 }
 
 sub _object_maker {
-    my ($builder_class, $init) = @_;
+    my ($builder, $init) = @_;
 
-    my $class = $builder_class->main_class;
+    my $class = $builder->main_class;
 
     my $stash = Package::Stash->new($class);
 

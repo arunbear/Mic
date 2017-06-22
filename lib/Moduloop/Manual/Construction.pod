@@ -169,7 +169,7 @@ If the default constructor is not flexible enough and you need to write your own
 =head2 The Builder class
 
 Each class has a corresponding Builder class. Within a class method, the Builder class
-is obtained by calling the C<builder_class> routine (see example below). 
+is obtained by calling the C<builder_for> routine (see example below). 
 
 The Builder class has the following construction related methods
 
@@ -215,7 +215,7 @@ We'll rewrite the counter example above and also show the more manual way of usi
     sub new {
         my ($class, $start) = @_;
 
-        my $builder = Moduloop::builder_class($class);
+        my $builder = Moduloop::builder_for($class);
         $builder->assert(start => $start);
         my $obj = $builder->new_object({count => $start});
         return $obj;
@@ -243,7 +243,7 @@ This can be simplified using the 'class_methods' declaration
             new => sub {
                 my ($class, $start) = @_;
 
-                my $builder = Moduloop::builder_class($class);
+                my $builder = Moduloop::builder_for($class);
                 $builder->assert(start => $start);
                 my $obj = $builder->new_object({count => $start});
                 return $obj;

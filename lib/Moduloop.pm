@@ -82,7 +82,7 @@ sub assemble {
     return $assembler->assemble;
 }
 
-sub builder_class {
+sub builder_for {
     my ($class) = @_;
 
     return $Util_class{ $class }

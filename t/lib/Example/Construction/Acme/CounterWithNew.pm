@@ -16,7 +16,7 @@ sub next {
 sub new {
     my ($class, $start) = @_;
 
-    my $builder = Moduloop::builder_class($class);
+    my $builder = Moduloop::builder_for($class);
     my $obj = $builder->new_object({count => $start});
     return $obj;
 };
