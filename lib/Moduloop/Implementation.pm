@@ -32,12 +32,6 @@ sub add_attribute_syms {
 
     my @slots = (
         keys %{ $arg->{has} },
-        @{ $arg->{requires}{attributes} || [] },
-        ( map {
-            @{ $arg->{traits}{$_}{attributes} || []  }
-          }
-          keys %{ $arg->{traits} }
-        ),
         '', # semiprivate pkg
     );
     foreach my $slot ( @slots ) {
