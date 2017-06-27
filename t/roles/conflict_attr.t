@@ -5,7 +5,7 @@ use Test::Most;
 {
     package Lawyer;
 
-    use Moduloop::TraitLib
+    use Moduloop::Role
         has  => { 
             CLIENTS => { default => sub { [] } } 
         }, 
@@ -15,7 +15,7 @@ use Test::Most;
 {
     package Server;
 
-    use Moduloop::TraitLib
+    use Moduloop::Role
         has  => { 
             CLIENTS => { default => sub { [] } } 
         }, 
@@ -30,15 +30,7 @@ use Test::Most;
     package BusyDudeImpl;
 
     use Moduloop::Implementation
-        traits => {
-            Lawyer => {
-                attributes => ['CLIENTS']
-            },
-            Server => {
-                methods    => [qw( serve )],
-                attributes => ['CLIENTS']
-            }
-        },
+        roles => [qw/Lawyer Server/],
     ;
 }
 
@@ -62,7 +54,6 @@ use Test::Most;
 
 package main;
 
-like($BusyDude::Error, qr/Cannot borrow trait 'CLIENTS' from both .*Lawyer/);
-like($BusyDude::Error, qr/Cannot borrow trait 'CLIENTS' from both .*Server/);
+like($BusyDude::Error, qr/Cannot have 'CLIENTS' in both Server and Lawyer/);
 
 done_testing();

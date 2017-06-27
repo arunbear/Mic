@@ -5,7 +5,7 @@ use Test::Most;
 {
     package Camper;
 
-    use Moduloop::TraitLib;
+    use Moduloop::Role;
 
     sub pitch {
         my ($self) = @_;
@@ -15,7 +15,7 @@ use Test::Most;
 {
     package BaseballPro;
 
-    use Moduloop::TraitLib;
+    use Moduloop::Role;
 
     sub pitch {
         my ($self) = @_;
@@ -26,14 +26,7 @@ use Test::Most;
     package BusyDudeImpl;
 
     use Moduloop::Implementation
-        traits => {
-            Camper => {
-                methods    => [qw( pitch )],
-            },
-            BaseballPro => {
-                methods    => [qw( pitch )],
-            }
-        },
+        roles => [qw/Camper BaseballPro/],
     ;
 
     sub pitch {

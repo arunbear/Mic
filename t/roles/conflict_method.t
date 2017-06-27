@@ -5,7 +5,7 @@ use Test::Most;
 {
     package Camper;
 
-    use Moduloop::TraitLib;
+    use Moduloop::Role;
 
     sub pitch {
         my ($self) = @_;
@@ -15,7 +15,7 @@ use Test::Most;
 {
     package BaseballPro;
 
-    use Moduloop::TraitLib;
+    use Moduloop::Role;
 
     sub pitch {
         my ($self) = @_;
@@ -26,14 +26,7 @@ use Test::Most;
     package BusyDudeImpl;
 
     use Moduloop::Implementation
-        traits => {
-            Camper => {
-                methods    => [qw( pitch )],
-            },
-            BaseballPro => {
-                methods    => [qw( pitch )],
-            }
-        },
+        roles => [qw/Camper BaseballPro/],
     ;
 }
 
@@ -57,7 +50,6 @@ use Test::Most;
 
 package main;
 
-like($BusyDude::Error, qr/Cannot borrow trait 'pitch' from both .*BaseballPro/);
-like($BusyDude::Error, qr/Cannot borrow trait 'pitch' from both .*Camper/);
+like($BusyDude::Error, qr/Cannot have 'pitch' in both BaseballPro and Camper/);
 
 done_testing();

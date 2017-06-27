@@ -6,15 +6,8 @@ use Moduloop ();
 {
     package Alpha;
 
-    use Moduloop::TraitLib
-        traits => {
-            Bravo => {
-                methods => [qw( bravo delta )],
-            },
-            Charlie => {
-                methods => [qw( charlie )],
-            },
-        },
+    use Moduloop::Role
+        roles => [qw( Bravo Charlie )],
     ;
 
     sub alpha { 'alpha' }
@@ -23,12 +16,8 @@ use Moduloop ();
 {
     package Bravo;
 
-    use Moduloop::TraitLib
-        traits => {
-            Delta => {
-                methods => [qw( delta )],
-            },
-        },
+    use Moduloop::Role
+        roles => [qw( Delta )],
     ;
 
     sub bravo { 'bravo' }
@@ -37,7 +26,7 @@ use Moduloop ();
 {
     package Charlie;
 
-    use Moduloop::TraitLib;
+    use Moduloop::Role;
 
     sub charlie { 'charlie' }
 }
@@ -45,7 +34,7 @@ use Moduloop ();
 {
     package Delta;
 
-    use Moduloop::TraitLib;
+    use Moduloop::Role;
 
     sub delta { 'delta' }
 }
@@ -54,11 +43,7 @@ use Moduloop ();
     package AlphabetImpl;
 
     use Moduloop::Implementation
-        traits => {
-            Alpha => {
-                methods => [qw( alpha bravo charlie delta )],
-            },
-        },
+        roles => [qw( Alpha )],
     ;
 }
 

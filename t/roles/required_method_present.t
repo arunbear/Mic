@@ -6,9 +6,9 @@ use Moduloop ();
 {
     package SorterTraits;
 
-    use Moduloop::TraitLib
+    use Moduloop::Role
         semiprivate => ['cmp'],
-        requires    => { methods => ['cmp'] }
+        requires    => ['cmp']
     ;
 
     sub sort {
@@ -23,11 +23,7 @@ use Moduloop ();
     package SorterImpl;
 
     use Moduloop::Implementation
-        traits => {
-            SorterTraits => {
-                methods => [qw( sort )],
-            },
-        },
+        roles => [ 'SorterTraits' ],
         semiprivate => ['cmp'],
     ;
 

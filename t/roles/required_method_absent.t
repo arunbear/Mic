@@ -5,8 +5,8 @@ use Test::Most;
 {
     package SorterTraits;
 
-    use Moduloop::TraitLib
-        requires => { methods => ['cmp'] }
+    use Moduloop::Role
+        requires => ['cmp']
     ;
 
     sub sort {
@@ -20,11 +20,7 @@ use Test::Most;
     package SorterImpl;
 
     use Moduloop::Implementation
-        traits => {
-            SorterTraits => {
-                methods => [qw( sort )],
-            },
-        },
+        roles => [ 'SorterTraits' ],
     ;
 }
 
@@ -48,6 +44,6 @@ use Test::Most;
 
 package main;
 
-like($Sorter::Error, qr/Method 'cmp', required by traitlib SorterTraits, is not implemented./);
+like($Sorter::Error, qr/Method 'cmp', required by role SorterTraits, is not implemented./);
 
 done_testing();
