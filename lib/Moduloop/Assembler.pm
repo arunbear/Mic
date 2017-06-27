@@ -64,6 +64,7 @@ sub assemble {
         has     => {
             %{ $meta->{has} || { } },
         },
+        around   => { local => $meta->{around} },
         forwards => $meta->{forwards},
         roles    => $meta->{roles},
         arrayimp => $meta->{arrayimp},
@@ -184,6 +185,7 @@ sub _compose_roles {
         $spec->{required_by_role}{$role} = $meta->{requires};
         _compose_roles($spec, $meta->{roles} || [], $from_role);
 
+        _add_role_modifiers($spec, $role, $meta->{around});
         _add_role_items($spec, $from_role, $role, $meta->{has}, 'has');
         _add_role_methods($spec, $from_role, $role, $meta, $method);
     }
@@ -382,6 +384,7 @@ sub _add_methods {
     }
 
     foreach my $name ( @{ $spec->{interface} } ) {
+        _add_modifiers($spec, $stash, $in_interface);
         _add_pre_conditions($spec, $stash, $name, 'object');
         _add_post_conditions($spec, $stash, $name, 'object');
     }
@@ -414,6 +417,18 @@ sub _add_invariants {
     };
     foreach my $type ( qw[before after] ) {
         install_modifier($stash->name, $type, @{ $spec->{interface} }, $spec->{invariant_guard});
+    }
+}
+
+sub _add_modifiers {
+    my ($spec, $stash, $in_interface) = @_;
+
+    foreach my $h (values %{ $spec->{implementation}{around} }) {
+
+        while ( my ($name, $sub) = each %{ $h } ) {
+            next unless $in_interface->{$name};
+            install_modifier($stash->name, 'around', $name, $sub);
+        }
     }
 }
 
@@ -750,6 +765,14 @@ sub _object_maker {
         lock_keys(%$obj);
     }
     return $obj;
+}
+
+sub _add_role_modifiers {
+    my ($spec, $role, $item) = @_;
+
+    for my $name ( keys %$item ) {
+        $spec->{implementation}{around}{$role}{$name} = $item->{$name};
+    }
 }
 
 sub _add_role_items {
