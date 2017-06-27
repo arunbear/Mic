@@ -1,5 +1,5 @@
 package Moduloop::Role;
-
+use strict;
 use Scalar::Util qw( reftype );
 require Moduloop::Implementation;
 
