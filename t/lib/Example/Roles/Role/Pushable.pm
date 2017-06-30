@@ -4,6 +4,7 @@ use Moduloop::Role
     has  => {
         items => { default => sub { [ ] } },
     }, 
+    semiprivate => ['remove'],
 ;
 
 sub size {
@@ -17,8 +18,8 @@ sub push {
     push @{ $self->{$ITEMS} }, $val;
 }
 
-sub pop {
-    my ($self, $i) = @_;
+sub remove {
+    my (undef, $self, $i) = @_;
 
     splice @{ $self->{$ITEMS} }, $i, 1;
 }

@@ -7,4 +7,11 @@ use Moduloop::Implementation
     /],
 ;
 
+sub pop {
+    my ($self) = @_;
+
+    $self->log_info;
+    $self->remove(0);
+}
+
 1;
