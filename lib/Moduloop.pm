@@ -6,7 +6,7 @@ use Carp;
 use Params::Validate qw(:all);
 use Moduloop::Assembler;
 
-our $VERSION = '0.000002';
+our $VERSION = '0.000003';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
