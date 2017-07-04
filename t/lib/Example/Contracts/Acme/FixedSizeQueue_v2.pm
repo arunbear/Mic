@@ -4,11 +4,11 @@ use Example::Delegates::Queue;
 
 use Moduloop::Implementation
     has  => {
-        q => { 
+        Q => {
             default => sub { Example::Delegates::Queue::->new },
         },
 
-        max_size => { 
+        MAX_SIZE => {
             init_arg => 'max_size',
             reader   => 'max_size',
         },
@@ -16,7 +16,7 @@ use Moduloop::Implementation
     forwards => [
         {
             send => [qw( head tail size )],
-            to   => 'q'
+            to   => 'Q'
         },
     ],
 ;

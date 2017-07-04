@@ -2,10 +2,9 @@ package Example::Construction::Acme::Set_v1;
 
 use Moduloop::Implementation
     has => { 
-        set => { 
+        SET => {
             default => sub { {} },
             init_arg => 'items',
-            map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
         } 
     },
 ;

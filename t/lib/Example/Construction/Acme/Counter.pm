@@ -2,7 +2,7 @@ package Example::Construction::Acme::Counter;
 
 use Moduloop::Imp
     has  => {
-        count => { init_arg => 'start' },
+        COUNT => { init_arg => 'start' },
     }, 
 ;
 

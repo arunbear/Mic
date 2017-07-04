@@ -2,7 +2,7 @@ package Example::Construction::Acme::Counter_v2;
 
 use Moduloop::Implementation
     has  => {
-        count => { },
+        COUNT => { },
     }, 
 ;
 

@@ -2,7 +2,7 @@ package Example::Construction::Acme::CounterWithNew;
 
 use Moduloop::Imp
     has  => {
-        count => { init_arg => 'start' },
+        COUNT => { init_arg => 'start' },
     }, 
     classmethod => ['new'],
 ;
@@ -17,7 +17,7 @@ sub new {
     my ($class, $start) = @_;
 
     my $builder = Moduloop::builder_for($class);
-    my $obj = $builder->new_object({count => $start});
+    my $obj = $builder->new_object({COUNT => $start});
     return $obj;
 };
 
