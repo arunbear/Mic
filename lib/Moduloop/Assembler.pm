@@ -64,7 +64,6 @@ sub assemble {
         has     => {
             %{ $meta->{has} || { } },
         },
-        around   => { local => $meta->{around} },
         forwards => $meta->{forwards},
         arrayimp => $meta->{arrayimp},
         slot_offset => $meta->{slot_offset},
@@ -247,7 +246,6 @@ sub _add_methods {
     }
 
     foreach my $name ( @{ $spec->{interface} } ) {
-        _add_modifiers($spec, $stash, $in_interface);
         _add_pre_conditions($spec, $stash, $name, 'object');
         _add_post_conditions($spec, $stash, $name, 'object');
     }
@@ -283,17 +281,6 @@ sub _add_invariants {
     }
 }
 
-sub _add_modifiers {
-    my ($spec, $stash, $in_interface) = @_;
-
-    foreach my $h (values %{ $spec->{implementation}{around} }) {
-
-        while ( my ($name, $sub) = each %{ $h } ) {
-            next unless $in_interface->{$name};
-            install_modifier($stash->name, 'around', $name, $sub);
-        }
-    }
-}
 
 sub _add_pre_conditions {
     my ($spec, $stash, $name, $type) = @_;
