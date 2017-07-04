@@ -20,7 +20,7 @@ use Test::Most;
 {
     package ProcessImpl;
 
-    use Moduloop::Imp
+    use Moduloop::HashImpl
         has => { ID => { reader => 'id' } }
     ;
     
