@@ -14,7 +14,6 @@ use Storable qw( dclone );
 use Sub::Name;
 
 use Exception::Class (
-    'Moduloop::Error::MethodDeclaration',
     'Moduloop::Error::ContractViolation',
 );
 use Moduloop::_Guts;
