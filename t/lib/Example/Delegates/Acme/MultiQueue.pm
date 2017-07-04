@@ -5,10 +5,10 @@ use Example::Delegates::Queue;
 use Moduloop::Implementation
     has  => {
         q1 => { 
-            default => sub { Example::Delegates::Queue->new },
+            default => sub { Example::Delegates::Queue::->new },
         },
         q2 => { 
-            default => sub { Example::Delegates::Queue->new },
+            default => sub { Example::Delegates::Queue::->new },
         },
     }, 
     forwards => [

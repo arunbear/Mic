@@ -5,7 +5,7 @@ use Example::Delegates::Queue;
 use Moduloop::ArrayImp
     has  => {
         Q => { 
-            default => sub { Example::Delegates::Queue->new },
+            default => sub { Example::Delegates::Queue::->new },
         },
 
         MAX_SIZE => { 
