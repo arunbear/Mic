@@ -200,7 +200,6 @@ sub _add_methods {
         }
         return UNIVERSAL::can($self, $f);
     };
-    _add_autoload($spec, $stash);
 
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
@@ -430,39 +429,6 @@ sub _add_class_methods {
         _add_pre_conditions($spec, $stash, $sub, 'class');
         _add_post_conditions($spec, $stash, $sub, 'class');
     }
-}
-
-sub _add_autoload {
-    my ($spec, $stash) = @_;
-
-    $spec->{implementation}{methods}{AUTOLOAD} = sub {
-        my $self = shift;
-
-        my $caller_sub = (caller 1)[3];
-        my $caller_pkg = $caller_sub;
-        $caller_pkg =~ s/::[^:]+$//;
-
-        my $called = ${ $stash->get_symbol('$AUTOLOAD') };
-        $called =~ s/.+:://;
-
-        if(    exists $spec->{implementation}{semiprivate}{$called}
-            && $caller_pkg eq ref $self
-        ) {
-            my $stash = _get_stash($spec->{implementation}{package});
-            my $sp_var = ${ $stash->get_symbol('$__') };
-            my $priv_pkg = reftype $self eq 'ARRAY'
-              ? $self->[0]
-              : $self->{$sp_var};
-            return $priv_pkg->$called($self, @_);
-        }
-        elsif( $called eq 'DESTROY' ) {
-            return;
-        }
-        else {
-            croak sprintf(q{Can't locate object method "%s" via package "%s"},
-                          $called, ref $self);
-        }
-    };
 }
 
 sub _add_delegates {
