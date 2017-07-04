@@ -22,7 +22,7 @@ use Moduloop::Implementation
 ;
 
 sub BUILD { 
-    my (undef, $self) = @_;
+    my ($self) = @_;
 
     # make constructor postcondition fail
     $self->{$Q}->push(1);

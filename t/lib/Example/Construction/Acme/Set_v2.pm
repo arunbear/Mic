@@ -9,7 +9,7 @@ use Moduloop::ArrayImp
 ;
 
 sub BUILD {
-    my (undef, $self, $args) = @_;
+    my ($self, $args) = @_;
 
     $self->[$SET] = { map { $_ => 1 } @{ $args } };
 }

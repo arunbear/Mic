@@ -27,7 +27,7 @@ use Test::Most;
     our $Count = 0;
 
     sub BUILD {
-        my (undef, $self) = @_;
+        my ($self) = @_;
 
         $self->{$ID} = ++$Count;
     }

@@ -7,7 +7,7 @@ use Moduloop::Implementation
 ;
 
 sub BUILD {
-    my (undef, $self, $arg) = @_;
+    my ($self, $arg) = @_;
 
     $self->{$COUNT} = $arg->{start};
 }
