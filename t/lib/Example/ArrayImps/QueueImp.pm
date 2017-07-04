@@ -1,6 +1,6 @@
 package Example::ArrayImps::QueueImp;
 
-use Moduloop::ArrayImp
+use Moduloop::ArrayImpl
     traits => {
         Example::TraitLibs::TraitLib::Pushable => {
             methods    => [qw( push size )],

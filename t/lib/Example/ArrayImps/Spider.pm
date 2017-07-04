@@ -17,7 +17,7 @@ Moduloop->assemble({
 
 package Example::ArrayImps::Acme::Spider;
 
-use Moduloop::ArrayImp
+use Moduloop::ArrayImpl
     has => { 
         URL => { reader => 'url', writer => 'set_url'  }
     },

@@ -1,4 +1,4 @@
-package Moduloop::ArrayImp;
+package Moduloop::ArrayImpl;
 
 use Readonly;
 require Moduloop::Implementation;
@@ -50,13 +50,13 @@ __END__
 
 =head1 NAME
 
-Moduloop::ArrayImp
+Moduloop::ArrayImpl
 
 =head1 SYNOPSIS
 
     package Example::ArrayImps::HashSet;
 
-    use Moduloop::ArrayImp
+    use Moduloop::ArrayImpl
         has => { set => { default => sub { {} } } },
     ;
 
@@ -76,8 +76,8 @@ Moduloop::ArrayImp
 
 =head1 DESCRIPTION
 
-Moduloop::ArrayImp can be used to create implementations based on blessed array refs (which may be desirable due to 
+Moduloop::ArrayImpl can be used to create implementations based on blessed array refs (which may be desirable due to 
 having faster access and less memory usage compared to hash based objects). 
 
-Moduloop::ArrayImp is used in the same way as L<Moduloop::Implementation>,
+Moduloop::ArrayImpl is used in the same way as L<Moduloop::Implementation>,
 the only difference being that the former creates array based objects.

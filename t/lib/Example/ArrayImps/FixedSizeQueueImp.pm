@@ -2,7 +2,7 @@ package Example::ArrayImps::FixedSizeQueueImp;
 
 use Example::Delegates::Queue;
 
-use Moduloop::ArrayImp
+use Moduloop::ArrayImpl
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },
