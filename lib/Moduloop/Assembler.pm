@@ -14,9 +14,7 @@ use Storable qw( dclone );
 use Sub::Name;
 
 use Exception::Class (
-    'Moduloop::Error::AssertionFailure' => { alias => 'assert_failed' },
     'Moduloop::Error::MethodDeclaration',
-    'Moduloop::Error::RoleConflict',
     'Moduloop::Error::ContractViolation',
 );
 use Moduloop::_Guts;
