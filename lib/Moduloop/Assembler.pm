@@ -71,13 +71,11 @@ sub assemble {
 
     _prep_interface($spec);
 
-    my $private_stash = Package::Stash->new("$spec->{name}::__Private");
     my $cls_stash = $self->{cls_stash};
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
-    $cls_stash->add_symbol('$__Private_pkg', $private_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
-    _add_methods($spec, $obj_stash, $private_stash);
+    _add_methods($spec, $obj_stash);
     _make_builder_class($spec);
     _add_class_methods($spec, $cls_stash);
     _check_interface($spec);
@@ -87,15 +85,11 @@ sub assemble {
 sub _collect_non_instance_methods {
     my ($spec, $meta) = @_;
 
-    my $is_semiprivate = _interface($meta, 'semiprivate');
     my $is_classmethod = _interface($meta, 'classmethod');
 
     foreach my $sub ( keys %{ $spec->{implementation}{methods} } ) {
         my $type;
-        if ( $is_semiprivate->{$sub} ) {
-            $type = 'semiprivate';
-        }
-        elsif ( $is_classmethod->{$sub} ) {
+        if ( $is_classmethod->{$sub} ) {
             $type = 'classmethod';
         }
         if ($type) {
@@ -125,7 +119,6 @@ sub _interface {
     $type ||= 'interface';
     my %must_allow = (
         interface   => [qw( AUTOLOAD can DOES DESTROY )],
-        semiprivate => [qw( BUILD )],
         classmethod => [  ],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
@@ -168,7 +161,7 @@ sub _check_interface {
 }
 
 sub _add_methods {
-    my ($spec, $stash, $private_stash) = @_;
+    my ($spec, $stash) = @_;
 
     my $in_interface = _interface($spec);
 
@@ -238,9 +231,6 @@ sub _add_methods {
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         next unless $in_interface->{$name};
         $stash->add_symbol("&$name", subname $stash->name."::$name" => $sub); 
-    }
-    while ( my ($name, $sub) = each %{ $spec->{implementation}{semiprivate} } ) {
-        $private_stash->add_symbol("&$name", subname $private_stash->name."::$name" => $sub);
     }
 
     foreach my $name ( @{ $spec->{interface} } ) {
@@ -539,10 +529,8 @@ sub _object_maker {
     my $spec = $stash->get_symbol('%__meta__');
     my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
     my $obj = $spec->{implementation}{arrayimp}
-      ? [ ${ $stash->get_symbol('$__Private_pkg') } ]
-      : {
-            $pkg_key => ${ $stash->get_symbol('$__Private_pkg') },
-        };
+      ? [ ]
+      : { };
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
         my $init_val = $init->{$attr}
