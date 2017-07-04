@@ -1,8 +1,7 @@
 package Example::ArrayImps::HashSet;
 
 use Moduloop::ArrayImp
-    has => { set => { default => sub { {} } } },
-    semiprivate => ['log_info'],
+    has => { SET => { default => sub { {} } } },
 ;
 
 sub has {
@@ -13,11 +12,11 @@ sub has {
 sub add {
     my ($self, $e) = @_;
     ++$self->[ $SET ]{$e};
-    $self->log_info;
+    log_info($self);
 }
 
 sub log_info {
-    my (undef, $self) = @_;
+    my ($self) = @_;
 
     warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), scalar(keys %{ $self->[$SET] });
 }
