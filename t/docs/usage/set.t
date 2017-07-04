@@ -3,7 +3,7 @@ use Test::Lib;
 use Test::More tests => 2;
 use Example::Usage::Set;
 
-my $set = Example::Usage::Set->new;
+my $set = Example::Usage::Set::->new;
 
 ok ! $set->has(1);
 

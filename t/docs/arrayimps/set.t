@@ -7,7 +7,7 @@ use Moduloop
 
 use Example::Synopsis::Set;
 
-my $set = Example::Synopsis::Set->new;
+my $set = Example::Synopsis::Set::->new;
 
 is reftype $set->[ $Example::ArrayImps::HashSet::SET ] => 'HASH';
 

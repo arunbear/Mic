@@ -5,7 +5,7 @@ use Test::More tests => 1;
 
 use Example::ArrayImps::Spider;
 
-my $spider = Example::ArrayImps::Spider->new;
+my $spider = Example::ArrayImps::Spider::->new;
 
 $spider->set_url('http://example.com');
 my $msg = $spider->crawl;

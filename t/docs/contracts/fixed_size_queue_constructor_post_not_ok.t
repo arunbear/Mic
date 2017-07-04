@@ -7,7 +7,7 @@ use Moduloop
 use Example::Contracts::FixedSizeQueue;
 
 throws_ok { 
-    my $q = Example::Contracts::FixedSizeQueue->new({max_size => 3});
+    my $q = Example::Contracts::FixedSizeQueue::->new({max_size => 3});
 } 
 qr/Method 'new' failed postcondition 'zero_sized'/;
 done_testing();

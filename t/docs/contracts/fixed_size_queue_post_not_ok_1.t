@@ -6,7 +6,7 @@ use Moduloop
     bind      => { 'Example::Contracts::FixedSizeQueue' => 'Example::Contracts::Acme::FixedSizeQueue_v2' };
 use Example::Contracts::FixedSizeQueue;
 
-my $q = Example::Contracts::FixedSizeQueue->new({max_size => 3});
+my $q = Example::Contracts::FixedSizeQueue::->new({max_size => 3});
 
 $q->push(1);
 is $q->size => 1, 'non empty';

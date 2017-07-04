@@ -5,7 +5,7 @@ use Test::More;
 #     bind => { 'Example::Delegates::FixedSizeQueue_v2' => 'Example::Delegates::Acme::FixedSizeQueue_v3' };
 use Example::Delegates::MultiQueue;
 
-my $q = Example::Delegates::MultiQueue->new;
+my $q = Example::Delegates::MultiQueue::->new;
 
 $q->multi_push('a');
 $q->multi_push('b');

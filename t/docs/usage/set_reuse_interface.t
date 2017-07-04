@@ -3,7 +3,7 @@ use Test::Lib;
 use Test::More tests => 3;
 use Example::Usage::SetReuseInterface;
 
-my $set = Example::Usage::SetReuseInterface->new;
+my $set = Example::Usage::SetReuseInterface::->new;
 
 ok ! $set->has(1);
 

@@ -3,7 +3,7 @@ use Test::Lib;
 use Test::More;
 use Example::Delegates::Queue;
 
-my $q = Example::Delegates::Queue->new;
+my $q = Example::Delegates::Queue::->new;
 
 is $q->size => 0;
 

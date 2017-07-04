@@ -6,7 +6,7 @@ use Moduloop
 
 use Example::Delegates::Queue;
 
-my $q = Example::Delegates::Queue->new;
+my $q = Example::Delegates::Queue::->new;
 
 $q->push($_) for 1 .. 3;
 is $q->size => 3;

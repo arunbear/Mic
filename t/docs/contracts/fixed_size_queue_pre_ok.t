@@ -5,7 +5,7 @@ use Moduloop
     contracts => { 'Example::Contracts::FixedSizeQueue' => { pre => 1 } };
 use Example::Contracts::FixedSizeQueue;
 
-my $q = Example::Contracts::FixedSizeQueue->new({max_size => 3});
+my $q = Example::Contracts::FixedSizeQueue::->new({max_size => 3});
 
 $q->push($_) for 1 .. 3;
 is $q->size => 3;
