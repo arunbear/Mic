@@ -27,7 +27,7 @@ use Test::Most;
     package PersonImpl;
 
     use Moduloop::Imp
-        has => { name => { reader => 'nmae' } }
+        has => { NAME => { reader => 'nmae' } }
     ;
 
     sub greet {

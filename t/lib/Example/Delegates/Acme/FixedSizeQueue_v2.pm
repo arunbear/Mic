@@ -4,23 +4,23 @@ use Example::Delegates::Queue;
 
 use Moduloop::Implementation
     has  => {
-        q => { 
+        Q => { 
             default => sub { Example::Delegates::Queue::->new },
         },
 
-        max_size => { 
+        MAX_SIZE => { 
             init_arg => 'max_size',
         },
     }, 
     forwards => [
         {
             send => 'q_size',
-            to   => 'q',
+            to   => 'Q',
             as   => 'size'
         },
         {
             send => 'q_pop',
-            to   => 'q',
+            to   => 'Q',
             as   => 'pop'
         },
     ],

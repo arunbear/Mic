@@ -2,7 +2,7 @@ package Example::Delegates::Acme::Queue_v1;
 
 use Moduloop::Implementation
     has  => {
-        q => { default => sub { [ ] } },
+        Q => { default => sub { [ ] } },
     }, 
 ;
 

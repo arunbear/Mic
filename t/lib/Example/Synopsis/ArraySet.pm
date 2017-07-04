@@ -1,7 +1,7 @@
 package Example::Synopsis::ArraySet;
 
 use Moduloop::Implementation
-    has => { set => { default => sub { [] } } },
+    has => { SET => { default => sub { [] } } },
 ;
 
 sub has {
