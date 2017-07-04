@@ -175,18 +175,6 @@ sub _add_methods {
 
     my $in_interface = _interface($spec);
 
-    $spec->{implementation}{semiprivate}{ASSERT} = sub {
-        shift;
-        my ($slot, $val) = @_;
-
-        my $slot_spec = $spec->{implementation}{has}{$slot}
-          or return;
-        return unless exists $slot_spec->{callbacks};
-
-        validate(@_, {
-            $slot => $slot_spec,
-        });
-    };
     $spec->{implementation}{methods}{DOES} = sub {
         my ($self, $r) = @_;
 
@@ -240,11 +228,9 @@ sub _add_methods {
                 my ($self, $new_val) = @_;
 
                 if ( reftype $self eq 'HASH' ) {
-                    $self->{$obfu_pkg}->ASSERT($name, $new_val);
                     $self->{ Moduloop::_Guts::obfu_name($name, $spec) } = $new_val;
                 }
                 else {
-                    $self->[0]->ASSERT($name, $new_val);
                     $self->[ $spec->{implementation}{slot_offset}{$name} ] = $new_val;
                 }
                 return $self;
