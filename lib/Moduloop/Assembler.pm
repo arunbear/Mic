@@ -354,15 +354,12 @@ sub _make_builder_class {
 
     $method{main_class} = sub { $spec->{name} };
 
-    my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
     $method{build} = sub {
         my (undef, $obj, $arg) = @_;
 
-        my $priv_pkg = reftype $obj eq 'ARRAY'
-          ? $obj->[0]
-          : $obj->{$obfu_pkg};
-        if ( my $builder = $priv_pkg->can('BUILD') ) {
-            $builder->($priv_pkg, $obj, $arg);
+        my $impl_pkg = $spec->{implementation}{package};
+        if ( my $builder = $impl_pkg->can('BUILD') ) {
+            $builder->($obj, $arg);
         }
     };
 
