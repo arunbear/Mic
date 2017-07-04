@@ -366,16 +366,6 @@ sub _make_builder_class {
         }
     };
 
-    $method{assert} = sub {
-        shift;
-        my ($slot, $val) = @_;
-
-        return unless exists $constructor_spec->{kv_args}{$slot};
-        validate(@_, {
-            $slot => $constructor_spec->{kv_args}{$slot},
-        });
-    };
-
     $method{check_invariants} = sub {
         shift;
         my ($obj) = @_;
