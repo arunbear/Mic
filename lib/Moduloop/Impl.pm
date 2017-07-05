@@ -10,34 +10,26 @@ __END__
 
 =head1 NAME
 
-Moduloop::Imp
+Moduloop::Impl
 
 =head1 SYNOPSIS
 
-    package Example::Construction::Acme::Set_v1;
+    package Example::Construction::Acme::Counter;
 
-    use Moduloop::Imp
-        has => {
-            set => {
-                default => sub { {} },
-                init_arg => 'items',
-                map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
-            }
-        },
+    use Moduloop::Impl
+        has  => {
+            COUNT => { init_arg => 'start' },
+        }, 
     ;
 
-    sub has {
-        my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
-    }
+    sub next {
+        my ($self) = @_;
 
-    sub add {
-        my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        $self->[ $COUNT ]++;
     }
 
     1;
 
 =head1 DESCRIPTION
 
-Moduloop::Imp is an alias of L<Moduloop::Implementation>, provided for convenience.
+Moduloop::Impl is an alias of L<Moduloop::ArrayImpl>, provided for convenience.
