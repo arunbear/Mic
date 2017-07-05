@@ -1,6 +1,6 @@
 package Example::Construction::Acme::CounterWithNew;
 
-use Moduloop::Imp
+use Moduloop::Impl
     has  => {
         COUNT => { init_arg => 'start' },
     }, 
@@ -10,7 +10,7 @@ use Moduloop::Imp
 sub next {
     my ($self) = @_;
 
-    $self->{$COUNT}++;
+    $self->[ $COUNT ]++;
 }
 
 sub new {

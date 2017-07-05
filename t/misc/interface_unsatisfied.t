@@ -26,13 +26,13 @@ use Test::Most;
 {
     package PersonImpl;
 
-    use Moduloop::Imp
+    use Moduloop::Impl
         has => { NAME => { reader => 'nmae' } }
     ;
 
     sub greet {
         my ($self) = @_;
-        return "Hello $self->{$NAME}";
+        return "Hello $self->[ $NAME ]";
     }
 }
 
