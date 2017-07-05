@@ -1,8 +1,8 @@
-package Moduloop::Imp;
+package Moduloop::Impl;
 
-require Moduloop::Implementation;
+require Moduloop::ArrayImpl;
 
-our @ISA = qw( Moduloop::Implementation );
+our @ISA = qw( Moduloop::ArrayImpl );
 
 1;
 
