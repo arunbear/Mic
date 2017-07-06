@@ -245,9 +245,9 @@ sub _add_invariants {
     return unless $Moduloop::Contracts_for{ $spec->{name} }{invariant};
     my $inv_hash =
       (!  ref $spec->{interface}
-       &&  $Moduloop::Spec_for{ $spec->{interface} }{invariant})
+       &&  $Moduloop::Spec_for{ $spec->{interface} }{interface_meta}{invariant})
 
-      || $spec->{invariant}
+      || $spec->{interface_meta}{invariant}
       or return;
 
     $spec->{invariant_guard} ||= sub {

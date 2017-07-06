@@ -55,12 +55,11 @@ use Moduloop
                 }
             },
         },
-    },
-
-    invariant => {
-        max_size_not_exceeded => sub {
-            my ($self) = @_;
-            $self->size <= $self->max_size;
+        invariant => {
+            max_size_not_exceeded => sub {
+                my ($self) = @_;
+                $self->size <= $self->max_size;
+            },
         },
     },
 
