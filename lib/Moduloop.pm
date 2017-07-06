@@ -72,12 +72,8 @@ sub assemble {
     validate(@args, {
         interface => { type => HASHREF | SCALAR },
         implementation => { type => SCALAR },
-        invariant     => { type => HASHREF, optional => 1 },
         constructor    => { type => HASHREF, optional => 1 },
-        class_methods  => { type => HASHREF, optional => 1 },
-        build_args     => { type => CODEREF, optional => 1 },
         name => { type => SCALAR, optional => 1 },
-        no_attribute_vars => { type => BOOLEAN, optional => 1 },
     });
     return $assembler->assemble;
 }
