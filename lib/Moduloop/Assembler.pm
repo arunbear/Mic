@@ -121,7 +121,7 @@ sub _interface {
         classmethod => [  ],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
-        $spec->{pre_and_post_conds} = $spec->{$type};
+        $spec->{interface_meta} = $spec->{$type};
         $spec->{$type} = [ keys %{ $spec->{$type}{object} } ];
     }
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
@@ -274,7 +274,7 @@ sub _add_pre_conditions {
 
     return unless $Moduloop::Contracts_for{ $spec->{name} }{pre};
 
-    my $pre_cond_hash = $spec->{pre_and_post_conds}{$type}{$name}{require}
+    my $pre_cond_hash = $spec->{interface_meta}{$type}{$name}{require}
       or return;
 
     my $guard = sub {
@@ -294,7 +294,7 @@ sub _add_post_conditions {
 
     return unless $Moduloop::Contracts_for{ $spec->{name} }{post};
 
-    my $post_cond_hash = $spec->{pre_and_post_conds}{$type}{$name}{ensure}
+    my $post_cond_hash = $spec->{interface_meta}{$type}{$name}{ensure}
       or return;
 
     my $constructor_spec = _constructor_spec($spec);
