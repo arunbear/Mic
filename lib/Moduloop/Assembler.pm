@@ -5,6 +5,7 @@ use Class::Method::Modifiers qw(install_modifier);
 use Carp;
 use Carp::Assert::More;
 use Hash::Util qw( lock_keys );
+use Hash::Merge qw( merge );
 use List::MoreUtils qw( all any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
@@ -69,6 +70,7 @@ sub assemble {
     $obj_stash = Package::Stash->new("$spec->{implementation}{package}::__Assembled");
 
     _prep_interface($spec);
+    _merge_interfaces($spec);
 
     my $cls_stash = $self->{cls_stash};
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
@@ -145,6 +147,17 @@ sub _prep_interface {
             $count++;
             redo;
         }
+    }
+}
+
+sub _merge_interfaces {
+    my ($spec) = @_;
+
+    foreach my $super (@{ $spec->{interface}{extends} || [] }) {
+        require_module($super);
+        my $declared_interface = $Moduloop::Spec_for{ $super }{interface}
+          or confess "$super is not a declared interface";
+        $spec->{interface} = merge($spec->{interface}, $declared_interface);
     }
 }
 
