@@ -158,6 +158,7 @@ sub _merge_interfaces {
         my $declared_interface = $Moduloop::Spec_for{ $super }{interface}
           or confess "$super is not a declared interface";
         $spec->{interface} = merge($spec->{interface}, $declared_interface);
+        $spec->{does}{$super} = 1;
     }
 }
 
@@ -182,14 +183,14 @@ sub _add_methods {
 
         if ( ! $r ) {
             my @items = (( $spec->{interface_name} ? $spec->{interface_name} : () ),
-                          $spec->{name}, sort keys %{ $spec->{composed_role} });
+                          $spec->{name}, sort keys %{ $spec->{does} });
             return unless defined wantarray;
             return wantarray ? @items : \@items;
         }
 
         return    $r eq $spec->{interface_name}
                || $spec->{name} eq $r
-               || $spec->{composed_role}{$r}
+               || $spec->{does}{$r}
                || $self->isa($r);
     };
     $spec->{implementation}{methods}{can} = sub {
