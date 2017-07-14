@@ -1,4 +1,4 @@
-package Example::Delegates::FixedSizeQueue_v2;
+package Example::Delegates::BoundedQueue_v2;
 
 use Moduloop
     interface => { 
@@ -18,7 +18,7 @@ use Moduloop
         }
     },
 
-    implementation => 'Example::Delegates::Acme::FixedSizeQueue_v2',
+    implementation => 'Example::Delegates::Acme::BoundedQueue_v2',
 ;
 
 1;

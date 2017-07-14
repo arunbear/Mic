@@ -1,4 +1,4 @@
-package Example::Contracts::FixedSizeQueue;
+package Example::Contracts::BoundedQueue;
 
 use Moduloop
     interface => {
@@ -63,7 +63,7 @@ use Moduloop
         },
     },
 
-    implementation => 'Example::Contracts::Acme::FixedSizeQueue_v1',
+    implementation => 'Example::Contracts::Acme::BoundedQueue_v1',
 ;
 
 1;

@@ -1,4 +1,4 @@
-package FixedSizeQueue;
+package BoundedQueue;
 
 use strict;
 use Moduloop ();
@@ -12,7 +12,7 @@ our %__meta__ = (
         },
         class => { new => {} }
     },
-    implementation => 'FixedSizeQueueImpl',
+    implementation => 'BoundedQueueImpl',
     construct_with  => {
         max_size => { 
             assert => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 

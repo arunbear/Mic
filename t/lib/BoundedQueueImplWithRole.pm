@@ -1,7 +1,7 @@
-package FixedSizeQueueImplWithRole;
+package BoundedQueueImplWithRole;
 
 use Moduloop::Implementation
-    roles => ['FixedSizeQueueRole'],
+    roles => ['BoundedQueueRole'],
     has  => {
         max_size => { 
             init_arg => 'max_size',

@@ -1,4 +1,4 @@
-package Example::Delegates::Acme::FixedSizeQueue_v3;
+package Example::Delegates::Acme::BoundedQueue_v3;
 
 use Example::Delegates::Queue;
 

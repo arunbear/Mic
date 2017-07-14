@@ -1,4 +1,4 @@
-package FixedSizeQueueRole;
+package BoundedQueueRole;
 
 use Moduloop::Role
     has  => {

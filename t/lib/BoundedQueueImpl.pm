@@ -1,4 +1,4 @@
-package FixedSizeQueueImpl;
+package BoundedQueueImpl;
 
 use Moduloop::Implementation
     has  => {

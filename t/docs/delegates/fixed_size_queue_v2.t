@@ -1,9 +1,9 @@
 use strict;
 use Test::Lib;
 use Test::More;
-use Example::Delegates::FixedSizeQueue_v2;
+use Example::Delegates::BoundedQueue_v2;
 
-my $q = Example::Delegates::FixedSizeQueue_v2::->new({max_size => 3});
+my $q = Example::Delegates::BoundedQueue_v2::->new({max_size => 3});
 
 $q->push($_) for 1 .. 3;
 is $q->q_size => 3;

@@ -2,7 +2,7 @@ use strict;
 use Test::Lib;
 use Test::More;
 # use Moduloop
-#     bind => { 'Example::Delegates::FixedSizeQueue_v2' => 'Example::Delegates::Acme::FixedSizeQueue_v3' };
+#     bind => { 'Example::Delegates::BoundedQueue_v2' => 'Example::Delegates::Acme::BoundedQueue_v3' };
 use Example::Delegates::MultiQueue;
 
 my $q = Example::Delegates::MultiQueue::->new;

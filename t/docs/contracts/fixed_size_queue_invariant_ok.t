@@ -2,10 +2,10 @@ use strict;
 use Test::Lib;
 use Test::More;
 use Moduloop
-    contracts => { 'Example::Contracts::FixedSizeQueue' => { invariant => 1 } };
-use Example::Contracts::FixedSizeQueue;
+    contracts => { 'Example::Contracts::BoundedQueue' => { invariant => 1 } };
+use Example::Contracts::BoundedQueue;
 
-my $q = Example::Contracts::FixedSizeQueue::->new({max_size => 3});
+my $q = Example::Contracts::BoundedQueue::->new({max_size => 3});
 
 $q->push($_) for 1 .. 3;
 is $q->size => 3;

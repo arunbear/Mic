@@ -1,4 +1,4 @@
-package Example::ArrayImps::FixedSizeQueueImp;
+package Example::ArrayImps::BoundedQueueImp;
 
 use Example::Delegates::Queue;
 
