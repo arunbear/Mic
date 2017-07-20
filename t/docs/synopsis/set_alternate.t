@@ -2,7 +2,7 @@ use strict;
 use Scalar::Util qw( reftype );
 use Test::Lib;
 use Test::More tests => 3;
-use Moduloop
+use Mic
     bind => { 'Example::Synopsis::Set' => 'Example::Synopsis::HashSet' };
 
 use Example::Synopsis::Set;

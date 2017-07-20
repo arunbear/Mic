@@ -1,10 +1,10 @@
-package Moduloop;
+package Mic;
 
 use strict;
 use 5.008_005;
 use Carp;
 use Params::Validate qw(:all);
-use Moduloop::Assembler;
+use Mic::Assembler;
 
 our $VERSION = '0.000003';
 $VERSION = eval $VERSION;
@@ -50,14 +50,14 @@ sub import {
 sub load_class {
     my ($class, $spec) = @_;
 
-    $spec->{name} ||= "Moduloop::Class_${\ ++$Class_count }";
+    $spec->{name} ||= "Mic::Class_${\ ++$Class_count }";
     $class->assemble($spec);
 }
 
 sub assemble {
     my (undef, $spec) = @_;
 
-    my $assembler = Moduloop::Assembler->new(-spec => $spec);
+    my $assembler = Mic::Assembler->new(-spec => $spec);
     my $cls_stash;
     if ( ! $spec->{name} ) {
         my $caller_pkg = (caller)[0];
@@ -92,7 +92,7 @@ __END__
 
 =head1 NAME
 
-Moduloop - Modular OOP made easy.
+Mic - Modular OOP made easy.
 
 =head1 SYNOPSIS
 
@@ -100,7 +100,7 @@ Moduloop - Modular OOP made easy.
 
     package Example::Synopsis::Set;
 
-    use Moduloop
+    use Mic
         interface => [ qw( has add ) ], # what the class does
 
         implementation => 'Example::Synopsis::ArraySet'; # how it does it
@@ -112,7 +112,7 @@ Moduloop - Modular OOP made easy.
 
     package Example::Synopsis::ArraySet;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
 	has => { set => { default => sub { [] } } },
     ;
 
@@ -148,7 +148,7 @@ Moduloop - Modular OOP made easy.
 
     package Example::Synopsis::HashSet;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
 	has => { set => { default => sub { {} } } },
     ;
 
@@ -169,7 +169,7 @@ Moduloop - Modular OOP made easy.
 
     package Example::Synopsis::Set;
 
-    use Moduloop
+    use Mic
         interface => [ qw( has add ) ],
 
         implementation => 'Example::Synopsis::HashSet'; # updated
@@ -179,7 +179,7 @@ Moduloop - Modular OOP made easy.
     # Or just
 
     use Test::More tests => 2;
-    use Moduloop
+    use Mic
 	bind => { 'Example::Synopsis::Set' => 'Example::Synopsis::HashSet' };
     use Example::Synopsis::Set;
 
@@ -195,7 +195,7 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Moduloop is a class building framework with the following features:
+Mic is a class building framework with the following features:
 
 =over
 
@@ -217,11 +217,11 @@ Encourages self documenting code.
 
 =item *
 
-Encourages robustness via Eiffel style L<contracts|Moduloop::Manual::Contracts>.
+Encourages robustness via Eiffel style L<contracts|Mic::Manual::Contracts>.
 
 =item *
 
-Supports code reuse via automated delegation and importable L<traits|Moduloop::TraitLib>.
+Supports code reuse via automated delegation and importable L<traits|Mic::TraitLib>.
 
 =item *
 
@@ -250,19 +250,19 @@ perhaps the most popular being the L<Moose> family. Although Moo(se) is very eff
 expense of L<Encapsulation|https://en.wikipedia.org/wiki/Information_hiding> (because Moose encourages the exposure of all an object's attributes via methods), and this in turn encourages
 designs that are tightly L<coupled|https://en.wikipedia.org/wiki/Coupling_(computer_programming)>.
 
-To see this first hand, try writing the fixed size queue from L<Moduloop::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
+To see this first hand, try writing the fixed size queue from L<Mic::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
 
-Moduloop takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
+Mic takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
 
 =head1 USAGE
 
 =head2 Via Import
 
-A class can be defined when importing Moduloop e.g.
+A class can be defined when importing Mic e.g.
 
     package Foo;
 
-    use Moduloop
+    use Mic
         interface => [ qw( list of methods ) ],
 
         constructor => { 
@@ -279,7 +279,7 @@ A class can be defined when importing Moduloop e.g.
         ;
     1;
 
-=head2 Moduloop->assemble([HASHREF])
+=head2 Mic->assemble([HASHREF])
 
 A class can also be defined by calling the C<assemble()> class method, with an optional hashref that
 specifies the class.
@@ -291,9 +291,9 @@ The class defined in the SYNOPSIS could also be defined like this
 
     package Example::Usage::Set;
 
-    use Moduloop ();
+    use Mic ();
 
-    Moduloop->assemble({
+    Mic->assemble({
         interface => [qw( add has )],
 
         implementation => 'Example::Usage::HashSet',
@@ -301,7 +301,7 @@ The class defined in the SYNOPSIS could also be defined like this
 
     package Example::Synopsis::HashSet;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has => { set => { default => sub { {} } } },
     ;
 
@@ -328,7 +328,7 @@ The meaning of the keys in the specification hash are described next.
 The interface is a list of messages that objects belonging to this class should respond to.
 
 It can be specified either as a reference to an array (which is how it appears in most examples in this documentation),
-or as a reference to a hash, in which case the values of the hash are L<contracts|Moduloop::Manual::Contracts> on the keys.
+or as a reference to a hash, in which case the values of the hash are L<contracts|Mic::Manual::Contracts> on the keys.
 
 An exception is raised if this is empty or missing.
 
@@ -339,7 +339,7 @@ otherwise an exception is raised.
 
 An optional reference to a hash which can be used to customise the behaviour of the default constructor.
 
-See L<Moduloop::Manual::Construction> for more about construction.
+See L<Mic::Manual::Construction> for more about construction.
 
 =head4 name => STRING (Default: 'new')
 
@@ -353,23 +353,23 @@ A hash that usded to define and validate named parameters to the default constru
 
 A hash that specifies postconditions that the constructor must satisfy.
 
-Postconditions are described in L<Moduloop::Manual::Contracts>.
+Postconditions are described in L<Mic::Manual::Contracts>.
 
 =head3 implementation => STRING
 
 The name of a package that defines the subroutines declared in the interface.
 
-L<Moduloop::Implementation> describes how implementations are configured.
+L<Mic::Implementation> describes how implementations are configured.
 
 =head3 invariant => HASHREF
 
-See L<Moduloop::Manual::Contracts> for more details about invariants.
+See L<Mic::Manual::Contracts> for more details about invariants.
 
 =head2 Bindings
 
 The implementation of a class can be quite easily changed from user code e.g. after
 
-    use Moduloop
+    use Mic
         bind => { 
             'Foo' => 'Foo::Fake', 
             'Bar' => 'Bar::Fake', 
@@ -392,25 +392,25 @@ The first step is to extract the common interface:
 
     package Example::Usage::SetInterface;
 
-    use Moduloop
+    use Mic
         declare_interface => [qw( add has )];
     1;
 
 C<declare_interface> can be used in conjunction with C<invariant>, C<constructor> and C<class_methods>.
 
-=head3 Moduloop->load_class(HASHREF)
+=head3 Mic->load_class(HASHREF)
 
 Then implementations of this interface can be loaded via C<load_class>:
 
     use Test::More tests => 4;
     use Example::Usage::SetInterface;
 
-    my $HashSetClass = Moduloop->load_class({
+    my $HashSetClass = Mic->load_class({
         interface      => 'Example::Usage::SetInterface',
         implementation => 'Example::Synopsis::HashSet',
     });
 
-    Moduloop->load_class({
+    Mic->load_class({
         interface      => 'Example::Usage::SetInterface',
         implementation => 'Example::Synopsis::ArraySet',
         name           => 'ArraySet',
@@ -447,16 +447,16 @@ returned by C<load_class>
 
 Behavioural and trait introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list (or array ref depending on context) of methods or traitlibs respectiively supported by the object.
 
-See the section "Using multiple traitlibs" from L<Moduloop::TraitLib/EXAMPLES> for an example.
+See the section "Using multiple traitlibs" from L<Mic::TraitLib/EXAMPLES> for an example.
 
-Also note that for any class C<Foo> created using Moduloop, and for any object created with C<Foo>'s constructor, the following will always return a true value
+Also note that for any class C<Foo> created using Mic, and for any object created with C<Foo>'s constructor, the following will always return a true value
 
     $object->DOES('Foo')
 
 =head1 BUGS
 
 Please report any bugs or feature requests via the GitHub web interface at
-L<https://github.com/arunbear/Moduloop/issues>.
+L<https://github.com/arunbear/Mic/issues>.
 
 =head1 ACKNOWLEDGEMENTS
 

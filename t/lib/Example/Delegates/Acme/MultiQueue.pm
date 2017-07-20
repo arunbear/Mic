@@ -2,7 +2,7 @@ package Example::Delegates::Acme::MultiQueue;
 
 use Example::Delegates::Queue;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has  => {
         Q1 => { 
             default => sub { Example::Delegates::Queue::->new },

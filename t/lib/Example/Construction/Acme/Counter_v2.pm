@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Counter_v2;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has  => {
         COUNT => { },
     }, 

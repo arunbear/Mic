@@ -1,6 +1,6 @@
 package Example::Synopsis::Counter;
 
-use Moduloop
+use Mic
     interface => { 
         object => {
             next => {},

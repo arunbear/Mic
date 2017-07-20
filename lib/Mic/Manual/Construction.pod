@@ -19,7 +19,7 @@ representing the starting value.
 
     package Example::Construction::Counter;
 
-    use Moduloop
+    use Mic
         interface => [ qw( next ) ],
 
         constructor => { 
@@ -37,7 +37,7 @@ representing the starting value.
 
     package Example::Construction::Acme::Counter;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has  => {
             count => { init_arg => 'start' },
         }, 
@@ -72,7 +72,7 @@ This can be acheieved using the "build_args" declaration, with which we use a su
 
     package Example::Construction::Set_v1;
 
-    use Moduloop
+    use Mic
         interface => [qw( add has )],
 
         constructor => { kv_args => { items => {} } },
@@ -92,7 +92,7 @@ In the implementation, we convert the argument array to a hash
 
     package Example::Construction::Acme::Set_v1;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has => { 
             set => { 
                 default => sub { {} },
@@ -148,7 +148,7 @@ is preferable due being more concise).
 
     package Example::Construction::Acme::Counter_v2;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has  => {
             count => { },
         }, 
@@ -190,12 +190,12 @@ declared with the attribute.
 
 =head2 Examples
 
-We'll rewrite the counter example above and also show the more manual way of using Moduloop
+We'll rewrite the counter example above and also show the more manual way of using Mic
 
     package Example::Construction::Counter_v2;
 
     use strict;
-    use Moduloop ();
+    use Mic ();
 
     our %__meta__ = (
         interface => [ qw( next ) ],
@@ -215,19 +215,19 @@ We'll rewrite the counter example above and also show the more manual way of usi
     sub new {
         my ($class, $start) = @_;
 
-        my $builder = Moduloop::builder_for($class);
+        my $builder = Mic::builder_for($class);
         $builder->assert(start => $start);
         my $obj = $builder->new_object({count => $start});
         return $obj;
     }
 
-    Moduloop->assemble;
+    Mic->assemble;
 
 This can be simplified using the 'class_methods' declaration
 
     package Example::Construction::Counter_v3;
 
-    use Moduloop
+    use Mic
         interface => [ qw( next ) ],
 
         constructor => { 
@@ -243,7 +243,7 @@ This can be simplified using the 'class_methods' declaration
             new => sub {
                 my ($class, $start) = @_;
 
-                my $builder = Moduloop::builder_for($class);
+                my $builder = Mic::builder_for($class);
                 $builder->assert(start => $start);
                 my $obj = $builder->new_object({count => $start});
                 return $obj;

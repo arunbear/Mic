@@ -1,6 +1,6 @@
 package Example::Synopsis::Acme::Counter;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has => {
         COUNT => { default => 0 },
     } 

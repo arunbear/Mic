@@ -1,6 +1,6 @@
 package Example::Delegates::BoundedQueue;
 
-use Moduloop
+use Mic
     interface => { 
         object => {
             push => {},

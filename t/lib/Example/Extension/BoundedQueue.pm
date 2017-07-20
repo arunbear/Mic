@@ -1,6 +1,6 @@
 package Example::Extension::BoundedQueue;
 
-use Moduloop
+use Mic
     interface => { 
         extends => [qw/Example::Extension::Queue/],
 

@@ -1,9 +1,9 @@
-package Moduloop::Role;
+package Mic::Role;
 use strict;
 use Scalar::Util qw( reftype );
-require Moduloop::Implementation;
+require Mic::Implementation;
 
-our @ISA = qw( Moduloop::Implementation );
+our @ISA = qw( Mic::Implementation );
 
 sub update_args {
     my ($class, $arg) = @_;
@@ -14,7 +14,7 @@ sub update_args {
 sub install_subs {
     my ($class, $stash) = @_;
 
-    my $meta = \ %Moduloop::_Guts::Implementation_meta;
+    my $meta = \ %Mic::_Guts::Implementation_meta;
 
     $stash->add_symbol('&ATTR',
         sub : lvalue {
@@ -37,13 +37,13 @@ __END__
 
 =head1 NAME
 
-Moduloop::Role
+Mic::Role
 
 =head1 SYNOPSIS
 
     package Foo::Role;
 
-    use Moduloop::Role
+    use Mic::Role
         has  => {
             beans => { default => sub { [ ] } },
         }, 
@@ -61,7 +61,7 @@ Roles provide reusable implementation details, i.e. they solve the problem of wh
 
 =head1 CONFIGURATION
 
-A role package can be configured either using Moduloop::Role or with a package variable C<%__meta__>. Both methods make use of the following keys:
+A role package can be configured either using Mic::Role or with a package variable C<%__meta__>. Both methods make use of the following keys:
 
 =head2 has => HASHREF
 
@@ -81,7 +81,7 @@ Any attributes listed here must be provided by an implementation package or a ro
 
 Variables with names corresponding to these attributes will be created in the role package to allow accessing the attributes e.g.
 
-    use Moduloop::Role
+    use Mic::Role
         requires => {
             attributes => [qw/length width/]
 
@@ -101,7 +101,7 @@ A list of roles which the current role is composed out of (roles can be built fr
 A list of semiprivate methods. These are methods provided by the role that are not indended
 to be used by end users of the class that the role was used in.
 
-Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Moduloop::Role (and also by Moduloop::Implementation).
+Each implementation package has a corresponding semiprivate package where its semiprivate methods live. This package can be accessed from an object via the variable C<$__> which is created by Mic::Role (and also by Mic::Implementation).
 
 A semiprivate method can then be called like this
 
@@ -128,7 +128,7 @@ Sample code:
 
     package Example::TraitLibs::TraitLib::Pushable;
 
-    use Moduloop::TraitLib
+    use Mic::TraitLib
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -179,7 +179,7 @@ The Queue class:
 
     package Example::Roles::Queue_v1;
 
-    use Moduloop
+    use Mic
         interface => [qw( push pop size )],
 
         implementation => 'Example::Roles::Acme::Queue_v1',
@@ -191,7 +191,7 @@ And its implementation:
 
     package Example::Roles::Acme::Queue_v1;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -240,7 +240,7 @@ Its class and implementation:
 
     package Example::Roles::Stack;
 
-    use Moduloop
+    use Mic
         interface => [qw( push pop size )],
 
         implementation => 'Example::Roles::Acme::Stack_v1',
@@ -250,7 +250,7 @@ Its class and implementation:
 
     package Example::Roles::Acme::Stack_v1;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -281,7 +281,7 @@ Suppose we wanted to factor out the commonality of the two implementations. We c
 
     package Example::Roles::Role::Pushable;
 
-    use Moduloop::Role
+    use Mic::Role
         has  => {
             items => { default => sub { [ ] } },
         }, 
@@ -306,7 +306,7 @@ Now using this role, the Queue implementation can be simplified to this:
 
     package Example::Roles::Acme::Queue_v2;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         roles => ['Example::Roles::Role::Pushable'],
 
         requires => {
@@ -326,7 +326,7 @@ And the Stack implementation can be simplified to this:
 
     package Example::Roles::Acme::Stack_v2;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         roles => ['Example::Roles::Role::Pushable'],
 
         requires => {
@@ -346,7 +346,7 @@ To test these new implementations, we don't even need to update the main classes
 
     use Test::More;
 
-    use Moduloop
+    use Mic
         bind => {
             'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v2',
         };
@@ -369,13 +369,13 @@ To test these new implementations, we don't even need to update the main classes
 
 =head2 Using multiple roles
 
-An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Moduloop::Implementation/PRIVATE ROUTINES>.
+An implementation can get its functionality from more than one role. As an example consider adding logging of the size as was done in L<Mic::Implementation/PRIVATE ROUTINES>.
 
 Such functionality does not logically belong in the Pushable role, but we could create a new role for it
 
     package Example::Roles::Role::LogSize;
 
-    use Moduloop::Role
+    use Mic::Role
         semiprivate => ['log_info'],
         requires => {
             methods => [qw/ size /],
@@ -394,7 +394,7 @@ Now we can use this role too
 
     package Example::Roles::Acme::Queue_v3;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         roles => [qw/
             Example::Roles::Role::Pushable
             Example::Roles::Role::LogSize
@@ -420,13 +420,13 @@ Now we can use this role too
 And use the queue like this
 
     % reply -I t/lib
-    0> use Moduloop bind => { 'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3' }
+    0> use Mic bind => { 'Example::Roles::Queue' => 'Example::Roles::Acme::Queue_v3' }
     1> use Example::Roles::Queue
     2> my $q = Example::Roles::Queue->new
     $res[0] = bless( {
         '83cb834b-' => 'Example::Roles::Queue::__Private',
         '83cb834b-items' => []
-    }, 'Example::Roles::Queue::__Moduloop' )
+    }, 'Example::Roles::Queue::__Mic' )
 
     3> $q->push(1)
     $res[1] = 1
@@ -451,4 +451,4 @@ And use the queue like this
 
     7>
 
-The last two commands show L<Moduloop>' support for introspection.
+The last two commands show L<Mic>' support for introspection.

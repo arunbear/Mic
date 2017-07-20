@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Moduloop
+use Mic
     contracts => { 'Example::Contracts::BoundedQueue' => { pre => 1 } };
 use Example::Contracts::BoundedQueue;
 

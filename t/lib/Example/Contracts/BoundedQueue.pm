@@ -1,6 +1,6 @@
 package Example::Contracts::BoundedQueue;
 
-use Moduloop
+use Mic
     interface => {
         class => {
             new => {

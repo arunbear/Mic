@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Set_v1;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has => { 
         SET => {
             default => sub { {} },

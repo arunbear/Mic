@@ -1,9 +1,9 @@
-package Moduloop::ArrayImpl;
+package Mic::ArrayImpl;
 
 use Readonly;
-require Moduloop::Implementation;
+require Mic::Implementation;
 
-our @ISA = qw( Moduloop::Implementation );
+our @ISA = qw( Mic::Implementation );
 
 sub update_args {
     my ($class, $arg) = @_;
@@ -50,13 +50,13 @@ __END__
 
 =head1 NAME
 
-Moduloop::ArrayImpl
+Mic::ArrayImpl
 
 =head1 SYNOPSIS
 
     package Example::ArrayImps::HashSet;
 
-    use Moduloop::ArrayImpl
+    use Mic::ArrayImpl
         has => { set => { default => sub { {} } } },
     ;
 
@@ -76,8 +76,8 @@ Moduloop::ArrayImpl
 
 =head1 DESCRIPTION
 
-Moduloop::ArrayImpl can be used to create implementations based on blessed array refs (which may be desirable due to 
+Mic::ArrayImpl can be used to create implementations based on blessed array refs (which may be desirable due to 
 having faster access and less memory usage compared to hash based objects). 
 
-Moduloop::ArrayImpl is used in the same way as L<Moduloop::Implementation>,
+Mic::ArrayImpl is used in the same way as L<Mic::Implementation>,
 the only difference being that the former creates array based objects.

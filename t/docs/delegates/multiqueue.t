@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::More;
-# use Moduloop
+# use Mic
 #     bind => { 'Example::Delegates::BoundedQueue_v2' => 'Example::Delegates::Acme::BoundedQueue_v3' };
 use Example::Delegates::MultiQueue;
 

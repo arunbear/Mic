@@ -1,8 +1,8 @@
 package Example::ArrayImps::Spider;
 
-use Moduloop ();
+use Mic ();
 
-Moduloop->assemble({
+Mic->assemble({
     interface => { 
         object => {
             crawl   => {},
@@ -17,7 +17,7 @@ Moduloop->assemble({
 
 package Example::ArrayImps::Acme::Spider;
 
-use Moduloop::ArrayImpl
+use Mic::ArrayImpl
     has => { 
         URL => { reader => 'url', writer => 'set_url'  }
     },

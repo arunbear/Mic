@@ -4,12 +4,12 @@ use Test::Most;
 
 {
     package Person;
-    use Moduloop ();
+    use Mic ();
 
     our $Error;
     
     eval { 
-        Moduloop->assemble({
+        Mic->assemble({
             interface => { 
                 object => {
                     greet => {},
@@ -26,7 +26,7 @@ use Test::Most;
 {
     package PersonImpl;
 
-    use Moduloop::Impl
+    use Mic::Impl
         has => { NAME => { reader => 'nmae' } }
     ;
 

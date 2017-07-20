@@ -1,4 +1,4 @@
-package Moduloop::_Guts;
+package Mic::_Guts;
 
 use Digest::MD5 qw( md5_hex );
 

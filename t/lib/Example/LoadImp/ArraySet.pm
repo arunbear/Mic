@@ -1,6 +1,6 @@
 package Example::LoadImp::ArraySet;
 
-use Moduloop::Implementation
+use Mic::Implementation
 
     has => { SET => { default => sub { [] } } },
 ;

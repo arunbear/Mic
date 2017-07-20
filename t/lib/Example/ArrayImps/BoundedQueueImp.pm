@@ -2,7 +2,7 @@ package Example::ArrayImps::BoundedQueueImp;
 
 use Example::Delegates::Queue;
 
-use Moduloop::ArrayImpl
+use Mic::ArrayImpl
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },

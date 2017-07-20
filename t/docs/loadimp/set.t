@@ -3,12 +3,12 @@ use Test::Lib;
 use Test::More tests => 6;
 use Example::LoadImp::Set;
 
-my $HashSetClass = Moduloop->load_class({
+my $HashSetClass = Mic->load_class({
     interface      => 'Example::LoadImp::Set',
     implementation => 'Example::LoadImp::HashSet',
 });
 
-Moduloop->load_class({
+Mic->load_class({
     interface      => 'Example::LoadImp::Set',
     implementation => 'Example::LoadImp::ArraySet',
     name           => 'ArraySet',

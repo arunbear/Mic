@@ -1,6 +1,6 @@
 package AlphabetRole;
 
-use Moduloop::Role;
+use Mic::Role;
 
 sub alpha   { 'alpha' }
 sub bravo   { 'bravo' }

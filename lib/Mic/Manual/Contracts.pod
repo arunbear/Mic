@@ -4,7 +4,7 @@ The following example illustrates the use of contracts, which are assertions tha
 
     package Example::Contracts::FixedSizeQueue;
 
-    use Moduloop
+    use Mic
         interface => {
             head => {},
             tail => {},
@@ -118,25 +118,25 @@ was violated.
 
 Contracts are not run by default, because they can result in many additional subroutine calls.
 
-To enable them, use the C<contracts> specifier when using Moduloop, e.g. to activate contracts
+To enable them, use the C<contracts> specifier when using Mic, e.g. to activate contracts
 for the Example::Contracts::FixedSizeQueue class/interface, the following can be done:
 
-    use Moduloop
+    use Mic
         contracts => { 'Example::Contracts::FixedSizeQueue' => { all => 1 } };
 
 turns on preconditions, postconditions and invariants.
 
-    use Moduloop
+    use Mic
         contracts => { 'Example::Contracts::FixedSizeQueue' => { pre => 1 } };
 
 turns on preconditions only.
 
-    use Moduloop
+    use Mic
         contracts => { 'Example::Contracts::FixedSizeQueue' => { post => 1 } };
 
 turns on postconditions only.
 
-    use Moduloop
+    use Mic
         contracts => { 'Example::Contracts::FixedSizeQueue' => { invariant => 1 } };
 
 turns on invariants only.

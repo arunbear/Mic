@@ -1,7 +1,7 @@
 package BoundedQueue;
 
 use strict;
-use Moduloop ();
+use Mic ();
 
 our %__meta__ = (
     interface => { 
@@ -19,4 +19,4 @@ our %__meta__ = (
         },
     }, 
 );
-Moduloop->minionize;
+Mic->minionize;

@@ -1,6 +1,6 @@
 package Example::Delegates::Acme::Queue_v1;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has  => {
         Q => { default => sub { [ ] } },
     }, 

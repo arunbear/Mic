@@ -4,9 +4,9 @@ use Test::Most;
 
 {
     package Process;
-    use Moduloop ();
+    use Mic ();
 
-    Moduloop->assemble({
+    Mic->assemble({
         interface => { 
             object => {
                 id => {},
@@ -20,7 +20,7 @@ use Test::Most;
 {
     package ProcessImpl;
 
-    use Moduloop::HashImpl
+    use Mic::HashImpl
         has => { ID => { reader => 'id' } }
     ;
     

@@ -1,7 +1,7 @@
-package Moduloop::Implementation;
+package Mic::Implementation;
 
 use strict;
-use Moduloop::_Guts;
+use Mic::_Guts;
 use Package::Stash;
 use Readonly;
 
@@ -44,9 +44,9 @@ sub add_obfu_name {
 
     Readonly my $sym_val => sprintf(
         "%s-$slot",
-       Moduloop::_Guts::attribute_sym($arg->{version}),
+       Mic::_Guts::attribute_sym($arg->{version}),
     );
-    $Moduloop::_Guts::obfu_name{$slot} = $sym_val;
+    $Mic::_Guts::obfu_name{$slot} = $sym_val;
 
     my $prefix = '';
     if($slot eq '') {
@@ -71,13 +71,13 @@ __END__
 
 =head1 NAME
 
-Moduloop::Implementation
+Mic::Implementation
 
 =head1 SYNOPSIS
 
     package Example::Construction::Acme::Set_v1;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has => {
             set => {
                 default => sub { {} },
@@ -106,7 +106,7 @@ behaviours described by the class interface.
 
 =head1 CONFIGURATION
 
-A implementation package is configured using Moduloop::Implementation and providing a hash with the following keys:
+A implementation package is configured using Mic::Implementation and providing a hash with the following keys:
 
 =head2 has => HASHREF
 
@@ -115,7 +115,7 @@ the following sub sections.
 
 An attribute called "foo" can be accessed via it's object in one of two ways:
 
-    # implementation defined using Moduloop::Implementation
+    # implementation defined using Mic::Implementation
     $self->{$FOO}
 
     # implementation defined using %__meta__
@@ -315,11 +315,11 @@ An exception will be raised if the same attribute/routine would be provided by t
 
 =back
 
-L<Moduloop::TraitLib> describes how traitlibs are configured.
+L<Mic::TraitLib> describes how traitlibs are configured.
 
 =head2 semiprivate => ARRAYREF
 
-These are perhaps only useful when used in conjunction with TraitLibs. They work the same way as in L<Moduloop::TraitLib>.
+These are perhaps only useful when used in conjunction with TraitLibs. They work the same way as in L<Mic::TraitLib>.
 
 =head1 PRIVATE ROUTINES
 
@@ -379,7 +379,7 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     $res[0] = bless( {
             '1f5f6ad9-' => 'Example::Construction::Set_v1::__Private',
             '1f5f6ad9-set' => {}
-        }, 'Example::Construction::Set_v1::__Moduloop' )
+        }, 'Example::Construction::Set_v1::__Mic' )
 
     2> $set->can
     $res[1] = [
@@ -397,7 +397,7 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     $res[3] = 2
 
     5> $set->log_info()
-    Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Moduloop" at reply input line 1.
+    Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Mic" at reply input line 1.
     6> 
 
 =head1 OBJECT COMPOSITION
@@ -444,7 +444,7 @@ Here is the interface for this fixed size queue
 
     package Example::Delegates::FixedSizeQueue;
 
-    use Moduloop
+    use Mic
         interface => [qw( push pop size )],
 
         constructor => {
@@ -466,7 +466,7 @@ And it is implemented like this
 
     use Example::Delegates::Queue;
 
-    use Moduloop::Implementation
+    use Mic::Implementation
         has  => {
             q => {
                 default => sub { Example::Delegates::Queue->new },

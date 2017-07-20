@@ -1,6 +1,6 @@
 package Example::Construction::Counter_v4;
 
-use Moduloop
+use Mic
     interface => { 
         object => {
             next => {},

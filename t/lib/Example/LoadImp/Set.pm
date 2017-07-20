@@ -1,6 +1,6 @@
 package Example::LoadImp::Set;
 
-use Moduloop
+use Mic
     declare_interface => { 
         object => {
             add => {},

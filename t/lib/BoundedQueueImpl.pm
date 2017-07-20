@@ -1,6 +1,6 @@
 package BoundedQueueImpl;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has  => {
         q => { default => sub { [ ] } },
         max_size => { 

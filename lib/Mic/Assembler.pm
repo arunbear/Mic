@@ -1,4 +1,4 @@
-package Moduloop::Assembler;
+package Mic::Assembler;
 
 use strict;
 use Class::Method::Modifiers qw(install_modifier);
@@ -15,9 +15,9 @@ use Storable qw( dclone );
 use Sub::Name;
 
 use Exception::Class (
-    'Moduloop::Error::ContractViolation',
+    'Mic::Error::ContractViolation',
 );
-use Moduloop::_Guts;
+use Mic::_Guts;
 
 sub new {
     my ($class, %arg) = @_;
@@ -49,7 +49,7 @@ sub assemble {
 
     my $obj_stash;
 
-    my $pkg = $Moduloop::Bound_implementation_of{ $spec->{name} } || $spec->{implementation};
+    my $pkg = $Mic::Bound_implementation_of{ $spec->{name} } || $spec->{implementation};
     $pkg ne $spec->{name}
       or confess "$spec->{name} cannot be its own implementation.";
     my $stash = _get_stash($pkg);
@@ -136,7 +136,7 @@ sub _prep_interface {
     my $count = 0;
     {
 
-        if (my $methods = $Moduloop::Spec_for{ $spec->{interface} }{interface}) {
+        if (my $methods = $Mic::Spec_for{ $spec->{interface} }{interface}) {
             $spec->{interface_name} = $spec->{interface};
             $spec->{interface} = $methods;
         }
@@ -155,7 +155,7 @@ sub _merge_interfaces {
 
     foreach my $super (@{ $spec->{interface}{extends} || [] }) {
         require_module($super);
-        my $declared_interface = $Moduloop::Spec_for{ $super }{interface}
+        my $declared_interface = $Mic::Spec_for{ $super }{interface}
           or confess "$super is not a declared interface";
         $spec->{interface} = merge($spec->{interface}, $declared_interface);
         $spec->{does}{$super} = 1;
@@ -210,7 +210,7 @@ sub _add_methods {
              && $meta->{reader}
              && $in_interface->{ $meta->{reader} } ) {
 
-            my $obfu_name = Moduloop::_Guts::obfu_name($name, $spec);
+            my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
             $spec->{implementation}{methods}{ $meta->{reader} } = sub { 
                 my ($self) = @_;
 
@@ -225,12 +225,12 @@ sub _add_methods {
              && $meta->{writer}
              && $in_interface->{ $meta->{writer} } ) {
 
-            my $obfu_pkg = Moduloop::_Guts::obfu_name('', $spec);
+            my $obfu_pkg = Mic::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{ $meta->{writer} } = sub {
                 my ($self, $new_val) = @_;
 
                 if ( reftype $self eq 'HASH' ) {
-                    $self->{ Moduloop::_Guts::obfu_name($name, $spec) } = $new_val;
+                    $self->{ Mic::_Guts::obfu_name($name, $spec) } = $new_val;
                 }
                 else {
                     $self->[ $spec->{implementation}{slot_offset}{$name} ] = $new_val;
@@ -256,10 +256,10 @@ sub _add_methods {
 sub _add_invariants {
     my ($spec, $stash) = @_;
 
-    return unless $Moduloop::Contracts_for{ $spec->{name} }{invariant};
+    return unless $Mic::Contracts_for{ $spec->{name} }{invariant};
     my $inv_hash =
       (!  ref $spec->{interface}
-       &&  $Moduloop::Spec_for{ $spec->{interface} }{interface_meta}{invariant})
+       &&  $Mic::Spec_for{ $spec->{interface} }{interface_meta}{invariant})
 
       || $spec->{interface_meta}{invariant}
       or return;
@@ -271,7 +271,7 @@ sub _add_invariants {
         foreach my $desc (keys %{ $inv_hash }) {
             my $sub = $inv_hash->{$desc};
             $sub->(@_)
-              or Moduloop::Error::ContractViolation->throw(
+              or Mic::Error::ContractViolation->throw(
                     error => "Invariant '$desc' violated",
                     show_trace => 1,
               );
@@ -286,7 +286,7 @@ sub _add_invariants {
 sub _add_pre_conditions {
     my ($spec, $stash, $name, $type) = @_;
 
-    return unless $Moduloop::Contracts_for{ $spec->{name} }{pre};
+    return unless $Mic::Contracts_for{ $spec->{name} }{pre};
 
     my $pre_cond_hash = $spec->{interface_meta}{$type}{$name}{require}
       or return;
@@ -295,7 +295,7 @@ sub _add_pre_conditions {
         foreach my $desc (keys %{ $pre_cond_hash }) {
             my $sub = $pre_cond_hash->{$desc};
             $sub->(@_)
-              or Moduloop::Error::ContractViolation->throw(
+              or Mic::Error::ContractViolation->throw(
                     error => "Method '$name' failed precondition '$desc'"
               );
         }
@@ -306,7 +306,7 @@ sub _add_pre_conditions {
 sub _add_post_conditions {
     my ($spec, $stash, $name, $type) = @_;
 
-    return unless $Moduloop::Contracts_for{ $spec->{name} }{post};
+    return unless $Mic::Contracts_for{ $spec->{name} }{post};
 
     my $post_cond_hash = $spec->{interface_meta}{$type}{$name}{ensure}
       or return;
@@ -333,7 +333,7 @@ sub _add_post_conditions {
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
             $sub->(@invocant, @old, $results_to_check, @_)
-              or Moduloop::Error::ContractViolation->throw(
+              or Mic::Error::ContractViolation->throw(
                     error => "Method '$name' failed postcondition '$desc'"
               );
         }
@@ -347,7 +347,7 @@ sub _make_builder_class {
     my ($spec) = @_;
 
     my $stash = Package::Stash->new("$spec->{name}::__Util");
-    $Moduloop::Util_class{ $spec->{name} } = $stash->name;
+    $Mic::Util_class{ $spec->{name} } = $stash->name;
 
     my $constructor_spec = _constructor_spec($spec);
 
@@ -455,7 +455,7 @@ sub _add_delegates {
 
             my @results;
             foreach my $desc ( @{ $local_method{$meth}{targets} } ) {
-                my $obfu_name = Moduloop::_Guts::obfu_name($desc->{to}, $spec);
+                my $obfu_name = Mic::_Guts::obfu_name($desc->{to}, $spec);
                 my $target = $desc->{as};
                 my $delegate = reftype $obj eq 'HASH'
                   ? $obj->{$obfu_name}
@@ -476,7 +476,7 @@ sub _constructor_spec {
 
     if(! ref $spec->{interface}) {
         my $s;
-        $s = $Moduloop::Spec_for{ $spec->{interface} }{constructor}
+        $s = $Mic::Spec_for{ $spec->{interface} }{constructor}
           and return $s;
     }
     $spec->{constructor} ||= {};
@@ -502,7 +502,7 @@ sub _add_default_constructor {
                 $arg = [@_];
             }
 
-            my $builder = Moduloop::builder_for($class);
+            my $builder = Mic::builder_for($class);
             my $obj = $builder->new_object;
             my $kv_args = ref $arg eq 'HASH' ? $arg : {};
             for my $name ( keys %{ $kv_args } ) {
@@ -516,7 +516,7 @@ sub _add_default_constructor {
                 if ( $attr ) {
                     my $attr_val = $arg->{$name};
                     if ( reftype $obj eq 'HASH' ) {
-                        my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
+                        my $obfu_name = Mic::_Guts::obfu_name($attr, $spec);
                         $obj->{$obfu_name} = $attr_val;
                     }
                     else {
@@ -540,7 +540,7 @@ sub _object_maker {
     my $stash = Package::Stash->new($class);
 
     my $spec = $stash->get_symbol('%__meta__');
-    my $pkg_key = Moduloop::_Guts::obfu_name('', $spec);
+    my $pkg_key = Mic::_Guts::obfu_name('', $spec);
     my $obj = $spec->{implementation}{arrayimp}
       ? [ ]
       : { };
@@ -556,13 +556,13 @@ sub _object_maker {
             $obj->[$offset] = $init_val;
         }
         else {
-            my $obfu_name = Moduloop::_Guts::obfu_name($attr, $spec);
+            my $obfu_name = Mic::_Guts::obfu_name($attr, $spec);
             $obj->{$obfu_name} = $init_val;
         }
     }
 
     bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
-    $Moduloop::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
+    $Mic::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
 
     if ( reftype $obj eq 'HASH' ) {
         lock_keys(%$obj);

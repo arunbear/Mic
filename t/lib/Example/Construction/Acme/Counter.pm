@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Counter;
 
-use Moduloop::Impl
+use Mic::Impl
     has  => {
         COUNT => { init_arg => 'start' },
     }, 

@@ -1,6 +1,6 @@
 package BoundedQueueImplWithRole;
 
-use Moduloop::Implementation
+use Mic::Implementation
     roles => ['BoundedQueueRole'],
     has  => {
         max_size => { 

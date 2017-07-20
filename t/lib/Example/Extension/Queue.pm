@@ -1,6 +1,6 @@
 package Example::Extension::Queue;
 
-use Moduloop
+use Mic
     declare_interface => { 
         object => {
             push => {},

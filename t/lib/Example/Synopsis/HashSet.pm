@@ -1,6 +1,6 @@
 package Example::Synopsis::HashSet;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has => { SET => { default => sub { {} } } },
 ;
 

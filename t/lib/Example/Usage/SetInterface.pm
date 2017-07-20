@@ -1,6 +1,6 @@
 package Example::Usage::SetInterface;
 
-use Moduloop
+use Mic
     declare_interface => { 
         object => {
             add => {},

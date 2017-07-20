@@ -1,6 +1,6 @@
 package Example::Usage::SetReuseInterface;
 
-use Moduloop
+use Mic
     interface => 'Example::Usage::SetInterface',
 
     implementation => 'Example::Synopsis::ArraySet',

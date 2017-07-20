@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::More;
-use Moduloop
+use Mic
     bind => { 'Example::Delegates::Queue' => 'Example::ArrayImps::QueueImp' };
 
 use Example::Delegates::Queue;

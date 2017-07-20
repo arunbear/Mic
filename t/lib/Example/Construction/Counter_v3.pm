@@ -1,7 +1,7 @@
 package Example::Construction::Counter_v3;
 
 use strict;
-use Moduloop
+use Mic
     interface => { 
         object => {
             next => {},

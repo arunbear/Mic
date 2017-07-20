@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Set_v2;
 
-use Moduloop::ArrayImpl
+use Mic::ArrayImpl
     has => { 
         SET => { 
             default => sub { {} },

@@ -1,6 +1,6 @@
 package BoundedQueueRole;
 
-use Moduloop::Role
+use Mic::Role
     has  => {
         q => { default => sub { [ ] } },
         max_size => { 

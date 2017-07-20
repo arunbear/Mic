@@ -2,7 +2,7 @@ package Example::Contracts::Acme::BoundedQueue_v6;
 
 use Example::Delegates::Queue;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },

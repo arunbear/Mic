@@ -1,6 +1,6 @@
 package Example::ArrayImps::HashSet;
 
-use Moduloop::ArrayImpl
+use Mic::ArrayImpl
     has => { SET => { default => sub { {} } } },
 ;
 

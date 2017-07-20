@@ -1,8 +1,8 @@
 package Example::Usage::Set;
 
-use Moduloop ();
+use Mic ();
 
-Moduloop->assemble({
+Mic->assemble({
     interface => { 
         object => {
             add => {},
@@ -16,7 +16,7 @@ Moduloop->assemble({
 
 package Example::Usage::HashSet;
 
-use Moduloop::Implementation
+use Mic::Implementation
     has => { SET => { default => sub { {} } } },
 ;
 

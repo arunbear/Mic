@@ -1,8 +1,8 @@
-package Moduloop::Impl;
+package Mic::Impl;
 
-require Moduloop::ArrayImpl;
+require Mic::ArrayImpl;
 
-our @ISA = qw( Moduloop::ArrayImpl );
+our @ISA = qw( Mic::ArrayImpl );
 
 1;
 
@@ -10,13 +10,13 @@ __END__
 
 =head1 NAME
 
-Moduloop::Impl
+Mic::Impl
 
 =head1 SYNOPSIS
 
     package Example::Construction::Acme::Counter;
 
-    use Moduloop::Impl
+    use Mic::Impl
         has  => {
             COUNT => { init_arg => 'start' },
         }, 
@@ -32,4 +32,4 @@ Moduloop::Impl
 
 =head1 DESCRIPTION
 
-Moduloop::Impl is an alias of L<Moduloop::ArrayImpl>, provided for convenience.
+Mic::Impl is an alias of L<Mic::ArrayImpl>, provided for convenience.

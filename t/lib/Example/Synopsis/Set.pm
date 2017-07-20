@@ -2,7 +2,7 @@
 
 package Example::Synopsis::Set;
 
-use Moduloop
+use Mic
     interface => {
         object => {
             add => {},

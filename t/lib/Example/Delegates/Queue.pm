@@ -1,6 +1,6 @@
 package Example::Delegates::Queue;
 
-use Moduloop
+use Mic
     interface => { 
         object => {
             push => {},

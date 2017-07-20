@@ -1,7 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Moduloop
+use Mic
     contracts => { 'Example::Contracts::BoundedQueue' => { invariant => 1 } },
     bind      => { 'Example::Contracts::BoundedQueue' => 'Example::Contracts::Acme::BoundedQueue_v5' };
 use Example::Contracts::BoundedQueue;
