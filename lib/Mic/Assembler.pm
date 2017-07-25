@@ -441,17 +441,12 @@ sub _add_delegates {
     }
 
     return unless %local_method;
-    my $in_interface = _interface($spec);
     foreach my $meth ( keys %local_method ) {
         if ( defined $spec->{implementation}{methods}{$meth} ) {
             croak "Cannot override implemented method '$meth' with a delegated method";
         }
         $spec->{implementation}{methods}{$meth} = sub { 
-            my $obj;
-            if( ! $in_interface->{$meth} ) {
-                shift;
-            }
-            $obj = shift;
+            my $obj = shift;
 
             my @results;
             foreach my $desc ( @{ $local_method{$meth}{targets} } ) {
