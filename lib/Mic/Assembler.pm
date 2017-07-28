@@ -6,7 +6,7 @@ use Carp;
 use Carp::Assert::More;
 use Hash::Util qw( lock_keys );
 use Hash::Merge qw( merge );
-use List::MoreUtils qw( all any uniq );
+use List::MoreUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
