@@ -1,9 +1,9 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Mic
-    contracts => { 'Example::Contracts::BoundedQueue' => { post => 1 } },
-    bind      => { 'Example::Contracts::BoundedQueue' => 'Example::Contracts::Acme::BoundedQueue_v6' };
+
+use Mic::Contracts 'Example::Contracts::BoundedQueue' => { post => 1 };
+use Mic::Bind      'Example::Contracts::BoundedQueue' => 'Example::Contracts::Acme::BoundedQueue_v6';
 use Example::Contracts::BoundedQueue;
 
 throws_ok { 

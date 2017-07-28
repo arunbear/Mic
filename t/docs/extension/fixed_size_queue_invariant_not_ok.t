@@ -1,9 +1,8 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Mic
-    contracts => { 'Example::Extension::BoundedQueue' => { invariant => 1 } },
-    bind      => { 'Example::Extension::BoundedQueue' => 'Example::Contracts::Acme::BoundedQueue_v5' };
+use Mic::Contracts 'Example::Extension::BoundedQueue' => { invariant => 1 };
+use Mic::Bind      'Example::Extension::BoundedQueue' => 'Example::Contracts::Acme::BoundedQueue_v5';
 use Example::Extension::BoundedQueue;
 
 my $q = Example::Extension::BoundedQueue::->new({max_size => 3});
