@@ -1,8 +1,8 @@
 package Example::Usage::Set;
 
-use Mic ();
+use Mic;
 
-Mic->assemble({
+Mic->setup_class({
     interface => { 
         object => {
             add => {},
