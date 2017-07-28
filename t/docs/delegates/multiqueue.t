@@ -1,8 +1,6 @@
 use strict;
 use Test::Lib;
 use Test::More;
-# use Mic
-#     bind => { 'Example::Delegates::BoundedQueue_v2' => 'Example::Delegates::Acme::BoundedQueue_v3' };
 use Example::Delegates::MultiQueue;
 
 my $q = Example::Delegates::MultiQueue::->new;
