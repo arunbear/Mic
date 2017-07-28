@@ -55,11 +55,14 @@ sub assemble {
     my $assembler = Mic::Assembler->new(-spec => $spec);
     my $cls_stash;
     if ( ! $spec->{name} ) {
-        my $caller_pkg = (caller)[0];
+        my $depth = 0;
+        my $caller_pkg = '';
+        my $pkg = __PACKAGE__;
 
-        if ( $caller_pkg eq __PACKAGE__ ) {
-            $caller_pkg = (caller 1)[0];
+        do {
+            $caller_pkg = (caller $depth++)[0];
         }
+          while $caller_pkg =~ /^$pkg\b/;
         $spec = $assembler->load_spec_from($caller_pkg);
     }
 
