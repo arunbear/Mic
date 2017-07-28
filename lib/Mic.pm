@@ -37,11 +37,6 @@ sub import {
             }
         }
     }
-    elsif ( $arg{declare_interface} ) {
-        my $caller_pkg = (caller)[0];
-        $arg{interface} = delete $arg{declare_interface};
-        $Spec_for{$caller_pkg} = \%arg;
-    }
     else {
         $class->assemble(\%arg);
     }
