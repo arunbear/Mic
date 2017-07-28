@@ -49,6 +49,8 @@ sub assemble {
     return $assembler->assemble;
 }
 
+*setup_class = \&assemble;
+
 sub builder_for {
     my ($class) = @_;
 
