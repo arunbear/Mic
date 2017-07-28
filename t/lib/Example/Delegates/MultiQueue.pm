@@ -1,6 +1,6 @@
 package Example::Delegates::MultiQueue;
 
-use Mic
+use Mic::Class
     interface => { 
         object => {
             multi_push => {},

@@ -1,6 +1,6 @@
 package Example::Construction::Counter;
 
-use Mic
+use Mic::Class
     interface => { 
         object => {
             next => {},

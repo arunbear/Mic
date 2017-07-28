@@ -1,6 +1,6 @@
 package Example::Extension::BoundedQueue;
 
-use Mic
+use Mic::Class
     interface => { 
         extends => [qw/Example::Extension::Queue/],
 

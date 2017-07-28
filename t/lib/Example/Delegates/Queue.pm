@@ -1,6 +1,6 @@
 package Example::Delegates::Queue;
 
-use Mic
+use Mic::Class
     interface => { 
         object => {
             push => {},

@@ -1,6 +1,6 @@
 package Example::Construction::Set_v1;
 
-use Mic
+use Mic::Class
 
     interface => { 
         object => {

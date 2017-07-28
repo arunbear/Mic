@@ -2,7 +2,7 @@
 
 package Example::Synopsis::Set;
 
-use Mic
+use Mic::Class
     interface => {
         object => {
             add => {},

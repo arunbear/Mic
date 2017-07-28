@@ -1,6 +1,6 @@
 package Example::Contracts::BoundedQueue;
 
-use Mic
+use Mic::Class
     interface => {
         class => {
             new => {

@@ -1,6 +1,6 @@
 package Example::Synopsis::Counter;
 
-use Mic
+use Mic::Class
     interface => { 
         object => {
             next => {},

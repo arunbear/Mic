@@ -1,7 +1,7 @@
 package Example::Construction::Counter_v3;
 
 use strict;
-use Mic
+use Mic::Class
     interface => { 
         object => {
             next => {},

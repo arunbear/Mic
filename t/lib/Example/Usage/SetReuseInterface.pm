@@ -1,6 +1,6 @@
 package Example::Usage::SetReuseInterface;
 
-use Mic
+use Mic::Class
     interface => 'Example::Usage::SetInterface',
 
     implementation => 'Example::Synopsis::ArraySet',

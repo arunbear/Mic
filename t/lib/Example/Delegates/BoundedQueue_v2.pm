@@ -1,6 +1,6 @@
 package Example::Delegates::BoundedQueue_v2;
 
-use Mic
+use Mic::Class
     interface => { 
         object => {
             push  => {},
