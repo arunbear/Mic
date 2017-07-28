@@ -1,8 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::More;
-use Mic
-    bind => { 'Example::Delegates::BoundedQueue_v2' => 'Example::Delegates::Acme::BoundedQueue_v3' };
+use Mic::Bind 'Example::Delegates::BoundedQueue_v2' => 'Example::Delegates::Acme::BoundedQueue_v3';
 use Example::Delegates::BoundedQueue_v2;
 
 my $q = Example::Delegates::BoundedQueue_v2::->new({max_size => 3});

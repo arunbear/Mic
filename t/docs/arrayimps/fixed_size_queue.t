@@ -1,8 +1,7 @@
 use strict;
 use Test::Lib;
 use Test::More;
-use Mic
-    bind => { 'Example::Delegates::BoundedQueue' => 'Example::ArrayImps::BoundedQueueImp' };
+use Mic::Bind 'Example::Delegates::BoundedQueue' => 'Example::ArrayImps::BoundedQueueImp';
 
 use Example::Delegates::BoundedQueue;
 
