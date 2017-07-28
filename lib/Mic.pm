@@ -15,33 +15,6 @@ our %Contracts_for;
 our %Spec_for;
 our %Util_class;
 
-sub import {
-    my ($class, %arg) = @_;
-
-    if ( $arg{bind} || $arg{contracts} ) {
-
-        if ( my $bindings = $arg{bind} ) {
-
-            foreach my $class ( keys %$bindings ) {
-                $Bound_implementation_of{$class} = $bindings->{$class};
-            }
-        }
-
-        if ( my $contracts = $arg{contracts} ) {
-
-            foreach my $class ( keys %$contracts ) {
-                $Contracts_for{$class} = $contracts->{$class};
-                if ( $Contracts_for{$class}{all} ) {
-                    $Contracts_for{$class} = { map { $_ => 1 } qw/pre post invariant/ };
-                }
-            }
-        }
-    }
-    else {
-        $class->assemble(\%arg);
-    }
-}
-
 sub load_class {
     my ($class, $spec) = @_;
 
