@@ -2,6 +2,7 @@ use strict;
 use Test::Lib;
 use Test::More tests => 6;
 use Example::LoadImp::Set;
+use Mic ();
 
 my $HashSetClass = Mic->load_class({
     interface      => 'Example::LoadImp::Set',
