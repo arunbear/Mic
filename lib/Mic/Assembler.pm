@@ -565,21 +565,6 @@ sub _object_maker {
     return $obj;
 }
 
-
-sub _copy_assertions {
-    my ($spec, $name, $attr) = @_;
-
-    my $constructor_spec = _constructor_spec($spec);
-    my $meta = $constructor_spec->{kv_args}{$name};
-
-    for my $desc ( keys %{ $meta->{callbacks} || {} } ) {
-        next if exists $spec->{implementation}{has}{$attr}{callbacks}{$desc};
-
-        $spec->{implementation}{has}{$attr}{callbacks}{$desc} = $meta->{callbacks}{$desc};
-    }
-}
-
-
 1;
 
 __END__
