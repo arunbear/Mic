@@ -6,19 +6,16 @@ use Mic::Implementation
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },
+            handles => {
+                q_size => 'size',
+                q_pop  => 'pop',
+            }
         },
 
         MAX_SIZE => { 
             init_arg => 'max_size',
         },
     }, 
-    forwards => [
-        {
-            send => [qw( q_size q_pop )],
-            to   => 'Q',
-            as   => [qw( size pop )],
-        },
-    ],
 ;
 
 sub push {

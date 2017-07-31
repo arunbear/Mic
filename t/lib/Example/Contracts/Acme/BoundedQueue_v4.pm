@@ -6,6 +6,7 @@ use Mic::Implementation
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },
+            handles => [qw( head size pop )],
         },
 
         MAX_SIZE => { 
@@ -13,12 +14,6 @@ use Mic::Implementation
             reader   => 'max_size',
         },
     }, 
-    forwards => [
-        {
-            send => [qw( head size pop )],
-            to   => 'Q'
-        },
-    ],
 ;
 
 sub tail { 

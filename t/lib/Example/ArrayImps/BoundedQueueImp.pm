@@ -6,18 +6,13 @@ use Mic::ArrayImpl
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },
+            handles => [qw( size pop )],
         },
 
         MAX_SIZE => { 
             init_arg => 'max_size',
         },
     }, 
-    forwards => [
-        {
-            send => [qw( size pop )],
-            to   => 'Q'
-        },
-    ],
 ;
 
 sub push {
