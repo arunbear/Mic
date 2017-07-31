@@ -238,8 +238,8 @@ sub _add_methods {
                 return $self;
             };
         }
+        _add_delegates($spec, $meta, $name);
     }
-    _add_delegates($spec);
 
     while ( my ($name, $sub) = each %{ $spec->{implementation}{methods} } ) {
         next unless $in_interface->{$name};
@@ -407,61 +407,45 @@ sub _add_class_methods {
 }
 
 sub _add_delegates {
-    my ($spec) = @_;
+    my ($spec, $meta, $name) = @_;
 
-    my %local_method;
-
-    foreach my $desc (@{ $spec->{implementation}{forwards} }) {
-
-        my $send = ref $desc->{send} eq 'ARRAY'
-          ? [uniq @{ $desc->{send} }]
-          : [$desc->{send}];
-
-        if ( any { exists $local_method{$_} } @{ $send } ) {
-            next;
+    if ( $meta->{handles} ) {
+        my $method;
+        my $target_method = {};
+        if ( ref $meta->{handles} eq 'ARRAY' ) {
+            $method = { map { $_ => 1 } @{ $meta->{handles} } };
         }
-        my $as = ref $desc->{as} eq 'ARRAY' ? $desc->{as} : [$desc->{as}];
-        if(ref $desc->{to} eq 'ARRAY') {
-            assert_nonref($desc->{send});
-            foreach my $i (0 .. $#{ $desc->{to} }) {
-                push @{ $local_method{ $desc->{send} }{targets} }, {
-                    to => $desc->{to}[$i],
-                    as => $as->[$i] || $desc->{send},
-                };
-            }
+        elsif( ref $meta->{handles} eq 'HASH' ) {
+            $method = $meta->{handles};
+            $target_method = $method;
         }
-        else {
-            foreach my $i (0 .. $#$send) {
-                push @{ $local_method{ $send->[$i] }{targets} }, {
-                    to => $desc->{to},
-                    as => $as->[$i] || $send->[$i],
-                };
-            }
-        }
-    }
 
-    return unless %local_method;
-    foreach my $meth ( keys %local_method ) {
-        if ( defined $spec->{implementation}{methods}{$meth} ) {
-            croak "Cannot override implemented method '$meth' with a delegated method";
-        }
-        $spec->{implementation}{methods}{$meth} = sub { 
-            my $obj = shift;
+        foreach my $meth ( keys %{ $method } ) {
+            if ( defined $spec->{implementation}{methods}{$meth} ) {
+                confess "Cannot override implemented method '$meth' with a delegated method";
+            }
+            else {
+                my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
+                my $target = $target_method->{$meth} || $meth;
+                $spec->{implementation}{methods}{$meth} = sub { 
+                    my $obj = shift;
 
-            my @results;
-            foreach my $desc ( @{ $local_method{$meth}{targets} } ) {
-                my $obfu_name = Mic::_Guts::obfu_name($desc->{to}, $spec);
-                my $target = $desc->{as};
-                my $delegate = reftype $obj eq 'HASH'
-                  ? $obj->{$obfu_name}
-                  : $obj->[ $spec->{implementation}{slot_offset}{ $desc->{to} } ];
-                push @results, $delegate->$target(@_);
+                    my $delegate = reftype $obj eq 'HASH'
+                        ? $obj->{$obfu_name}
+                        : $obj->[ $spec->{implementation}{slot_offset}{ $name } ];
+                    if (wantarray) {
+                        my @results = $delegate->$target(@_);
+                        return @results;
+                    }
+                    elsif( defined wantarray ) {
+                        return $delegate->$target(@_);
+                    }
+                    else {
+                        $delegate->$target(@_);
+                        return;
+                    }
+                }
             }
-            if (@results == 1) {
-                return $results[0];
-            }
-            return unless defined wantarray;
-            return wantarray ? @results : [@results];
         }
     }
 }
