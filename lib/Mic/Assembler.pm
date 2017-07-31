@@ -13,9 +13,6 @@ use Scalar::Util qw( reftype );
 use Storable qw( dclone );
 use Sub::Name;
 
-use Exception::Class (
-    'Mic::Error::ContractViolation',
-);
 use Mic::_Guts;
 
 sub new {
@@ -270,10 +267,7 @@ sub _add_invariants {
         foreach my $desc (keys %{ $inv_hash }) {
             my $sub = $inv_hash->{$desc};
             $sub->(@_)
-              or Mic::Error::ContractViolation->throw(
-                    error => "Invariant '$desc' violated",
-                    show_trace => 1,
-              );
+              or confess "Invariant '$desc' violated";
         }
     };
     foreach my $type ( qw[before after] ) {
@@ -294,9 +288,7 @@ sub _add_pre_conditions {
         foreach my $desc (keys %{ $pre_cond_hash }) {
             my $sub = $pre_cond_hash->{$desc};
             $sub->(@_)
-              or Mic::Error::ContractViolation->throw(
-                    error => "Method '$name' failed precondition '$desc'"
-              );
+              or confess "Method '$name' failed precondition '$desc'";
         }
     };
     install_modifier($stash->name, 'before', $name, $guard);
@@ -332,9 +324,7 @@ sub _add_post_conditions {
         foreach my $desc (keys %{ $post_cond_hash }) {
             my $sub = $post_cond_hash->{$desc};
             $sub->(@invocant, @old, $results_to_check, @_)
-              or Mic::Error::ContractViolation->throw(
-                    error => "Method '$name' failed postcondition '$desc'"
-              );
+              or confess "Method '$name' failed postcondition '$desc'";
         }
         return unless defined wantarray;
         return wantarray ? @$results : $results->[0];
