@@ -1,6 +1,5 @@
 requires 'perl', '5.008005';
 
-requires 'Carp::Assert::More', '1.14';
 requires 'Class::Method::Modifiers', '2.12';
 requires 'Exception::Class', '1.38';
 requires 'Hash::Merge', '0.2';

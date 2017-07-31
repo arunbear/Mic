@@ -3,7 +3,6 @@ package Mic::Assembler;
 use strict;
 use Class::Method::Modifiers qw(install_modifier);
 use Carp;
-use Carp::Assert::More;
 use Hash::Util qw( lock_keys );
 use Hash::Merge qw( merge );
 use List::MoreUtils qw( any uniq );
