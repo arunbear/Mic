@@ -121,6 +121,7 @@ sub _interface {
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
         $spec->{interface_meta} = $spec->{$type};
         $spec->{$type} = [ keys %{ $spec->{$type}{object} } ];
+        $Mic::Spec_for{ $spec->{name} }{interface} = $spec->{interface_meta};
     }
     return { map { $_ => 1 } @{ $spec->{$type} }, @{ $must_allow{$type} } };
 }
@@ -152,7 +153,7 @@ sub _merge_interfaces {
     foreach my $super (@{ $spec->{interface}{extends} || [] }) {
         require_module($super);
         my $declared_interface = $Mic::Spec_for{ $super }{interface}
-          or confess "$super is not a declared interface";
+          or confess "Could not find interface '$super'";
         $spec->{interface} = merge($spec->{interface}, $declared_interface);
         $spec->{does}{$super} = 1;
     }
