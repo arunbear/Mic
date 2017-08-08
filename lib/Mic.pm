@@ -196,7 +196,7 @@ Makes it easy to create classes that are L<modular|http://en.wikipedia.org/wiki/
 
 =item *
 
-Enables trivial swapping of implementations.
+Enables trivial swapping of implementations (see L<Mic::Bind>).
 
 =item *
 
@@ -204,7 +204,7 @@ Encourages self documenting code.
 
 =item *
 
-Encourages robustness via Eiffel style L<contracts|Mic::Manual::Contracts>.
+Encourages robustness via Eiffel style L<contracts|Mic::Contracts>.
 
 =item *
 
@@ -234,50 +234,33 @@ Mic takes some inspriation from Moose's declaratve approach to simplifying OO au
 
 =head1 USAGE
 
-=head2 Via Import
+=head2 Mic->setup_class(HASHREF)
 
-A class can be defined when importing Mic e.g.
-
-    package Foo;
-
-    use Mic
-        interface => [ qw( list of methods ) ],
-
-        constructor => { 
-            kv_args => {
-                # A Params::Validate spec
-                arg_name => {
-                    # ...
-                },
-                # ... other args
-            }
-        },
-
-        implementation => 'An::Implementation::Package',
-        ;
-    1;
-
-=head2 Mic->assemble(HASHREF)
-
-A class can also be defined by calling the C<assemble()> class method, with a hashref that
+In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the C<setup_class()> class method, with a hashref that
 specifies the class.
 
 The class defined in the SYNOPSIS could also be defined like this
 
     package Example::Usage::Set;
 
-    use Mic ();
+    use Mic;
 
-    Mic->assemble({
-        interface => [qw( add has )],
+    Mic->setup_class({
+        interface => { 
+            object => {
+                add => {},
+                has => {},
+            },
+            class => { new => {} }
+        },
 
         implementation => 'Example::Usage::HashSet',
     });
 
-    package Example::Synopsis::HashSet;
+    package Example::Usage::HashSet;
 
     use Mic::Implementation
-        has => { set => { default => sub { {} } } },
+        has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
@@ -292,74 +275,50 @@ The class defined in the SYNOPSIS could also be defined like this
 
     1;
 
-Here the interface and implementation packages are both in the same file. 
+For scenarios in which interfaces and implementations are defined in their own files, see L<Mic::Class> and L<Mic::Interface>.
 
 =head2 Specification
 
 The meaning of the keys in the specification hash are described next.
 
-=head3 interface => ARRAYREF | HASHREF
+=head3 interface => HASHREF | STRING
 
-The interface is a list of messages that objects belonging to this class should respond to.
+The interface is a group of messages that objects belonging to this class should respond to.
 
-It can be specified either as a reference to an array (which is how it appears in most examples in this documentation),
-or as a reference to a hash, in which case the values of the hash are L<contracts|Mic::Manual::Contracts> on the keys.
+It can be specified as a reference to a hash, in which the values of the hash are L<contracts|Mic::Contracts> on the keys.
+
+It can also be specified as a string that names a L<Mic::Interface> package which defines the interface.
 
 An exception is raised if this is empty or missing.
 
-The messages named in this list must have corresponding subroutine definitions in a declared implementation,
+The messages named in this group must have corresponding subroutine definitions in a declared implementation,
 otherwise an exception is raised.
 
-=head3 constructor => HASHREF
+The interface consists of the following subsections:
 
-An optional reference to a hash which can be used to customise the behaviour of the default constructor.
+=head4 object => HASHREF
 
-See L<Mic::Manual::Construction> for more about construction.
+Specifies the names of each method that these objects can respond to, as well as their contracts.
 
-=head4 name => STRING (Default: 'new')
+=head4 class => HASHREF
 
-The name of the constructor.
+Specifies the names of each class method that the class can respond to, as well as their contracts.
 
-=head4 kv_args => HASHREF
+=head4 invariant => HASHREF
 
-A hash that usded to define and validate named parameters to the default constructor. See L<Params::Validate> (especially the C<validate> function) for how this validation works.
-
-=head4 ensure => HASHREF
-
-A hash that specifies postconditions that the constructor must satisfy.
-
-Postconditions are described in L<Mic::Manual::Contracts>.
+See L<Mic::Manual::Contracts> for more details about invariants.
 
 =head3 implementation => STRING
 
 The name of a package that defines the subroutines declared in the interface.
 
-L<Mic::Implementation> describes how implementations are configured.
+L<Mic::Implementation> and L<Mic::ArrayImpl> describe how implementations are configured.
 
-=head3 invariant => HASHREF
+=head1 Interface Sharing
 
-See L<Mic::Manual::Contracts> for more details about invariants.
+=head3 Mic::Interface
 
-=head2 Bindings
-
-The implementation of a class can be quite easily changed from user code e.g. after
-
-    use Mic
-        bind => { 
-            'Foo' => 'Foo::Fake', 
-            'Bar' => 'Bar::Fake', 
-        };
-    use Foo;
-    use Bar;
-
-Foo and bar will be bound to fake implementations (e.g. to aid with testing), instead of the implementations defined in
-their respective modules.
-
-=head2 Interface Sharing
-
-=head3 declare_interface => ARRAYREF | HASHREF
-
-If two or more classes share a common interface, we can reduce duplication by factoring out that interface using C<declare_interface>, which expects an interface specified in the same way as C<interface> 
+If two or more classes share a common interface, we can reduce duplication by factoring out that interface using L<Mic::Interface>, which expects an interface specified in the same way as C<interface> 
 
 Suppose we wanted to use both versions of the set class (from the synopsis) in the same program.
 
@@ -367,11 +326,15 @@ The first step is to extract the common interface:
 
     package Example::Usage::SetInterface;
 
-    use Mic
-        declare_interface => [qw( add has )];
-    1;
+    use Mic::Interface
+        object => {
+            add => {},
+            has => {},
+        },
+        class => { new => {} }
+    ;
 
-C<declare_interface> can be used in conjunction with C<invariant>, C<constructor> and C<class_methods>.
+    1;
 
 =head3 Mic->load_class(HASHREF)
 
@@ -420,9 +383,7 @@ returned by C<load_class>
 
 =head2 Introspection
 
-Behavioural and trait introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> which if called with no argument will return a list (or array ref depending on context) of methods or traitlibs respectiively supported by the object.
-
-See the section "Using multiple traitlibs" from L<Mic::TraitLib/EXAMPLES> for an example.
+Behavioural (method) and interface introspection are possible using C<$object-E<gt>can> and C<$object-E<gt>DOES> respectiively which if called with no argument will return a list (or array ref depending on context) of methods or interfaces supported by the object.
 
 Also note that for any class C<Foo> created using Mic, and for any object created with C<Foo>'s constructor, the following will always return a true value
 
