@@ -65,7 +65,7 @@ __END__
 
 =head1 NAME
 
-Mic - Modular OOP made easy.
+Mic - Messages, Interfaces and Contracts.
 
 =head1 SYNOPSIS
 
@@ -73,33 +73,40 @@ Mic - Modular OOP made easy.
 
     package Example::Synopsis::Set;
 
-    use Mic
-        interface => [ qw( has add ) ], # what the class does
+    use Mic::Class
+        interface => {
+            object => {
+                add => {},
+                has => {},
+            },
+            class => {
+                new => {},
+            }
+        },
 
-        implementation => 'Example::Synopsis::ArraySet'; # how it does it
-
+        implementation => 'Example::Synopsis::ArraySet',
+        ;
     1;
-
 
     # And the implementation for this class:
 
     package Example::Synopsis::ArraySet;
 
     use Mic::Implementation
-	has => { set => { default => sub { [] } } },
+        has => { SET => { default => sub { [] } } },
     ;
 
     sub has {
-	my ($self, $e) = @_;
-	scalar grep { $_ == $e } @{ $self->{$SET} };
+        my ($self, $e) = @_;
+        scalar grep { $_ == $e } @{ $self->{$SET} };
     }
 
     sub add {
-	my ($self, $e) = @_;
+        my ($self, $e) = @_;
 
-	if ( ! $self->has($e) ) {
-	    push @{ $self->{$SET} }, $e;
-	}
+        if ( ! $self->has($e) ) {
+            push @{ $self->{$SET} }, $e;
+        }
     }
 
     1;
@@ -110,7 +117,7 @@ Mic - Modular OOP made easy.
     use Test::More tests => 2;
     use Example::Synopsis::Set;
 
-    my $set = Example::Synopsis::Set->new;
+    my $set = Example::Synopsis::Set::->new;
 
     ok ! $set->has(1);
     $set->add(1);
@@ -122,17 +129,17 @@ Mic - Modular OOP made easy.
     package Example::Synopsis::HashSet;
 
     use Mic::Implementation
-	has => { set => { default => sub { {} } } },
+        has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
-	my ($self, $e) = @_;
-	exists $self->{$SET}{$e};
+        my ($self, $e) = @_;
+        exists $self->{$SET}{$e};
     }
 
     sub add {
-	my ($self, $e) = @_;
-	++$self->{$SET}{$e};
+        my ($self, $e) = @_;
+        ++$self->{$SET}{$e};
     }
 
     1;
@@ -142,8 +149,16 @@ Mic - Modular OOP made easy.
 
     package Example::Synopsis::Set;
 
-    use Mic
-        interface => [ qw( has add ) ],
+    use Mic::Class
+        interface => {
+            object => {
+                add => {},
+                has => {},
+            },
+            class => {
+                new => {},
+            }
+        },
 
         implementation => 'Example::Synopsis::HashSet'; # updated
 
@@ -152,11 +167,10 @@ Mic - Modular OOP made easy.
     # Or just
 
     use Test::More tests => 2;
-    use Mic
-	bind => { 'Example::Synopsis::Set' => 'Example::Synopsis::HashSet' };
+    use Mic::Bind 'Example::Synopsis::Set' => 'Example::Synopsis::HashSet';
     use Example::Synopsis::Set;
 
-    my $set = Example::Synopsis::Set->new;
+    my $set = Example::Synopsis::Set::->new;
 
     ok ! $set->has(1);
     $set->add(1);
@@ -168,13 +182,13 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Mic is a class building framework with the following features:
+Mic is an OOP automation framework with the following features:
 
 =over
 
 =item *
 
-Reduces the tedium and boilerplate code typically involved in creating classes.
+Reduces the tedium and boilerplate code typically involved in creating object oriented modules.
 
 =item *
 
@@ -194,20 +208,13 @@ Encourages robustness via Eiffel style L<contracts|Mic::Manual::Contracts>.
 
 =item *
 
-Supports code reuse via automated delegation and importable L<traits|Mic::TraitLib>.
-
-=item *
-
 Supports hash and array based objects.
 
 =back
 
 
-Modularity means there is a clear and obvious separation between what end users need to know (the interface for using the class) and implementation details that users
+Modularity means there is an obvious separation between what the users of an object need to know (the interface for using the object) and implementation details that users
 don't need to know about.
-
-Classes are built from a specification that declares the interface of the class (i.e. what commands instances of the classs respond to),
-as well as a package that provide the implementation of these commands.
 
 This separation of interface from implementation details is an important aspect of modular design, as it enables modules to be interchangeable (so long as they have the same interface).
 
@@ -218,14 +225,12 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 =head1 RATIONALE
 
-Due to Perl's "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
+Due to Perl's low level "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
 perhaps the most popular being the L<Moose> family. Although Moo(se) is very effective at simplifying class building, this is typically achieved at the
 expense of L<Encapsulation|https://en.wikipedia.org/wiki/Information_hiding> (because Moose encourages the exposure of all an object's attributes via methods), and this in turn encourages
 designs that are tightly L<coupled|https://en.wikipedia.org/wiki/Coupling_(computer_programming)>.
 
-To see this first hand, try writing the fixed size queue from L<Mic::Implementation/OBJECT COMPOSITION> using L<Moo>, bearing in mind that the only operations the queue should allow are C<push>, C<pop> and C<size>. It is also a revealing exercise to consider how this queue would be written in another language such as Ruby or PHP (e.g. would you need to expose all object attributes via methods?). 
-
-Mic takes inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put encapsulation and loose coupling on the path of least resistance.
+Mic takes some inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put abstraction and loose coupling on the path of least resistance.
 
 =head1 USAGE
 
@@ -252,13 +257,10 @@ A class can be defined when importing Mic e.g.
         ;
     1;
 
-=head2 Mic->assemble([HASHREF])
+=head2 Mic->assemble(HASHREF)
 
-A class can also be defined by calling the C<assemble()> class method, with an optional hashref that
+A class can also be defined by calling the C<assemble()> class method, with a hashref that
 specifies the class.
-
-If the hashref is not given, the specification is read from a package variable named C<%__meta__> in the package
-from which C<assemble()> was called.
 
 The class defined in the SYNOPSIS could also be defined like this
 
