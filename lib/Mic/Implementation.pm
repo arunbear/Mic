@@ -79,10 +79,9 @@ Mic::Implementation
 
     use Mic::Implementation
         has => {
-            set => {
+            SET => {
                 default => sub { {} },
                 init_arg => 'items',
-                map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
             }
         },
     ;
@@ -110,19 +109,12 @@ A implementation package is configured using Mic::Implementation and providing a
 
 =head2 has => HASHREF
 
-This declares attributes of the implementation, mapping the name of an attribute to a hash with keys described in
+This declares attributes (or instance variables) of the implementation, mapping the name of an attribute to a hash with keys described in
 the following sub sections.
 
-An attribute called "foo" can be accessed via it's object in one of two ways:
+An attribute called "FOO" can be accessed via it's object using the symbol C<$FOO> which is created by Mic::Implementation:
 
-    # implementation defined using Mic::Implementation
     $self->{$FOO}
-
-    # implementation defined using %__meta__
-    $self->{-foo}
-
-The advantage of the first form is that the symbol C<$FOO> is not (easily) available to users of the object, so
-there is greater incentive for using the provided interface when using the object.
 
 =head3 default => SCALAR | CODEREF
 
@@ -130,201 +122,42 @@ The default value assigned to the attribute when the object is created. This can
 which will be excecuted to build the the default value (this would be needed if the default value is a reference,
 to prevent all objects from sharing the same reference).
 
-=head3 callbacks => HASHREF
+=head3 handles => ARRAYREF | HASHREF
 
-This is like the C<callbacks> declared in a class package (under C<constructor/kv_args>), except that these assertions are not run at
-construction time. Rather they are invoked by calling the semiprivate ASSERT routine.
+This declares that methods can be forwarded from the object to this attribute in one of two ways
+described below.
+
+=head3 handles => ARRAYREF
+
+All methods in the given array will be forwarded.
+
+=head3 handles => HASHREF
+
+Method forwarding will be set up such that a method whose name is a key in the given hash will be
+forwarded to a method whose name is the corresponding value in the hash.
+
 
 =head3 init_arg => SCALAR
 
 This causes the attribute to be populated with the value of a similarly named constructor parameter.
 
-=head3 map_init_arg => CODEREF
-
-If the attribute has an C<init_arg>, it will be populated with the result of applying the given code ref to the value of a similarly named constructor parameter.
-
 =head3 reader => SCALAR
 
-This can be a string which if present will be the name of a generated reader method.
+This must be a string which defines the name of a generated reader (or accessor) method.
 
 Readers should only be created if they are needed by end users of the class.
 
 =head3 writer => SCALAR
 
-This can be a string which if present will be the name of a generated writer method.
+This must be a string which defines the name of a generated writer (or mutator) method.
 
 Writers should only be created if they are needed by end users of the class.
 
-=head2 forwards => ARRAYREF
-
-A reference to an array of hashes, each of which specifies methods delegated to an object stored in one of the implementation
-'s attributes.
-
-    forwards => [
-        { 
-            send => 'start',
-            to   => 'engine'
-        },
-        { 
-            send => 'power',
-            to   => 'flywheel',
-            as   => 'brake',
-        },
-        { 
-            send => [qw(play pause rewind fast_forward shuffle)],
-            to   => 'ipod',
-        },
-        { 
-            send => [qw(accelerate decelerate)],
-            to => 'brakes',
-            as => [qw(start stop)],
-        },
-        { 
-            send => 'drive',
-            to => [qw(right_rear_wheel left_rear_wheel)],
-            as => [qw(rotate_clockwise rotate_anticlockwise)]
-        },
-    ],
-
-(I<This is inspired by L<Class::Delegator>>)
-
-These forwarding methods are generated as public methods if they are declared in
-the interface, and as semiprivate routines otherwise.
-
-=head3 Specifying methods to be delegated
-
-The names of methods to be redispatched are specified using the C<send> key. The corresponding value may be specified as a single string or as an array of strings. A single string specifies a single method to be delegated, while an array reference is a list of methods to be delegated.
-
-=head3 Specifying methods to be delegated
-
-The C<to> key specifies the attribute(s) to which the method(s) specified by the send parameter are to be delegated.
-
-=head3 Specifying the name of a delegated method
- 
-Sometimes it's necessary for the name of the method that's being delegated to
-be different from the name of the method to which you're delegating execution.
-For example, your class might already have a method with the same name as the
-method to which you're delegating. The C<as> key allows you translate
-the method name or names in a delegation specification. The value associated with
-an C<as> key specifies the name of the method to be invoked, and may be
-a string or an array (with the number of elements in the array matching the
-number of elements in a corresponding C<send> array).
- 
-If the attribute is specified via a single string, that string is taken as the
-name of the attribute to which the associated method (or methods) should be
-delegated. For example, to delegate invocations of C<$self-E<gt>power(...)> to
-C<$self-E<gt>{$FLYWHEEL}-E<gt>brake(...)>:
- 
-    forwards => [
-        {
-            send => 'power',
-              to => 'flywheel',
-              as => 'brake',
-        },
-    ]
- 
-If both the C<send> and the C<as> parameters specify array references, each
-local method name and deleted method name form a pair, which is invoked. For
-example:
- 
-  forwards => [
-        {
-            send => [qw(accelerate decelerate)],
-              to => 'brakes',
-              as => [qw(start stop)],
-        },
-  ]
- 
-In this example, the C<accelerate> method will be delegated to the C<start>
-method of the C<brakes> attribute and the C<decelerate> method will be
-delegated to the C<stop> method of the C<brakes> attribute.
-
-=head3 Delegation to multiple attributes in parallel
- 
-An array reference can be used as the value of the C<to> key to specify
-a list of attributes, I<all of which> are delegated to--in the same order
-as they appear in the array. In this case, the C<send> key B<must> be a
-scalar value, not an array of methods to delegate.
- 
-For example, to distribute invocations of C<$self-E<gt>drive(...)> to both
-C<$self-E<gt>{$LEFT_REAR_WHEEL}-E<gt>drive(...)> and
-C<$self-E<gt>{$RIGHT_REAR_WHEEl}-E<gt>drive(...)>:
- 
-  forwards => [{
-      send => 'drive',
-        to => [qw(left_rear_wheel right_rear_wheel)]
-  }]
- 
-Note that using an array to specify parallel delegation has an effect on the
-return value of the delegation method specified by the C<send> key. In a
-scalar context, the original call returns a reference to an array containing
-the (scalar context) return values of each of the calls. In a list context,
-the original call returns a list of array references containing references to
-the individual (list context) return lists of the calls. So, for example, if
-the C<cost> method of a class were delegated like so:
- 
-  forwards => [{
-      send => 'cost',
-        to => ['supplier', 'manufacturer', 'distributor']
-  }]
- 
-then the total cost could be calculated like this:
- 
-  use List::Util 'sum';
-  my $total = sum @{$obj->cost()};
- 
-If both the C<"to"> and the C<"as"> keys specify multiple values,
-then each attribute and method name form a pair, which is invoked. For
-example:
- 
-  forwards => [{
-      send => 'escape',
-        to => [ qw(flywheel smokescreen ) ],
-        as => [ qw( engage release ) ],
-  }]
- 
-would sequentially call, within the C<escape()> delegation method:
- 
-  $self->{$FLYWHEEL}->engage(...);
-  $self->{$SMOKESCReen}->release(...);
-
-=head2 traits => HASHREF
-
-A reference to a hash where the keys are names of TraitLib packages, and the values are hashrefs that
-specify which attributes and methods are being borrowed form the TraitLib e.g. 
-
-        traits => {
-            traitlib1 => {
-                methods    => [qw/some methods/],
-                attributes => [qw/some attributes/],
-            },
-            ...
-        },
-
-Any attributes and/or routines defined in the specified traitlibs will be added to the implementation subject to the following rules 
-
-=over 
-
-=item Implementation trumps TraitLibs
-
-An attribute/routine defined in a traitlib won't get added to the implementation if the implementation already has an attribute/routine with the same name.
-
-=item Conflicts not allowed
-
-An exception will be raised if the same attribute/routine would be provided by two traitlibs.
-
-=back
-
-L<Mic::TraitLib> describes how traitlibs are configured.
-
-=head2 semiprivate => ARRAYREF
-
-These are perhaps only useful when used in conjunction with TraitLibs. They work the same way as in L<Mic::TraitLib>.
 
 =head1 PRIVATE ROUTINES
 
 An implementation package will typically contain subroutines that are for internal use in the package and therefore ought not to be declared in the interface.
-These won't be callable using the C<$minion-E<gt>command(...)> syntax.
+These won't be callable using the C<$object-E<gt>command(...)> syntax.
 
 As an example, suppose we want to print an informational message whenever the Set's C<has> or C<add> methods are called. A first cut may look like:
 
@@ -369,37 +202,36 @@ But this duplication of code is not good, so we factor it out:
         warn sprintf "[%s] I have %d element(s)\n", scalar(localtime), $self->size;
     }
 
-Notice how the C<log_info> routine is called as a regular sub rather than as a method.
+Notice how the C<log_info> routine is called as a regular subroutine rather than as a method.
 
 Here is a transcript of using this object via L<reply|https://metacpan.org/pod/distribution/Reply/bin/reply>
 
     5:51% reply -I t/lib
     0> use Example::Construction::Set_v1
-    1> my $set = Example::Construction::Set_v1->new
+    1> my $set = Example::Construction::Set_v1::->new
     $res[0] = bless( {
-            '1f5f6ad9-' => 'Example::Construction::Set_v1::__Private',
-            '1f5f6ad9-set' => {}
-        }, 'Example::Construction::Set_v1::__Mic' )
-
+             '9bc09ac8-SET' => {}
+           }, 'Example::Construction::Acme::Set_v1::__Assembled' )
+    
     2> $set->can
     $res[1] = [
-    'add',
-    'has',
-    'size'
+      'add',
+      'has',
+      'size'
     ]
-
+    
     3> $set->add(1)
-    [Sat Jan 10 17:52:35 2015] I have 0 element(s)
+    [Thu Aug 10 16:16:15 2017] I have 0 element(s)
     $res[2] = 1
-
+    
     4> $set->add(1)
-    [Sat Jan 10 17:57:03 2015] I have 1 element(s)
+    [Thu Aug 10 16:16:36 2017] I have 1 element(s)
     $res[3] = 2
-
+    
     5> $set->log_info()
-    Can't locate object method "log_info" via package "Example::Construction::Set_v1::__Mic" at reply input line 1.
-    6> 
-
+    Can't locate object method "log_info" via package "Example::Construction::Acme::Set_v1::__Assembled" at reply input line 1.
+    6>
+    
 =head1 OBJECT COMPOSITION
 
 Composition allows us to create new objects incorporating the functionality of existing ones.
@@ -424,72 +256,70 @@ As an example, consider a queue which we would use like this:
     is $q->size => 1;
     done_testing();
 
-Now suppose we need a queue which maintains a fixed size by evicting the oldest items:
+Now suppose we need a queue which maintains a fixed maximum size by evicting the oldest items:
 
     use strict;
     use Test::More;
-    use Example::Delegates::FixedSizeQueue;
+	use Example::Delegates::BoundedQueue;
 
-    my $q = Example::Delegates::FixedSizeQueue->new(max_size => 3);
+	my $q = Example::Delegates::BoundedQueue::->new({max_size => 3});
 
-    $q->push($_) for 1 .. 3;
-    is $q->size => 3;
+	$q->push($_) for 1 .. 3;
+	is $q->size => 3;
 
-    $q->push($_) for 4 .. 6;
-    is $q->size => 3;
-    is $q->pop => 4;
-    done_testing();
+	$q->push($_) for 4 .. 6;
+	is $q->size => 3;
+	is $q->pop => 4;
+	done_testing();
 
 Here is the interface for this fixed size queue
 
-    package Example::Delegates::FixedSizeQueue;
+	package Example::Delegates::BoundedQueue;
 
-    use Mic
-        interface => [qw( push pop size )],
+	use Mic::Class
+		interface => { 
+			object => {
+				push => {},
+				pop  => {},
+				size => {},
+			},
+			class => { new => {} }
+		},
 
-        constructor => {
-            kv_args => {
-                max_size => { 
-                    callbacks => { positive_int => sub { $_[0] =~ /^\d+$/ && $_[0] > 0 } }, 
-                },
-            }
-        },
+		implementation => 'Example::Delegates::Acme::BoundedQueue_v1',
+	;
 
-        implementation => 'Example::Delegates::Acme::FixedSizeQueue_v1',
-    ;
-
-    1;
+	1;
 
 And it is implemented like this
 
-    package Example::Delegates::Acme::FixedSizeQueue_v1;
+	package Example::Delegates::Acme::BoundedQueue_v1;
 
-    use Example::Delegates::Queue;
+	use Example::Delegates::Queue;
 
-    use Mic::Implementation
-        has  => {
-            q => {
-                default => sub { Example::Delegates::Queue->new },
+	use Mic::Implementation
+		has  => {
+			Q => { 
+				default => sub { Example::Delegates::Queue::->new },
+				handles => [qw( size pop )],
+			},
 
-                handles => [qw( size pop )],
-            },
+			MAX_SIZE => { 
+				init_arg => 'max_size',
+			},
+		}, 
+	;
 
-            max_size => {
-                init_arg => 'max_size',
-            },
-        },
-    ;
+	sub push {
+		my ($self, $val) = @_;
 
-    sub push {
-        my ($self, $val) = @_;
+		$self->{$Q}->push($val);
 
-        $self->{$Q}->push($val);
+		if ($self->size > $self->{$MAX_SIZE}) {
+			$self->pop;        
+		}
+	}
 
-        if ($self->size > $self->{$MAX_SIZE}) {
-            $self->pop;
-        }
-    }
+	1;
 
-    1;
-
-The fixed size queue is composed out of the regular queue, which handles the C<size> and C<pop> methods.
+The bounded queue is composed out of the regular queue, which handles the C<size> and C<pop> methods.
