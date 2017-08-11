@@ -2,7 +2,7 @@ package Example::Construction::Acme::CounterWithNew;
 
 use Mic::Impl
     has  => {
-        COUNT => { init_arg => 'start' },
+        COUNT => { },
     }, 
     classmethod => ['new'],
 ;
