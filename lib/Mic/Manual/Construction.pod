@@ -1,6 +1,8 @@
 =head1 The Default constructor
 
-The Default constructor supports twp forms of usage described below. 
+Classes created using Mic are provided with a generated constructor.
+
+This default constructor supports two forms of usage described below.
 
 =head2 Keyword Parameters
 
@@ -22,7 +24,7 @@ The class and implementation:
     package Example::Construction::Counter;
 
     use Mic::Class
-        interface => { 
+        interface => {
             object => {
                 next => {},
             },
@@ -38,7 +40,7 @@ The class and implementation:
     use Mic::Impl
         has  => {
             COUNT => { init_arg => 'start' },
-        }, 
+        },
     ;
 
     sub next {
@@ -49,7 +51,7 @@ The class and implementation:
 
     1;
 
-Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration. 
+Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration.
 
 =head2 Positional parameters
 
@@ -73,7 +75,7 @@ This can be acheieved using the BUILD special method.
 
     use Mic::Class
 
-        interface => { 
+        interface => {
             object => {
                 add => {},
                 has => {},
@@ -92,10 +94,10 @@ In the implementation, we convert the argument array to a hash
     package Example::Construction::Acme::Set_v2;
 
     use Mic::ArrayImpl
-        has => { 
-            SET => { 
+        has => {
+            SET => {
                 default => sub { {} },
-            } 
+            }
         },
     ;
 
@@ -133,7 +135,7 @@ will receive the newly created object and either a hashref of named parameters o
 This is useful for carrying out any post-construction logic e.g. object validation.
 
 It can also be used to process constructor arguments, e.g. the counter implementation
-above can also be written using BUILD instead of init_arg (though init_arg 
+above can also be written using BUILD instead of init_arg (though init_arg
 is preferable due to being more concise).
 
     package Example::Construction::Acme::Counter_v2;
@@ -141,7 +143,7 @@ is preferable due to being more concise).
     use Mic::Implementation
         has  => {
             COUNT => { },
-        }, 
+        },
     ;
 
     sub BUILD {
@@ -165,7 +167,7 @@ If the default constructor is not flexible enough and you need to write your own
 =head2 Builders
 
 Each class has a corresponding Builder. Within a class method, the Builder
-is obtained by calling the C<builder_for> routine (see example below). 
+is obtained by calling the C<builder_for> routine (see example below).
 
 A builder has the following construction related methods
 
@@ -188,7 +190,7 @@ We'll rewrite the counter example above providing a C<new> method:
     use Mic::Impl
         has  => {
             COUNT => { },
-        }, 
+        },
         classmethod => ['new'],
     ;
 
