@@ -215,26 +215,26 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     $res[0] = bless( {
              '9bc09ac8-SET' => {}
            }, 'Example::Construction::Acme::Set_v1::__Assembled' )
-    
+
     2> $set->can
     $res[1] = [
       'add',
       'has',
       'size'
     ]
-    
+
     3> $set->add(1)
     [Thu Aug 10 16:16:15 2017] I have 0 element(s)
     $res[2] = 1
-    
+
     4> $set->add(1)
     [Thu Aug 10 16:16:36 2017] I have 1 element(s)
     $res[3] = 2
-    
+
     5> $set->log_info()
     Can't locate object method "log_info" via package "Example::Construction::Acme::Set_v1::__Assembled" at reply input line 1.
     6>
-    
+
 =head1 OBJECT COMPOSITION
 
 Composition allows us to create new objects incorporating the functionality of existing ones.
@@ -263,66 +263,66 @@ Now suppose we need a queue which maintains a fixed maximum size by evicting the
 
     use strict;
     use Test::More;
-	use Example::Delegates::BoundedQueue;
+    use Example::Delegates::BoundedQueue;
 
-	my $q = Example::Delegates::BoundedQueue::->new({max_size => 3});
+    my $q = Example::Delegates::BoundedQueue::->new({max_size => 3});
 
-	$q->push($_) for 1 .. 3;
-	is $q->size => 3;
+    $q->push($_) for 1 .. 3;
+    is $q->size => 3;
 
-	$q->push($_) for 4 .. 6;
-	is $q->size => 3;
-	is $q->pop => 4;
-	done_testing();
+    $q->push($_) for 4 .. 6;
+    is $q->size => 3;
+    is $q->pop => 4;
+    done_testing();
 
 Here is the interface for this fixed size queue
 
-	package Example::Delegates::BoundedQueue;
+    package Example::Delegates::BoundedQueue;
 
-	use Mic::Class
-		interface => { 
-			object => {
-				push => {},
-				pop  => {},
-				size => {},
-			},
-			class => { new => {} }
-		},
+    use Mic::Class
+        interface => {
+            object => {
+                push => {},
+                pop  => {},
+                size => {},
+            },
+            class => { new => {} }
+        },
 
-		implementation => 'Example::Delegates::Acme::BoundedQueue_v1',
-	;
+        implementation => 'Example::Delegates::Acme::BoundedQueue_v1',
+    ;
 
-	1;
+    1;
 
 And it is implemented like this
 
-	package Example::Delegates::Acme::BoundedQueue_v1;
+    package Example::Delegates::Acme::BoundedQueue_v1;
 
-	use Example::Delegates::Queue;
+    use Example::Delegates::Queue;
 
-	use Mic::Implementation
-		has  => {
-			Q => { 
-				default => sub { Example::Delegates::Queue::->new },
-				handles => [qw( size pop )],
-			},
+    use Mic::Implementation
+        has  => {
+            Q => {
+                default => sub { Example::Delegates::Queue::->new },
+                handles => [qw( size pop )],
+            },
 
-			MAX_SIZE => { 
-				init_arg => 'max_size',
-			},
-		}, 
-	;
+            MAX_SIZE => {
+                init_arg => 'max_size',
+            },
+        },
+    ;
 
-	sub push {
-		my ($self, $val) = @_;
+    sub push {
+        my ($self, $val) = @_;
 
-		$self->{$Q}->push($val);
+        $self->{$Q}->push($val);
 
-		if ($self->size > $self->{$MAX_SIZE}) {
-			$self->pop;        
-		}
-	}
+        if ($self->size > $self->{$MAX_SIZE}) {
+            $self->pop;
+        }
+    }
 
-	1;
+    1;
 
 The bounded queue is composed out of the regular queue, which handles the C<size> and C<pop> methods.
