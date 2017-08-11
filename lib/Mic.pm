@@ -223,15 +223,6 @@ where in the words of Alan Kay (who coined the term "Object Oriented Programming
 and "OOP to me means only messaging, local retention and protection and hiding of state-process, and extreme late-binding of all things."
 (see L<The Deep Insights of Alan Kay|http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/>).
 
-=head1 RATIONALE
-
-Due to Perl's low level "assembly required" approach to OOP, there are many CPAN modules that exist to automate this assembly,
-perhaps the most popular being the L<Moose> family. Although Moo(se) is very effective at simplifying class building, this is typically achieved at the
-expense of L<Encapsulation|https://en.wikipedia.org/wiki/Information_hiding> (because Moose encourages the exposure of all an object's attributes via methods), and this in turn encourages
-designs that are tightly L<coupled|https://en.wikipedia.org/wiki/Coupling_(computer_programming)>.
-
-Mic takes some inspriation from Moose's declaratve approach to simplifying OO automation, but also aims to put abstraction and loose coupling on the path of least resistance.
-
 =head1 USAGE
 
 =head2 Mic->setup_class(HASHREF)
