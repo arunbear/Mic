@@ -1,62 +1,61 @@
 =head1 The Default constructor
 
-The Default constructor will accept any named parameters defined by 'constructor/kv_args'. In the absence of such configuration,
-any parameters passed to the default constructor are ignored.
+The Default constructor supports twp forms of usage described below. 
+
+=head2 Keyword Parameters
+
+For objects constructed using keyword parameters, the constructor should be passed a hashref containing the the keyword parameters.
 
 Imagine a counter that starts from a user supplied value, so we can use it this way
 
     use Test::More tests => 3;
     use Example::Construction::Counter;
 
-    my $counter = Example::Construction::Counter->new(start => 10);
+    my $counter = Example::Construction::Counter->new({start => 10});
 
     is $counter->next => 10;
     is $counter->next => 11;
     is $counter->next => 12;
 
-To make this work, we use 'construct/kv_args' to define the constructor parameter
-representing the starting value.
+The class and implementation:
 
     package Example::Construction::Counter;
 
-    use Mic
-        interface => [ qw( next ) ],
-
-        constructor => { 
-            kv_args => {
-                start => {
-                    callbacks => {
-                        is_integer => sub { $_[0] =~ /^\d+$/ }
-                    },
-                },
-            }
+    use Mic::Class
+        interface => { 
+            object => {
+                next => {},
+            },
+            class => { new => {} }
         },
+
         implementation => 'Example::Construction::Acme::Counter';
 
     1;
 
     package Example::Construction::Acme::Counter;
 
-    use Mic::Implementation
+    use Mic::Impl
         has  => {
-            count => { init_arg => 'start' },
+            COUNT => { init_arg => 'start' },
         }, 
     ;
 
     sub next {
         my ($self) = @_;
 
-        $self->{$COUNT}++;
+        $self->[ $COUNT ]++;
     }
 
     1;
 
-Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration. We also used an assert declaration
-to constrain the value of the 'start' parameter.
+Here the 'count' attribute is bound to the 'start' constructor parameter using the init_arg declaration. 
 
 =head2 Positional parameters
 
-Sometimes, we'd like our constructor to take positional parameters. Consider a set object that we'd create by passing a list of items.
+For objects constructed using positional parameters, the constructor should be passed a list of positional parameters. These parameters will be passed to the BUILD special method (described in the next section) as an array ref.
+
+As an example, consider a set object that we'd create by passing a list of items.
 
     use Test::More tests => 3;
     use Example::Construction::Set_v1;
@@ -68,50 +67,59 @@ Sometimes, we'd like our constructor to take positional parameters. Consider a s
     $set->add(5);
     ok $set->has(5);
 
-This can be acheieved using the "build_args" declaration, with which we use a sub to wrap the argument array in a hash. This sub is itself wrapped around the default constructor, so that the positional arguments given by a user are passed to the constructor in the keyword style it expects.
+This can be acheieved using the BUILD special method.
 
-    package Example::Construction::Set_v1;
+    package Example::Construction::Set_v2;
 
-    use Mic
-        interface => [qw( add has )],
+    use Mic::Class
 
-        constructor => { kv_args => { items => {} } },
-
-        build_args => sub {
-            my ($class, @items) = @_;
-
-            return { items => \@items };
+        interface => { 
+            object => {
+                add => {},
+                has => {},
+                size => {},
+            },
+            class => { new => {} }
         },
 
-        implementation => 'Example::Construction::Acme::Set_v1',
+        implementation => 'Example::Construction::Acme::Set_v2',
     ;
 
     1;
 
 In the implementation, we convert the argument array to a hash
 
-    package Example::Construction::Acme::Set_v1;
+    package Example::Construction::Acme::Set_v2;
 
-    use Mic::Implementation
+    use Mic::ArrayImpl
         has => { 
-            set => { 
+            SET => { 
                 default => sub { {} },
-                init_arg => 'items',
-                map_init_arg => sub { return { map { $_ => 1 } @{ $_[0] } } },
             } 
         },
     ;
 
+    sub BUILD {
+        my ($self, $args) = @_;
+
+        $self->[$SET] = { map { $_ => 1 } @{ $args } };
+    }
+
     sub has {
         my ($self, $e) = @_;
 
-        exists $self->{$SET}{$e};
+        exists $self->[$SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
 
-        ++$self->{$SET}{$e};
+        ++$self->[$SET]{$e};
+    }
+
+    sub size {
+        my ($self) = @_;
+        scalar(keys %{ $self->[$SET] });
     }
 
     1;
@@ -120,136 +128,84 @@ In the implementation, we convert the argument array to a hash
 =head2 BUILD
 
 If this subroutine is defined, it will be called by the default constructor and
-will receive (as its 2nd and 3rd arguments) the object and a hashref of named parameters that were passed to the constructor.
+will receive the newly created object and either a hashref of named parameters or an arrayref of positional parameters depending on whether the constructor was passed a hashref or list respectiively.
 
 This is useful for carrying out any post-construction logic e.g. object validation.
 
-BUILD can be used for validating the relation between attributes
-
-    package My::Game::Implementation;
-
-    sub BUILD {
-        my (undef, $self) = @_;
-
-        $self->{$TEAM1} != $self->{$TEAM2}
-          or confess "Teams must be different";
-
-        $self->{$TEAM1}->number_of_players 
-          == 
-        $self->{$TEAM2}->number_of_players
-          or confess "Teams must have the same number of players";
-    }
-
-    ...
-
 It can also be used to process constructor arguments, e.g. the counter implementation
 above can also be written using BUILD instead of init_arg (though init_arg 
-is preferable due being more concise).
+is preferable due to being more concise).
 
     package Example::Construction::Acme::Counter_v2;
 
     use Mic::Implementation
         has  => {
-            count => { },
+            COUNT => { },
         }, 
     ;
 
     sub BUILD {
-        my (undef, $self, $arg) = @_;
+        my ($self, $arg) = @_;
 
         $self->{$COUNT} = $arg->{start};
     }
 
-    ...
+    sub next {
+        my ($self) = @_;
+
+        $self->{$COUNT}++;
+    }
+
+    1;
 
 =head1 Writing your own constructor
 
-If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of the Builder class.
+If the default constructor is not flexible enough and you need to write your own constructor, this can be done with the aid of builders.
 
-=head2 The Builder class
+=head2 Builders
 
-Each class has a corresponding Builder class. Within a class method, the Builder class
+Each class has a corresponding Builder. Within a class method, the Builder
 is obtained by calling the C<builder_for> routine (see example below). 
 
-The Builder class has the following construction related methods
+A builder has the following construction related methods
 
-=head3 new_object
+=head3 new_object([HASHREF])
 
 This creates a new instance, in which attributes with declared defaults are populated with those defaults,
-and all others are populated with undef.
+and all others are populated with undef. A hashref can also be supplied, in which case it is used to populate the attributes.
 
 =head3 build
 
-This can be used in a class method to invoke the semiprivate BUILD routine for an object after the object
+This can be used in a class method to invoke the BUILD method for an object after the object
 is created.
-
-=head3 assert
-
-Given the name of a declared attribute and a value, this routine validates the value using any assertions
-declared with the attribute.
 
 =head2 Examples
 
-We'll rewrite the counter example above and also show the more manual way of using Mic
+We'll rewrite the counter example above providing a C<new> method:
 
-    package Example::Construction::Counter_v2;
+    package Example::Construction::Acme::CounterWithNew;
 
-    use strict;
-    use Mic ();
+    use Mic::Impl
+        has  => {
+            COUNT => { },
+        }, 
+        classmethod => ['new'],
+    ;
 
-    our %__meta__ = (
-        interface => [ qw( next ) ],
+    sub next {
+        my ($self) = @_;
 
-        constructor => { 
-            kv_args => {
-                start => {
-                    callbacks => {
-                        is_integer => sub { $_[0] =~ /^\d+$/ }
-                    },
-                },
-            }
-        },
-        implementation => 'Example::Construction::Acme::Counter',
-    );
+        $self->[ $COUNT ]++;
+    }
 
     sub new {
         my ($class, $start) = @_;
 
         my $builder = Mic::builder_for($class);
-        $builder->assert(start => $start);
-        my $obj = $builder->new_object({count => $start});
+        my $obj = $builder->new_object({COUNT => $start});
         return $obj;
-    }
-
-    Mic->assemble;
-
-This can be simplified using the 'class_methods' declaration
-
-    package Example::Construction::Counter_v3;
-
-    use Mic
-        interface => [ qw( next ) ],
-
-        constructor => { 
-            kv_args => {
-                start => {
-                    callbacks => {
-                        is_integer => sub { $_[0] =~ /^\d+$/ }
-                    },
-                },
-            }
-        },
-        class_methods => {
-            new => sub {
-                my ($class, $start) = @_;
-
-                my $builder = Mic::builder_for($class);
-                $builder->assert(start => $start);
-                my $obj = $builder->new_object({count => $start});
-                return $obj;
-            },
-        },
-
-        implementation => 'Example::Construction::Acme::Counter';
+    };
 
     1;
+
+Note that C<new> must be tagged as a 'classmethod' for this to work.

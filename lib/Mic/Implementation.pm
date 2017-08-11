@@ -153,6 +153,9 @@ This must be a string which defines the name of a generated writer (or mutator) 
 
 Writers should only be created if they are needed by end users of the class.
 
+=head2 classmethod => ARRAYREF
+
+A list of methods that are intended to be called via the class (package), rather than via an object. See L<Mic::Manual::Construction> for an example.
 
 =head1 PRIVATE ROUTINES
 
