@@ -1,10 +1,10 @@
 {
-   "abstract" : "Simplifies the creation of loosely coupled object oriented code.",
+   "abstract" : "Messages, Interfaces and Contracts.",
    "author" : [
       "Arun Prasaad <arunbear@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Minions",
+   "name" : "Mic",
    "no_index" : {
       "directory" : [
          "t",
@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Exception::Class" : "1.38",
+            "Class::Method::Modifiers" : "2.12",
+            "Hash::Merge" : "0.2",
             "List::MoreUtils" : "0.33",
             "Package::Stash" : "0.36",
             "Params::Validate" : "1.10",
@@ -62,17 +63,18 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/arunbear/Minions/issues"
+         "web" : "https://github.com/arunbear/Mic/issues"
       },
-      "homepage" : "https://github.com/arunbear/Minions",
+      "homepage" : "https://github.com/arunbear/Mic",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/arunbear/Minions.git",
-         "web" : "https://github.com/arunbear/Minions"
+         "url" : "git://github.com/arunbear/Mic.git",
+         "web" : "https://github.com/arunbear/Mic"
       }
    },
-   "version" : "1.000000",
+   "version" : "0.000003",
    "x_contributors" : [
       "Arun Prasaad <arunbear@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }
