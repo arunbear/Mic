@@ -43,7 +43,6 @@ sub assemble {
     validate(@args, {
         interface => { type => HASHREF | SCALAR },
         implementation => { type => SCALAR },
-        constructor    => { type => HASHREF, optional => 1 },
         name => { type => SCALAR, optional => 1 },
     });
     return $assembler->assemble;
