@@ -119,7 +119,16 @@ sub _interface {
         classmethod => [  ],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
-        $spec->{interface_meta} = $spec->{$type};
+        $spec->{interface_meta} = $spec->{$type}; do {
+            my @args = %{ $spec->{$type} };
+            validate(@args, {
+                object     => { type => HASHREF },
+                class      => { type => HASHREF },
+                extends    => { type => ARRAYREF, optional => 1 },
+                invariant  => { type => HASHREF, optional => 1 },
+            });
+            $spec->{$type};
+        };
         $spec->{$type} = [ keys %{ $spec->{$type}{object} } ];
         $Mic::Spec_for{ $spec->{name} }{interface} = $spec->{interface_meta};
     }
