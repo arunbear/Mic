@@ -211,6 +211,7 @@ sub _add_methods {
 
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
+        _validate_slot_def($meta);
         if ( !  $spec->{implementation}{methods}{$name}
              && $meta->{reader}
              && $in_interface->{ $meta->{reader} } ) {
@@ -256,6 +257,16 @@ sub _add_methods {
         _add_post_conditions($spec, $stash, $name, 'object');
     }
     _add_invariants($spec, $stash);
+}
+
+sub _validate_slot_def {
+    validate(@_, {
+        default  => { type => SCALAR   | CODEREF, optional => 1 },
+        handles  => { type => ARRAYREF | HASHREF, optional => 1 },
+        init_arg => { type => SCALAR, optional => 1 },
+        reader   => { type => SCALAR, optional => 1 },
+        writer   => { type => SCALAR, optional => 1 },
+    });
 }
 
 sub _add_invariants {
