@@ -49,6 +49,7 @@ sub assemble {
 }
 
 *setup_class = \&assemble;
+*define_class = \&assemble;
 
 sub builder_for {
     my ($class) = @_;
@@ -224,9 +225,9 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 
 =head1 USAGE
 
-=head2 Mic->setup_class(HASHREF)
+=head2 Mic->define_class(HASHREF)
 
-In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the C<setup_class()> class method, with a hashref that
+In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the C<define_class()> class method, with a hashref that
 specifies the class.
 
 The class defined in the SYNOPSIS could also be defined like this
@@ -235,7 +236,7 @@ The class defined in the SYNOPSIS could also be defined like this
 
     use Mic;
 
-    Mic->setup_class({
+    Mic->define_class({
         interface => { 
             object => {
                 add => {},
