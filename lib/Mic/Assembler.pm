@@ -119,7 +119,7 @@ sub _interface {
         classmethod => [  ],
     );
     if ( $type eq 'interface' && ref $spec->{$type} eq 'HASH') {
-        $spec->{interface_meta} = $spec->{$type}; do {
+        $spec->{interface_meta} = do {
             my @args = %{ $spec->{$type} };
             validate(@args, {
                 object     => { type => HASHREF },
