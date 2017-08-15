@@ -58,7 +58,6 @@ sub assemble {
         has     => {
             %{ $meta->{has} || { } },
         },
-        forwards => $meta->{forwards},
         arrayimp => $meta->{arrayimp},
         slot_offset => $meta->{slot_offset},
     };
