@@ -301,6 +301,7 @@ sub _add_pre_conditions {
 
     return unless $Mic::Contracts_for{ $spec->{name} }{pre};
 
+    _validate_contract_def($spec->{interface_meta}{$type}{$name});
     my $pre_cond_hash = $spec->{interface_meta}{$type}{$name}{require}
       or return;
 
@@ -319,6 +320,7 @@ sub _add_post_conditions {
 
     return unless $Mic::Contracts_for{ $spec->{name} }{post};
 
+    _validate_contract_def($spec->{interface_meta}{$type}{$name});
     my $post_cond_hash = $spec->{interface_meta}{$type}{$name}{ensure}
       or return;
 
@@ -350,6 +352,13 @@ sub _add_post_conditions {
         return wantarray ? @$results : $results->[0];
     };
     install_modifier($stash->name, 'around', $name, $guard);
+}
+
+sub _validate_contract_def {
+    validate(@_, {
+        ensure   => { type => HASHREF, optional => 1 },
+        require  => { type => HASHREF, optional => 1 },
+    });
 }
 
 sub _make_builder_class {
