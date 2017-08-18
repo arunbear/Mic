@@ -228,6 +228,21 @@ sub _add_methods {
         }
 
         if ( !  $spec->{implementation}{methods}{$name}
+             && $meta->{property}
+             && $in_interface->{ $meta->{property} } ) {
+
+            my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
+            $spec->{implementation}{methods}{ $meta->{property} } = sub : lvalue {
+                my ($self) = @_;
+
+                if ( reftype $self eq 'HASH' ) {
+                    return $self->{$obfu_name};
+                }
+                return $self->[ $spec->{implementation}{slot_offset}{$name} ];
+            };
+        }
+
+        if ( !  $spec->{implementation}{methods}{$name}
              && $meta->{writer}
              && $in_interface->{ $meta->{writer} } ) {
 
@@ -264,6 +279,7 @@ sub _validate_slot_def {
         default  => { type => SCALAR   | CODEREF, optional => 1 },
         handles  => { type => ARRAYREF | HASHREF, optional => 1 },
         init_arg => { type => SCALAR, optional => 1 },
+        property => { type => SCALAR, optional => 1 },
         reader   => { type => SCALAR, optional => 1 },
         writer   => { type => SCALAR, optional => 1 },
     });
