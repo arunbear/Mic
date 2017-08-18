@@ -246,7 +246,6 @@ sub _add_methods {
              && $meta->{writer}
              && $in_interface->{ $meta->{writer} } ) {
 
-            my $obfu_pkg = Mic::_Guts::obfu_name('', $spec);
             $spec->{implementation}{methods}{ $meta->{writer} } = sub {
                 my ($self, $new_val) = @_;
 
