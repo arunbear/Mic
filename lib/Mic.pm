@@ -6,7 +6,7 @@ use Carp;
 use Params::Validate qw(:all);
 use Mic::Assembler;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
