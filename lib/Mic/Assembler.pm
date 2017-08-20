@@ -231,6 +231,8 @@ sub _add_methods {
              && $meta->{property}
              && $in_interface->{ $meta->{property} } ) {
 
+            confess "'property' can only be used from Perl 5.16 onwards"
+              if $] lt '5.016';
             my $obfu_name = Mic::_Guts::obfu_name($name, $spec);
             $spec->{implementation}{methods}{ $meta->{property} } = sub : lvalue {
                 my ($self) = @_;
