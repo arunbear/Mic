@@ -2,6 +2,9 @@ Revision history for Minions
 
 {{$NEXT}}
 
+0.000005 2017-08-20T17:02:07Z
+        - Fix for failing test with Perl < 5.16
+
 0.000004 2017-08-19T21:08:54Z
         - Add define_class() as alias for setup_class()
         - Add more spec validations.
