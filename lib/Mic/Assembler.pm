@@ -122,7 +122,7 @@ sub _interface {
             validate(@args, {
                 object     => { type => HASHREF },
                 class      => { type => HASHREF },
-                extends    => { type => ARRAYREF, optional => 1 },
+                extends    => { type => SCALAR | ARRAYREF, optional => 1 },
                 invariant  => { type => HASHREF, optional => 1 },
             });
             $spec->{$type};
@@ -158,7 +158,7 @@ sub _merge_interfaces {
     my ($spec, $interfaces, $from_interface) = @_;
 
     if ( ! $interfaces ) {
-        $interfaces = $spec->{interface}{extends} || [];
+        $interfaces = to_aref($spec->{interface}{extends});
     }
 
     $from_interface ||= {};
@@ -171,8 +171,15 @@ sub _merge_interfaces {
           or confess "Could not find interface '$super'";
         merge($spec->{interface}, $declared_interface, $from_interface);
         $spec->{does}{$super} = 1;
-        _merge_interfaces($spec, $declared_interface->{extends} || [], $from_interface);
+        _merge_interfaces($spec, to_aref($declared_interface->{extends}), $from_interface);
     }
+}
+
+sub to_aref {
+    my ($x) = @_;
+
+    return [] unless defined $x;
+    return ref $x eq 'ARRAY' ? $x : [$x];
 }
 
 sub merge {
