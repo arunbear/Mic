@@ -4,7 +4,6 @@ use strict;
 use Class::Method::Modifiers qw(install_modifier);
 use Carp;
 use Hash::Util qw( lock_keys );
-use Hash::Merge qw( merge );
 use List::MoreUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
@@ -156,14 +155,40 @@ sub _prep_interface {
 }
 
 sub _merge_interfaces {
-    my ($spec) = @_;
+    my ($spec, $interfaces, $from_interface) = @_;
 
-    foreach my $super (@{ $spec->{interface}{extends} || [] }) {
+    if ( ! $interfaces ) {
+        $interfaces = $spec->{interface}{extends} || [];
+    }
+
+    $from_interface ||= {};
+
+    foreach my $super (@{ $interfaces }) {
+        $super eq $spec->{name}
+          and confess "$spec->{name} cannot extend itself";
         require_module($super);
         my $declared_interface = $Mic::Spec_for{ $super }{interface}
           or confess "Could not find interface '$super'";
-        $spec->{interface} = merge($spec->{interface}, $declared_interface);
+        merge($spec->{interface}, $declared_interface, $from_interface);
         $spec->{does}{$super} = 1;
+        _merge_interfaces($spec, $declared_interface->{extends} || [], $from_interface);
+    }
+}
+
+sub merge {
+    my ($h1, $h2, $from) = @_;
+
+    foreach my $k (keys %{ $h2 }) {
+        if (exists $h1->{$k}) {
+            if (   ref $h1->{$k} eq 'HASH'
+                && ref $h2->{$k} eq 'HASH'
+            ) {
+                merge($h1->{$k}, $h2->{$k}, $from);
+            }
+        }
+        else {
+            $h1->{$k} = $h2->{$k};
+        }
     }
 }
 
