@@ -299,9 +299,9 @@ Specifies the names of each class method that the class can respond to, as well 
 
 See L<Mic::Contracts> for more details about invariants.
 
-=head4 extends => ARRAYREF
+=head4 extends => STRING | ARRAYREF
 
-Specifies the names of one or more super-interfaces. This means the interface will include any methods from the super-interfaces that aren't declared locally. This is how Mic supports interface inheritance.
+Specifies the names of one or more super-interfaces. This means the interface will include any methods from the super-interfaces that aren't declared locally.
 
 =head3 implementation => STRING
 
