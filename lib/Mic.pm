@@ -92,20 +92,20 @@ Mic - Messages, Interfaces and Contracts.
 
     package Example::Synopsis::ArraySet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { [] } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        scalar grep { $_ == $e } @{ $self->{$SET} };
+        scalar grep { $_ == $e } @{ $self->[SET] };
     }
 
     sub add {
         my ($self, $e) = @_;
 
         if ( ! $self->has($e) ) {
-            push @{ $self->{$SET} }, $e;
+            push @{ $self->[SET] }, $e;
         }
     }
 
@@ -128,18 +128,18 @@ Mic - Messages, Interfaces and Contracts.
 
     package Example::Synopsis::HashSet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        ++$self->[SET]{$e};
     }
 
     1;
