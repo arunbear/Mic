@@ -42,6 +42,10 @@ sub add_sym {
         sprintf('$%s', uc $slot),
         \ $sym_val
     );
+    $stash->add_symbol(
+        sprintf('&%s', uc $slot),
+        sub () { $sym_val }
+    );
 }
 
 1;
