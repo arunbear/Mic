@@ -244,7 +244,7 @@ sub _add_methods {
     while ( my ($name, $meta) = each %{ $spec->{implementation}{has} } ) {
 
         _validate_slot_def($meta);
-        if ( !  $spec->{implementation}{methods}{$name}
+        if ( !  $spec->{implementation}{methods}{ $meta->{reader} }
              && $meta->{reader}
              && $in_interface->{ $meta->{reader} } ) {
 
@@ -259,7 +259,7 @@ sub _add_methods {
             };
         }
 
-        if ( !  $spec->{implementation}{methods}{$name}
+        if ( !  $spec->{implementation}{methods}{ $meta->{property} }
              && $meta->{property}
              && $in_interface->{ $meta->{property} } ) {
 
@@ -276,7 +276,7 @@ sub _add_methods {
             };
         }
 
-        if ( !  $spec->{implementation}{methods}{$name}
+        if ( !  $spec->{implementation}{methods}{ $meta->{writer} }
              && $meta->{writer}
              && $in_interface->{ $meta->{writer} } ) {
 
