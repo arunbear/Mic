@@ -39,6 +39,7 @@ sub assemble {
         $spec = $assembler->load_spec_from($caller_pkg);
     }
 
+    _check_imp_aliases($spec);
     my @args = %$spec;
     validate(@args, {
         interface => { type => HASHREF | SCALAR },
@@ -46,6 +47,19 @@ sub assemble {
         name => { type => SCALAR, optional => 1 },
     });
     return $assembler->assemble;
+}
+
+sub _check_imp_aliases {
+    my ($spec) = @_;
+    
+    my @imp_aliases = qw[via impl];
+    foreach my $k (@imp_aliases) {
+        if (! exists $spec->{implementation} && exists $spec->{$k}) {
+            $spec->{implementation} = $spec->{$k};
+            delete @{$spec}{ @imp_aliases };
+            last;
+        }
+    }
 }
 
 *setup_class = \&assemble;
@@ -241,7 +255,7 @@ The class defined in the SYNOPSIS could also be defined like this
             class => { new => {} }
         },
 
-        implementation => 'Example::Usage::HashSet',
+        via => 'Example::Usage::HashSet',
     });
 
     package Example::Usage::HashSet;
@@ -304,6 +318,14 @@ Specifies the names of one or more super-interfaces. This means the interface wi
 The name of a package that defines the subroutines declared in the interface.
 
 L<Mic::Impl> describes how implementations are configured.
+
+=head3 impl => STRING
+
+An alias of "implementation" above.
+
+=head3 via => STRING
+
+An alias of "implementation" above.
 
 =head1 Interface Sharing
 

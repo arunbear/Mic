@@ -11,7 +11,7 @@ Mic->define_class({
         class => { new => {} }
     },
 
-    implementation => 'Example::Usage::HashSet',
+    via => 'Example::Usage::HashSet',
 });
 
 package Example::Usage::HashSet;
