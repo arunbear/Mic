@@ -144,9 +144,9 @@ Here is a transcript of using this object via L<reply|https://metacpan.org/pod/d
     5:51% reply -I t/lib
     0> use Example::Construction::Set_v1
     1> my $set = Example::Construction::Set_v1::->new
-    $res[0] = bless( {
-             '9bc09ac8-SET' => {}
-           }, 'Example::Construction::Acme::Set_v1::__Assembled' )
+    $res[0] = bless( [
+         {}
+       ], 'Example::Construction::Acme::Set_v1::__Assembled' )
 
     2> $set->can
     $res[1] = [
