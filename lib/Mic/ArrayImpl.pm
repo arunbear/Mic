@@ -15,13 +15,7 @@ sub add_attribute_syms {
     my ($class, $arg, $stash) = @_;
 
     my @slots = (
-        '__', # semiprivate pkg
         keys %{ $arg->{has} },
-        ( map {
-            @{ $arg->{traits}{$_}{attributes} || []  }
-          }
-          keys %{ $arg->{traits} }
-        ),
     );
     my %seen_attr;
     foreach my $i ( 0 .. $#slots ) {
