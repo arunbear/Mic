@@ -206,10 +206,6 @@ Encourages self documenting code.
 
 Encourages robustness via Eiffel style L<contracts|Mic::Contracts>.
 
-=item *
-
-Supports hash and array based objects.
-
 =back
 
 
@@ -250,18 +246,18 @@ The class defined in the SYNOPSIS could also be defined like this
 
     package Example::Usage::HashSet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        ++$self->[SET]{$e};
     }
 
     1;
