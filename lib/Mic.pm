@@ -303,7 +303,7 @@ Specifies the names of one or more super-interfaces. This means the interface wi
 
 The name of a package that defines the subroutines declared in the interface.
 
-L<Mic::Implementation> and L<Mic::ArrayImpl> describe how implementations are configured.
+L<Mic::Impl> describes how implementations are configured.
 
 =head1 Interface Sharing
 
