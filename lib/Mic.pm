@@ -79,7 +79,7 @@ __END__
 
 =head1 NAME
 
-Mic - Messages, Interfaces and Contracts.
+Mic - Simplified OOP with emphasis on modularity and loose coupling.
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ This is an early release available for testing and feedback and as such is subje
 
 =head1 DESCRIPTION
 
-Mic is an OOP automation framework with the following features:
+Mic (Messages, Interfaces and Contracts) is a framework for simplifying the coding of OOP modules, with the following features:
 
 =over
 
