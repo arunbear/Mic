@@ -26,11 +26,9 @@ sub define {
     my $caller_pkg = delete $arg{-caller} || (caller)[0];
     my $stash = Package::Stash->new($caller_pkg);
 
-    $class->update_args(\%arg);
     $class->add_attribute_syms(\%arg, $stash);
 
     $stash->add_symbol('%__meta__', \%arg);
-    $class->install_subs($stash);
 }
 
 sub add_attribute_syms {
@@ -38,38 +36,26 @@ sub add_attribute_syms {
 
     my @slots = (
         keys %{ $arg->{has} },
-        '', # semiprivate pkg
     );
-    foreach my $slot ( @slots ) {
-        $class->add_obfu_name($arg, $stash, $slot);
+    my %seen_attr;
+    foreach my $i ( 0 .. $#slots ) {
+        next if exists $seen_attr{ $slots[$i] };
+
+        $seen_attr{ $slots[$i] }++;
+        $class->add_sym($arg, $stash, $slots[$i], $i);
     }
 }
 
-sub add_obfu_name {
-    my ($class, $arg, $stash, $slot) = @_;
+sub add_sym {
+    my ($class, $arg, $stash, $slot, $sym_val) = @_;
 
-    Readonly my $sym_val => sprintf(
-        "%s-$slot",
-       Mic::_Guts::attribute_sym($arg->{version}),
-    );
-    $Mic::_Guts::obfu_name{$slot} = $sym_val;
+    $arg->{slot_offset}{$slot} = $sym_val;
 
-    my $prefix = '';
-    if($slot eq '') {
-        $prefix = '__';
-    }
-    else {
-        $slot = uc $slot;
-    }
     $stash->add_symbol(
-        sprintf('$%s%s', $prefix, $slot),
-        \ $sym_val
+        sprintf('&%s', uc $slot),
+        sub () { $sym_val }
     );
 }
-
-sub update_args {}
-
-sub install_subs {}
 
 1;
 
@@ -85,25 +71,18 @@ Hash based implementations are now deprecated. This module will provide the same
 
 =head1 SYNOPSIS
 
-    package Example::Construction::Acme::Set_v1;
+    package Example::Construction::Acme::Counter;
 
     use Mic::Implementation
-        has => {
-            SET => {
-                default => sub { {} },
-                init_arg => 'items',
-            }
-        },
+        has  => {
+            COUNT => { init_arg => 'start' },
+        }, 
     ;
 
-    sub has {
-        my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
-    }
+    sub next {
+        my ($self) = @_;
 
-    sub add {
-        my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        $self->[COUNT]++;
     }
 
     1;
@@ -122,9 +101,9 @@ A implementation package is configured using Mic::Implementation and providing a
 This declares attributes (or instance variables) of the implementation, mapping the name of an attribute to a hash with keys described in
 the following sub sections.
 
-An attribute called "FOO" can be accessed via it's object using the symbol C<$FOO> which is created by Mic::Implementation:
+An attribute called "FOO" can be accessed via it's object using the symbol C<FOO> which is created by Mic::Impl
 
-    $self->{$FOO}
+    $self->[FOO]
 
 =head3 default => SCALAR | CODEREF
 
