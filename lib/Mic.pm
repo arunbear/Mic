@@ -218,7 +218,7 @@ Encourages self documenting code.
 
 =item *
 
-Encourages robustness via Eiffel style L<contracts|Mic::Contracts>.
+Simplifies code verification via Eiffel style L<contracts|Mic::Contracts>.
 
 =back
 
