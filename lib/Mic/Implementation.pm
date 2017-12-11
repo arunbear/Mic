@@ -4,7 +4,6 @@ use strict;
 use Mic::_Guts;
 use Package::Stash;
 use Params::Validate qw(:all);
-use Readonly;
 
 sub import {
     my $class = shift;
