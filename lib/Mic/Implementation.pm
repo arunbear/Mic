@@ -1,7 +1,6 @@
 package Mic::Implementation;
 
 use strict;
-use Mic::_Guts;
 use Package::Stash;
 use Params::Validate qw(:all);
 

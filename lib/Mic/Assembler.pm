@@ -10,8 +10,6 @@ use Package::Stash;
 use Storable qw( dclone );
 use Sub::Name;
 
-use Mic::_Guts;
-
 sub new {
     my ($class, %arg) = @_;
 
@@ -575,7 +573,6 @@ sub _object_maker {
     my $stash = Package::Stash->new($class);
 
     my $spec = $stash->get_symbol('%__meta__');
-    my $pkg_key = Mic::_Guts::obfu_name('', $spec);
     my $obj = [ ];
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
@@ -589,8 +586,6 @@ sub _object_maker {
     }
 
     bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
-    $Mic::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
-
     return $obj;
 }
 
