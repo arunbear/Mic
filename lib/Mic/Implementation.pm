@@ -51,7 +51,7 @@ sub add_sym {
     $arg->{slot_offset}{$slot} = $sym_val;
 
     $stash->add_symbol(
-        sprintf('&%s', uc $slot),
+        sprintf('&%s', $slot),
         sub () { $sym_val }
     );
 }
