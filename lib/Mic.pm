@@ -15,6 +15,10 @@ our %Contracts_for;
 our %Spec_for;
 our %Util_class;
 
+sub import {
+    strict->import();
+}
+
 sub load_class {
     my ($class, $spec) = @_;
 
