@@ -87,7 +87,7 @@ Mic - Simplified OOP with emphasis on modularity and loose coupling.
 
 =head1 SYNOPSIS
 
-    # A simple Set class:
+    # The evolution of a simple Set class:
 
     package Example::Synopsis::Set;
 
