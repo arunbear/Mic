@@ -287,6 +287,7 @@ sub _add_methods {
     foreach my $name ( @{ $spec->{interface} } ) {
         _add_pre_conditions($spec, $stash, $name, 'object');
         _add_post_conditions($spec, $stash, $name, 'object');
+        _add_overloads($spec, $stash, $name, 'object');
     }
     _add_invariants($spec, $stash);
 }
@@ -385,6 +386,19 @@ sub _add_post_conditions {
         return wantarray ? @$results : $results->[0];
     };
     install_modifier($stash->name, 'around', $name, $guard);
+}
+
+sub _add_overloads {
+    my ($spec, $stash, $name, $type) = @_;
+
+    my $overload_type = $spec->{interface_meta}{$type}{$name}{overloads}
+      or return;
+
+    my $overload = "package ${ \ $stash->name };";
+    $overload .= " use overload '$overload_type' => \\&$name;";
+
+    eval $overload;
+    confess "Failed: [$overload]" if $@;
 }
 
 sub _validate_contract_def {
