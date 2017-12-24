@@ -244,7 +244,7 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the C<define_class()> class method, with a hashref that
 specifies the class.
 
-The class defined in the SYNOPSIS could also be defined like this
+The class defined in the SYNOPSIS could also be defined like this (in one file)
 
     package Example::Usage::Set;
 
