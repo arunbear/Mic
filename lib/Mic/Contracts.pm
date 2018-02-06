@@ -112,6 +112,28 @@ The following example illustrates the use of contracts, which are assertions tha
 
     1;
 
+The contract constrains the behaviour of its implementation in various ways:
+
+=over
+
+=item *
+
+The precondition on C<new> requires that its argument is a positive integer.
+
+=item *
+
+The postconditions on C<push> ensure that the queue size increases by one after a push, and that the newly pushed item is at the back of the queue.
+
+=item *
+
+The postcondition on C<pop> ensures that a popped item was previously at the front of the queue.
+
+=item *
+
+The invariant ensures that the queue never exceeds its maximum size.
+
+=back
+
 =head1 Types of Contracts
 
 =head2 Preconditions (require)
