@@ -341,7 +341,7 @@ sub _add_pre_conditions {
         foreach my $desc (keys %{ $pre_cond_hash }) {
             my $sub = $pre_cond_hash->{$desc};
             $sub->(@_)
-              or confess "Method '$name' failed precondition '$desc'";
+              or confess "Precondition '$desc' on '$name', is not satisfied";
         }
     };
     install_modifier($stash->name, 'before', $name, $guard);
