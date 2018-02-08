@@ -3,12 +3,15 @@ package Mic::Assembler;
 use strict;
 use Class::Method::Modifiers qw(install_modifier);
 use Carp;
+use Config::Tiny;
 use List::MoreUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
 use Package::Stash;
 use Storable qw( dclone );
 use Sub::Name;
+
+use Mic::ContractConfig;
 
 sub new {
     my ($class, %arg) = @_;
@@ -65,6 +68,7 @@ sub assemble {
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
+    $self->_check_contract_config;
     _add_methods($spec, $obj_stash);
     _make_builder_class($spec);
     _add_class_methods($spec, $cls_stash);
@@ -203,6 +207,20 @@ sub _check_interface {
         ++$count;
     }
     $count > 0 or confess "Cannot have an empty interface.";
+}
+
+sub _check_contract_config {
+    my ($self) = @_;
+
+    return if $self->{config_file_read};
+
+    my $config_file = $ENV{MIC_CONTRACTS}
+      or return;
+
+    my $config = Config::Tiny->read($config_file);
+    Mic::ContractConfig::configure($config);
+
+    $self->{config_file_read} = 1;
 }
 
 sub _add_methods {
