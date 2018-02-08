@@ -174,6 +174,8 @@ was violated.
 
 Contracts are not run by default, because they can result in many additional subroutine calls.
 
+=head2 Via Code
+
 To enable them, use L<Mic::Contracts>, e.g. to activate contracts
 for the Example::Contracts::BoundedQueue class, the following can be done:
 
@@ -192,6 +194,46 @@ turns on postconditions only.
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { invariant => 1 };
 
 turns on invariants only.
+
+=head2 Via Configuration file
+
+Alternatively, contracts can be controlled more dynamically by setting the environment variable C<MIC_CONTRACTS> to the name of a .ini file. 
+
+For example, given the file my.contracts.ini with the following content
+
+    [Example::Contracts::BoundedQueue]
+    invariant = on
+    pre = off
+
+and by setting C<MIC_CONTRACTS>
+
+    export MIC_CONTRACTS=/path/to/my.contracts.ini
+
+Then invariant checking will be turned on for Example::Contracts::BoundedQueue.
+
+The format of the file is simple: one section per Class/Interface. Then within each section the keys are contract types
+
+=over
+
+=item pre
+
+Preconditions
+
+=item post
+
+Postconditions
+
+=item invariant
+
+Invariants
+
+=item all
+
+All contract types
+
+=back
+
+The values are interpreted as booleans, with 0, 'off' and 'false' being considered false (and anything else considered true).
 
 =head1 See Also
 
