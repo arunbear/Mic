@@ -1,15 +1,11 @@
 package Mic::Contracts;
 use strict;
+use Mic::ContractConfig;
 
 sub import {
     my (undef, %contract_for) = @_;
 
-    foreach my $class ( keys %contract_for ) {
-        $Mic::Contracts_for{$class} = $contract_for{$class};
-        if ( $Mic::Contracts_for{$class}{all} ) {
-            $Mic::Contracts_for{$class} = { map { $_ => 1 } qw/pre post invariant/ };
-        }
-    }
+    Mic::ContractConfig::configure(\ %contract_for);
     strict->import();
 }
 
