@@ -1,7 +1,6 @@
 use strict;
 use Test::Lib;
 use Test::Most;
-use Mic::Contracts 'Example::Contracts::BoundedQueue' => { pre => 1 };
 use Example::Contracts::BoundedQueue;
 
 my $q = Example::Contracts::BoundedQueue::->new({max_size => 3});

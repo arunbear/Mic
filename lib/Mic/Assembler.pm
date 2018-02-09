@@ -349,7 +349,10 @@ sub _add_invariants {
 sub _add_pre_conditions {
     my ($spec, $stash, $name, $type) = @_;
 
-    return unless $Mic::Contracts_for{ $spec->{name} }{pre};
+    if (defined $Mic::Contracts_for{ $spec->{name} }{pre}
+        && ! $Mic::Contracts_for{ $spec->{name} }{pre}) {
+        return;
+    }
 
     _validate_contract_def($spec->{interface_meta}{$type}{$name});
     my $pre_cond_hash = $spec->{interface_meta}{$type}{$name}{require}
