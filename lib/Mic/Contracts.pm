@@ -22,13 +22,15 @@ Mic::Contracts
     # example.pl
 
     use Mic::Contracts
-        'Foo' => { all => 1 }, # all contracts are run
-        'Bar' => { pre => 1 }, # only preconditions are run
+        'Foo' => { all  => 1 }, # all contracts are run
+        'Bar' => { post => 1 }, # postconditions (and preconditions) are run
+        'Baz' => { pre  => 0 }; # all contracts are skipped
 
     use Foo;
     use Bar;
+    use Baz;
 
-    # do stuff with Foo and Bar
+    # do stuff with Foo, Bar and Baz
 
 =head1 DESCRIPTION
 
