@@ -172,28 +172,28 @@ was violated.
 
 =head1 Enabling Contracts
 
-Contracts are not run by default, because they can result in many additional subroutine calls.
+Postconditions and invariants are not run by default, because they can result in many additional subroutine calls.
 
 =head2 Via Code
 
-To enable them, use L<Mic::Contracts>, e.g. to activate contracts
+To enable them, use L<Mic::Contracts>, e.g. to activate all contract types
 for the Example::Contracts::BoundedQueue class, the following can be done:
 
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { all => 1 };
 
-This turns on preconditions, postconditions and invariants.
-
-    use Mic::Contracts 'Example::Contracts::BoundedQueue' => { pre => 1 };
-
-turns on preconditions only.
+This turns on preconditions, postconditions and invariants. Whereas
 
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { post => 1 };
 
-turns on postconditions only.
+turns on postconditions (and preconditions). And
 
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { invariant => 1 };
 
-turns on invariants only.
+turns on invariants (and preconditions).
+
+Any defined preconditions will be run unless they are deactivated, which can be done with:
+
+    use Mic::Contracts 'Example::Contracts::BoundedQueue' => { pre => 0 };
 
 =head2 Via Configuration file
 
