@@ -43,6 +43,7 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "2.12",
+            "Config::Tiny" : "2.23",
             "List::MoreUtils" : "0.33",
             "Module::Runtime" : "0.014",
             "Package::Stash" : "0.36",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/arunbear/Mic"
       }
    },
-   "version" : "0.001003",
+   "version" : "0.001004",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "arunbear <arunbear@gmail.com>"
